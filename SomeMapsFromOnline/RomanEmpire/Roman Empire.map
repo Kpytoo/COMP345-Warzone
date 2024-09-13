@@ -1,0 +1,53 @@
+[Map]
+image=Roman Empire.bmp
+wrap=no
+scroll=horizontal
+author=Maxime Gousse
+
+[Continents]
+Iberia=4
+Gaul=3
+Britania=2
+Germania=3
+Italia=4
+Africa=2
+Illyricum=5
+Greece=6
+
+[Territories]
+Tarraconensis, 158, 429, Iberia, Aquitania, Narbonensis, Balearic Islands, Baetica, Lusitania
+Lusitania, 66, 442, Iberia, Tarraconensis, Baetica
+Baetica, 92, 498, Iberia, Lusitania, Tarraconensis, Mauretania
+Balearic Islands, 251, 469, Iberia, Tarraconensis, Mauretania, Sardinia
+
+Lugdunensis, 231, 254, Gaul, Belgica, Upper Germania, Narbonensis, Aquitania
+Aquitania, 224, 323, Gaul, Lugdunensis, Narbonensis, Tarraconensis
+Narbonensis, 284, 360, Gaul, Lugdunensis, Upper Germania, Augusta, Corsica, Tarraconensis, Aquitania
+
+Lower Germania, 297, 191, Germania, Belgica
+Upper Germania, 310, 284, Germania, Belgica, Raetia, Augusta, Narbonensis, Lugdunensis
+Belgica, 284, 231, Germania, Lower Germania, Upper Germania, Lugdunensis, Lower Britania
+
+Upper Britania, 165, 158, Britania, Lower Britania
+Lower Britania, 205, 149, Britania, Upper Britania, Belgica
+
+Augusta, 409, 380, Italia, Raetia, Noricum, Pannonia, Macedonia, Sicilia, Corsica, Narbonensis, Upper Germania
+Corsica, 360, 403, Italia, Augusta, Sardinia, Narbonensis
+Sardinia, 363, 455, Italia, Corsica, Sicilia, Balearic Islands
+Sicilia, 465, 505, Italia, Augusta, Numidia, Sardinia
+
+Mauretania, 172, 571, Africa, Baetica, Balearic Islands, Numidia
+Numidia, 353, 554, Africa, Sicilia, Mauretania
+
+Raetia, 373, 277, Illyricum, Noricum, Augusta, Upper Germania
+Noricum, 429, 271, Illyricum, Pannonia, Augusta, Raetia
+Pannonia, 472, 290, Illyricum, Danube, Dalmatia, Augusta, Noricum
+Danube, 512, 307, Illyricum, Upper Moesia, Dalmatia, Pannonia
+Dalmatia, 528, 350, Illyricum, Danube, Upper Moesia, Macedonia, Pannonia
+
+Upper Moesia, 594, 366, Greece, Lower Moesia, Thrace, Macedonia, Dalmatia, Danube
+Lower Moesia, 673, 370, Greece, Thrace, Upper Moesia
+Thrace, 670, 409, Greece, Lower Moesia, Macedonia, Upper Moesia
+Macedonia, 597, 426, Greece, Upper Moesia, Thrace, Achaia, Epirus, Augusta, Dalmatia
+Epirus, 578, 462, Greece, Macedonia, Achaia
+Achaia, 604, 505, Greece, Macedonia, Epirus

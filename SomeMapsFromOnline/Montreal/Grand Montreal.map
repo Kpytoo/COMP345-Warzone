@@ -1,0 +1,161 @@
+[Map]
+author=Maxime Gousse
+warn=yes
+image=Grand Montreal.bmp
+wrap=no
+scroll=horizontal
+
+[Continents]
+Nord Ouest=13
+Nord Est=13
+Ouest-Laval=10
+Est-Laval=8
+West-Island=9
+Centre Ville=9
+Montreal Est=10
+Vaudreuil Soulange=12
+Roussillon=11
+Champlain=11
+Richelieu=10
+Monteregie=12
+
+[Territories]
+Genda, 40, 90, Nord Ouest, St-Colomban, Gordonville
+St-Colomban, 140, 120, Nord Ouest, Genda, St-Jerome, Mirabel, Gordonville
+Mirabel, 250, 200, Nord Ouest, St-Colomban, St-Antoine Du Nord, Blainville, Ste-Therese, Boisbriand, Montee St-Charles, Belle Riviere, Gordonville
+Gordonville, 100, 210, Nord Ouest, St-Colomban, Mirabel, Montee St-Charles, Genda
+Montee St-Charles, 150, 300, Nord Ouest, Gordonville, St-Placide, Oka, St-Joseph Du Lac, Deux Montagnes, St-Eustache, Belle Riviere, Mirabel
+Ste-Therese, 380, 240, Nord Ouest, Mirabel, Boisbriand, Rosemere, Blainville, Ste-Rose
+Boisbriand, 360, 270, Nord Ouest, Ste-Therese, Mirabel, Belle Riviere
+Belle Riviere, 330, 300, Nord Ouest, Boisbriand, Mirabel, Montee St-Charles, St-Eustache, Deux Montagnes, Laval Ouest
+St-Eustache, 280, 320, Nord Ouest, Deux Montagnes, Ste-Marthe Sur Le Lac, Belle Riviere, St-Joseph Du Lac, Montee St-Charles
+Deux Montagnes, 320, 350, Nord Ouest, Belle Riviere, St-Eustache, Ste-Marthe Sur Le Lac, Montee St-Charles
+Ste-Marthe Sur Le Lac, 295, 365, Nord Ouest, Deux Montagnes, St-Eustache, St-Joseph Du Lac
+St-Joseph Du Lac, 240, 370, Nord Ouest, Ste-Marthe Sur Le Lac, St-Eustache, Montee St-Charles, Oka
+Oka, 170, 410, Nord Ouest, St-Joseph Du Lac, Montee St-Charles, St-Placide, Hudson
+St-Placide, 80, 350, Nord Ouest, Oka, Montee St-Charles
+
+St-Jerome, 220, 50, Nord Est, St-Colomban, St-Antoine Du Nord
+St-Antoine Du Nord, 300, 120, Nord Est, St-Jerome, Mirabel, Ste-Anne Des Plaines, Blainville
+Blainville, 360, 180, Nord Est, St-Antoine Du Nord, Mirabel, Ste-Therese, Rosemere, Lorraine, Terrebonne, Ste-Anne Des Plaines
+Rosemere, 410, 230, Nord Est, Blainville, Ste-Therese, Auteuil, Lorraine
+Lorraine, 425, 200, Nord Est, Rosemere, Blainville, Terrebonne, St-Vincent De Paul
+Terrebonne, 470, 160, Nord Est, Lorraine, Lachenaie, Mascouche, La Plaine, Ste-Anne Des Plaines, Blainville
+Lachenaie, 610, 150, Nord Est, Terrebonne, Mascouche, Le Gardeur, Repentigny, St-Francois
+Le Gardeur, 665, 70, Nord Est, Mascouche, Lachenaie, Repentigny
+Repentigny, 720, 60, Nord Est, Lachenaie, Le Gardeur
+Mascouche, 560, 90, Nord Est, Lachenaie, Le Gardeur, La Plaine, Terrebonne
+La Plaine, 460, 65, Nord Est, Mascouche, Terrebonne, Ste-Anne Des Plaines
+Ste-Anne Des Plaines, 370, 90, Nord Est, La Plaine, Terrebonne, Blainville, St-Antoine Du Nord
+
+Laval Sur Le Lac, 355, 365, Ouest-Laval, Ste-Dorothee, Laval Ouest, Ile Bizard
+Laval Ouest, 370, 340, Ouest-Laval, Laval Sur Le Lac, Ste-Dorothee, Fabreville, Belle Riviere
+Fabreville, 410, 325, Ouest-Laval, Laval Ouest, Ste-Dorothee, Chomedey, Ste-Rose, St-Martin
+Ste-Dorothee, 395, 365, Ouest-Laval, Laval Sur Le Lac, Laval Ouest, Roxboro, Fabreville, Chomedey
+Roxboro, 425, 375, Ouest-Laval, Ste-Dorothee, Chomedey, St-Laurent
+Chomedey, 435, 360, Ouest-Laval, Roxboro, Ste-Dorothee, Fabreville, Laval Des Rapides, St-Martin
+Ste-Rose, 415, 285, Ouest-Laval, Fabreville, St-Martin, Auteuil, Ste-Therese
+St-Martin, 440, 310, Ouest-Laval, Ste-Rose, Fabreville, Chomedey, Laval Des Rapides, Montmorency, La Belle, Auteuil
+Laval Des Rapides, 455, 345, Ouest-Laval, Chomedey, St-Martin, Montmorency
+Montmorency, 470, 335, Ouest-Laval, St-Martin, Laval Des Rapides, Concorde, La Belle
+
+Auteuil, 445, 255, Est-Laval, Ste-Rose, St-Martin, La Belle, Rosemere, St-Vincent De Paul
+La Belle, 470, 285, Est-Laval, Auteuil, St-Martin, Concorde, Pont Viau, Montmorency, St-Vincent De Paul
+Concorde, 495, 320, Est-Laval, La Belle, Montmorency, Ahuntsic, Pont Viau
+Pont Viau, 510, 280, Est-Laval, St-Vincent De Paul, La Belle, Concorde, Montreal Nord, Duvernay
+St-Vincent De Paul, 495, 210, Est-Laval, Auteuil, La Belle, Pont Viau, Duvernay, St-Francois, Lorraine
+Duvernay, 530, 250, Est-Laval, Pont Viau, Laval Du Moulin, St-Francois, St-Vincent De Paul
+Laval Du Moulin, 575, 205, Est-Laval, St-Francois, Duvernay
+St-Francois, 560, 190, Est-Laval, Laval Du Moulin, St-Vincent De Paul, Duvernay, Lachenaie
+
+Ile Bizard, 330, 405, West-Island, Laval Sur Le Lac, Pierrefonds
+Pierrefonds, 350, 435, West-Island, Ile Bizard, Dollard Des Ormeaux, Kirkland, Senneville
+Senneville, 295, 480, West-Island, Pierrefonds, Kirkland, Beaconsfield, Baie D'Urfe, Vaudreuil Dorion
+Baie D'Urfe, 305, 500, West-Island, Senneville, Ile Perrot, Beaconsfield
+Beaconsfield, 355, 480, West-Island, Baie D'Urfe, Pointe Claire, Kirkland, Senneville
+Kirkland, 350, 460, West-Island, Pierrefonds, Senneville, Beaconsfield, Pointe Claire, Dollard Des Ormeaux
+Pointe Claire, 400, 450, West-Island, Beaconsfield, Kirkland, Dorval, Dollard Des Ormeaux
+Dollard Des Ormeaux, 400, 415, West-Island, Pierrefonds, Kirkland, Pointe Claire, Dorval, St-Laurent
+Dorval, 450, 460, West-Island, Pointe Claire, Lachine, St-Laurent, Dollard Des Ormeaux
+
+St-Laurent, 470, 400, Centre Ville, Dorval, Lachine, Cote St-Luc, Mont Royal, Ahuntsic, Roxboro, Dollard Des Ormeaux
+Lachine, 500, 465, Centre Ville, St-Laurent, Dorval, La Salle, NDG CDN, Cote St-Luc
+Cote St-Luc, 520, 430, Centre Ville, St-Laurent, Lachine, NDG CDN, Mont Royal
+La Salle, 570, 470, Centre Ville, Lachine, Verdun, NDG CDN, Kahnawake
+Verdun, 605, 425, Centre Ville, La Salle, Brossard, Ville Marie, Westmount, NDG CDN
+Westmount, 560, 415, Centre Ville, NDG CDN, Verdun, Ville Marie
+NDG CDN, 550, 420, Centre Ville, Mont Royal, Cote St-Luc, Lachine, La Salle, Verdun, Westmount, Ville Marie, Outremont
+Mont Royal, 530, 370, Centre Ville, St-Laurent, Cote St-Luc, NDG CDN, Outremont, Rosemont, Ahuntsic
+Outremont, 565, 380, Centre Ville, Rosemont, Mont Royal, NDG CDN, Ville Marie, Plateau Mont Royal
+
+Ville Marie, 600, 390, Montreal Est, Outremont, NDG CDN, Westmount, Verdun, Longueuil, St-Lambert, Hochelaga, Plateau Mont Royal
+Plateau Mont Royal, 590, 360, Montreal Est, Ville Marie, Hochelaga, Rosemont, Outremont
+Rosemont, 560, 345, Montreal Est, Ahuntsic, Mont Royal, Outremont, Plateau Mont Royal, Hochelaga, St-Leonard
+Ahuntsic, 525, 340, Montreal Est, Concorde, St-Laurent, Mont Royal, Rosemont, St-Leonard, Montreal Nord
+Montreal Nord, 550, 280, Montreal Est, Ahuntsic, St-Leonard, Anjou, Pointe Aux Trembles, Pont Viau
+St-Leonard, 575, 290, Montreal Est, Montreal Nord, Ahuntsic, Rosemont, Hochelaga, Anjou
+Hochelaga, 625, 310, Montreal Est, St-Leonard, Rosemont, Plateau Mont Royal, Ville Marie, Maisonneuve, Anjou, Boucherville
+Anjou, 600, 255, Montreal Est, Pointe Aux Trembles, Montreal Nord, St-Leonard, Hochelaga, Maisonneuve
+Maisonneuve, 630, 245, Montreal Est, Pointe Aux Trembles, Anjou, Hochelaga
+Pointe Aux Trembles, 635, 210, Montreal Est, Montreal Nord, Anjou, Maisonneuve
+
+Rigaud, 50, 450, Vaudreuil Soulange, Hudson, St-Lazarre
+Hudson, 110, 450, Vaudreuil Soulange, Rigaud, St-Lazarre, Vaudreuil Dorion, Oka
+St-Lazarre, 120, 510, Vaudreuil Soulange, Rigaud, Hudson, Vaudreuil Dorion, St-Clet, Les Cedres
+St-Clet, 60, 570, Vaudreuil Soulange, St-Lazarre, Les Cedres, Coteau Du Lac
+Les Cedres, 180, 590, Vaudreuil Soulange, St-Lazarre, St-Clet, Coteau Du Lac, Vaudreuil Dorion
+Vaudreuil Dorion, 200, 530, Vaudreuil Soulange, Hudson, St-Lazarre, Les Cedres, Ile Perrot, Senneville
+Ile Perrot, 280, 550, Vaudreuil Soulange, Vaudreuil Dorion, Baie D'Urfe
+Coteau Du Lac, 70, 630, Vaudreuil Soulange, St-Clet, Les Cedres, Grande Ile, Coteau Station
+Coteau Station, 40, 680, Vaudreuil Soulange, Coteau Du Lac
+Grande Ile, 140, 660, Vaudreuil Soulange, Coteau Du Lac, Salaberry De Valleyfield, St-Timothee
+Salaberry De Valleyfield, 150, 700, Vaudreuil Soulange, Grande Ile, St-Timothee
+St-Timothee, 240, 660, Vaudreuil Soulange, Grande Ile, Salaberry De Valleyfield, Beauharnois
+
+St-Etienne, 320, 700, Roussillon, Beauharnois, St-Paul
+Beauharnois, 350, 650, Roussillon, St-Etienne, St-Paul, Chateauguay, St-Timothee
+St-Paul, 420, 680, Roussillon, St-Etienne, Beauharnois, Mercier, Chateauguay, St-Isidore
+Chateauguay, 425, 580, Roussillon, St-Paul, Mercier, St-Isidore, Kahnawake, Beauharnois
+Mercier, 460, 620, Roussillon, Chateauguay, St-Paul, St-Isidore
+St-Isidore, 500, 650, Roussillon, St-Paul, Mercier, Chateauguay, Kahnawake, St-Remi, St-Constant
+St-Remi, 550, 670, Roussillon, St-Isidore, St-Constant, St-Mathieu, St-Edouard
+St-Edouard, 630, 690, Roussillon, St-Remi, St-Mathieu, St-Jacques, St-Philippe
+Kahnawake, 520, 540, Roussillon, Chateauguay, St-Isidore, St-Constant, Ste-Catherine, La Salle
+Ste-Catherine, 600, 520, Roussillon, Kahnawake, St-Constant, Candiac
+St-Constant, 580, 580, Roussillon, Kahnawake, St-Isidore, St-Remi, St-Mathieu, Candiac, Ste-Catherine
+
+Candiac, 635, 540, Champlain, Ste-Catherine, St-Constant, St-Mathieu, St-Philippe, La Prairie
+La Prairie, 710, 520, Champlain, Candiac, St-Philippe, L'Acadie, St-Luc, Carignan, Brossard
+Brossard, 700, 460, Champlain, Verdun, La Prairie, Carignan, St-Hubert, Greenfield Park
+St-Hubert, 730, 410, Champlain, Brossard, Carignan, St-Bruno, Boucherville, Longueuil, Greenfield Park
+Greenfield Park, 665, 415, Champlain, Brossard, St-Hubert, Longueuil, St-Lambert
+St-Lambert, 645, 390, Champlain, Ville Marie, Greenfield Park, Longueuil
+Longueuil, 675, 350, Champlain, Ville Marie, St-Lambert, Greenfield Park, St-Hubert, Boucherville
+Boucherville, 725, 290, Champlain, Hochelaga, Longueuil, St-Hubert, St-Bruno, Ste-Julie, Varennes
+St-Mathieu, 625, 615, Champlain, Candiac, St-Constant, St-Remi, St-Edouard, St-Philippe
+St-Philippe, 700, 600, Champlain, Candiac, St-Mathieu, St-Edouard, St-Jacques, L'Acadie, La Prairie
+St-Jacques, 720, 650, Champlain, St-Philippe, St-Edouard, Napierville, L'Acadie
+
+L'Acadie, 790, 620, Richelieu, St-Philippe, St-Jacques, Napierville, La Prairie, St-Jacques, St-Luc, St-Jean Sur Richelieu
+Napierville, 790, 700, Richelieu, St-Jacques, St-Jean Sur Richelieu, L'Acadie, St-Jean Sur Richelieu
+St-Jean Sur Richelieu, 840, 650, Richelieu, St-Luc, L'Acadie, Napierville, Iberville
+St-Luc, 810, 550, Richelieu, L'Acadie, St-Jean Sur Richelieu, Chambly, Carignan, La Prairie
+Carignan, 785, 465, Richelieu, St-Luc, Chambly, St-Basile Le Grand, St-Bruno, St-Hubert, Brossard, La Prairie
+Chambly, 840, 490, Richelieu, St-Luc, Notre Dame De Bon Secours, Carignan
+Notre Dame De Bon Secours, 880, 505, Richelieu, Chambly, St-Mathias, Iberville
+Iberville, 890, 610, Richelieu, Notre Dame De Bon Secours, St-Jean Sur Richelieu
+St-Basile Le Grand, 850, 360, Richelieu, Carignan, Beloeil, McMasterville, Ste-Julie, St-Bruno
+St-Mathias, 885, 420, Richelieu, Notre Dame De Bon Secours, Mont St-Hilaire
+
+St-Marc Sur Richelieu, 880, 180, Monteregie, McMasterville, Beloeil, St-Antoine Sur Richelieu, Vercheres, St-Amable
+St-Bruno, 780, 370, Monteregie, St-Hubert, Carignan, St-Basile Le Grand, Ste-Julie, Boucherville
+Ste-Julie, 800, 280, Monteregie, Boucherville, St-Bruno, St-Basile Le Grand, McMasterville, St-Amable, Varennes
+McMasterville, 860, 280, Monteregie, Ste-Julie, St-Basile Le Grand, Beloeil, St-Marc Sur Richelieu, St-Amable
+Beloeil, 880, 310, Monteregie, McMasterville, St-Basile Le Grand, Mont St-Hilaire, St-Marc Sur Richelieu
+Mont St-Hilaire, 920, 330, Monteregie, Beloeil, St-Mathias, St-Denis
+St-Amable, 815, 210, Monteregie, Varennes, Ste-Julie, McMasterville, St-Marc Sur Richelieu, Vercheres
+Varennes, 745, 190, Monteregie, Boucherville, Ste-Julie, St-Amable, Vercheres
+Vercheres, 800, 110, Monteregie, Varennes, St-Amable, St-Marc Sur Richelieu, Contrecoeur, St-Antoine Sur Richelieu
+Contrecoeur, 855, 30, Monteregie, Vercheres, Vercheres, St-Antoine Sur Richelieu
+St-Antoine Sur Richelieu, 910, 40, Monteregie, Contrecoeur, Vercheres, St-Marc Sur Richelieu, St-Denis
+St-Denis, 930, 170, Monteregie, Mont St-Hilaire, St-Antoine Sur Richelieu, St-Denis
