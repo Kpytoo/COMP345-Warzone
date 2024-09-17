@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+
 #include "MapFiles/Map.h"
 
 class Player
@@ -11,7 +12,7 @@ class Player
 
 public:
     std::vector<Territory *> OwnedTerritories;
-    std::vector<Hand *> PlayerHand; // Need to implement deck and hand
+//    std::vector<Hand *> PlayerHand; // Need to implement deck and hand
 
     std::vector<Territory *> toDefend();
     std::vector<Territory *> toAttack();

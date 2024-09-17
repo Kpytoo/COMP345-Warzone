@@ -2,32 +2,55 @@
 #define MAP_H
 
 #include <iostream>
-#include <vector>
+#include <map>
 #include <string>
+
+class Territory
+{
+public:
+    std::string name;
+    int numberOfArmies;
+    int x, y;
+//    Player *owner; // need Player object
+    std::map<std::string, Territory *> adjacentTerritories;
+
+    std::string to_string();
+};
 
 class Continent
 {
 public:
-    const int bonusPoints;
-    Player *owner;
-    std::vector<Territory *> territories; // Territories that belong to this continent
-};
+    Continent();
 
-class Territory
-{
+    int bonusPoints;
+//    Player *owner;
+    std::map<std::string, Territory *> childTerritories; // Territories that belong to this continent
 
-public:
-    std::string name;
-    int numberOfArmies;
-    Player *owner;        // need Player object
-    Continent *continent; // Maybe do continent class? If not just an integer to associate territory to continent
-    std::vector<Territory *> adjacentTerritories;
+    std::string to_string();
 };
 
 class Map
 {
-
 public:
+    std::map<std::string, Continent *> continents;
+    std::map<std::string, Territory *> territories;
+
+    std::string to_string();
+};
+
+class MapLoader
+{
+public:
+    void LoadMap(std::string sFileName, Map* map);
+
+private:
+    bool ParseMapMetaData(std::ifstream& mapFile, Map* map);
+
+    void ParseContinents(std::ifstream& mapFile, Map* map);
+
+    void ParseTerritories(std::ifstream& mapFile, Map* map);
+
+    void PopulateAdjacentTerritories(Map* map);
 };
 
 #endif

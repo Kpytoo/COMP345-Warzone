@@ -1,25 +1,16 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <stdexcept>
-int testLoadMaps(std::string fname)
+#include "MapFiles/MapDriver.h"
+
+#include "MapFiles/Map.h"
+
+int testLoadMaps()
 {
-    try
-    {
-        std::ifstream MyFile(fname);
-        MyFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    MapLoader mapLoader;
 
-        if (!MyFile.is_open())
-        {
-            throw std::runtime_error("File could not be opened: " + fname);
-        }
-    }
+    Map map;
 
-    catch (const std::exception &e)
-    {
+    mapLoader.LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", &map);
 
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
+    std::cout << map.to_string();
 
     return 0;
 };

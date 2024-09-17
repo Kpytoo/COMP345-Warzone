@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "MapFiles/MapDriver.h"
+
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    testLoadMaps();
+
     return 0;
 }
