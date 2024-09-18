@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
+#include <unordered_set>
+#include <queue>
 
 #include "MapFiles/Map.h"
 
@@ -55,12 +57,36 @@ bool Map::Validate() {
     // 2) continents are connected subgraphs
     // 3) each country belongs to one and only one continent.
 
-    // For number 1, ensure that every continent has a connection to another continent through an adjacent territory.
-    // For number 2, validate that for every adjacent territory, they have the parent territory as a parent territory.
-    // For number 3, it should already be handled by the parser as it will not process (TODO: this needs to be properly validated and checked in the parser) any lines defining a territory that shares a name with already loaded territory.
+    // Step 1: Check if the entire map is a connected graph
+    if (!IsConnectedGraph(territories, territories)) {
+        std::cerr << "Map validation failed: The map is not a connected graph.\n";
+        return false;
+    }
 
+    // Step 2: Check if each continent is a connected subgraph
+    for (const auto& continentPair : continents) {
+        Continent* continent = continentPair.second;
+        if (!IsConnectedGraph(continent->childTerritories, continent->childTerritories)) {
+            std::cerr << "Map validation failed: Continent '" << continentPair.first
+                      << "' is not a connected subgraph.\n";
+            return false;
+        }
+    }
 
+    // Step 3: Ensure each territory belongs to one and only one continent
+    std::unordered_set<std::string> assignedTerritories;
+    for (const auto& continentPair : continents) {
+        for (const auto& territoryPair : continentPair.second->childTerritories) {
+            if (assignedTerritories.find(territoryPair.first) != assignedTerritories.end()) {
+                std::cerr << "Map validation failed: Territory '" << territoryPair.first
+                          << "' is assigned to multiple continents.\n";
+                return false;
+            }
+            assignedTerritories.insert(territoryPair.first);
+        }
+    }
 
+    std::cout << "Map validation successful.\n"; // TODO: display name of map here from metadata
     return true;
 }
 
@@ -82,6 +108,36 @@ Map::~Map() {
     for (auto& territory : territories) {
         delete territory.second; // Delete all territory instances that were dynamically allocated.
     }
+}
+
+bool Map::IsConnectedGraph(std::map<std::string, Territory *>& territories, const std::map<std::string, Territory *>& validTerritories) {
+    if (territories.empty()) return false;
+
+    std::unordered_set<std::string> visited;
+    std::queue<std::string> q;
+
+    // Start with any territory (first in the map)
+    auto it = territories.begin();
+    q.push(it->first);
+    visited.insert(it->first);
+
+    while (!q.empty()) {
+        std::string current = q.front();
+        q.pop();
+        Territory* currentTerritory = territories[current];
+
+        // Visit all adjacent territories that are part of the valid set (e.g., within the same continent)
+        for (const auto& adj : currentTerritory->adjacentTerritories) {
+            if (validTerritories.find(adj.first) != validTerritories.end() &&
+                visited.find(adj.first) == visited.end()) {
+                visited.insert(adj.first);
+                q.push(adj.first);
+            }
+        }
+    }
+
+    // If all territories were visited, the map is connected
+    return visited.size() == territories.size();
 }
 
 void MapLoader::LoadMap(std::string sFileName, Map* map) {

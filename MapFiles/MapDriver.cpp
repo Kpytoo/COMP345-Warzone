@@ -11,6 +11,8 @@ int testLoadMaps()
 //    mapLoader.LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", &map);
     mapLoader.LoadMap("../SomeMapsFromOnline/Aden/Aden.map", &map);
 
+    map.Validate();
+
     std::cout << map;
 
     return 0;

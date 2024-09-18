@@ -40,6 +40,9 @@ public:
     friend std::ostream & operator << (std::ostream &out,  Map &m);
 
     virtual ~Map();
+
+private:
+    static bool IsConnectedGraph(std::map<std::string, Territory *>& territories, const std::map<std::string, Territory *>& validTerritories);
 };
 
 class MapLoader
