@@ -7,11 +7,6 @@
 
 #include "MapFiles/Map.h"
 
-/*
- * TODO: Update driver code to test all maps including some invalid ones
- * TODO: Dump parsed data to files for examination
- */
-
 /**
  * Removes leading and trailing whitespace from a given string.
  *
