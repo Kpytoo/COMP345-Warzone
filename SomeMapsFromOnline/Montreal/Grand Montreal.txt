@@ -1,0 +1,12 @@
+Grand Montreal Read Me
+======================
+
+Welcome to my home twon :-). I am born and bread in Montreal, Quebec, Canada. I love Pocket Conquest and I love maps so I thought I had to do this map!
+
+OK, "Grand Montreal" is a large one (probably as big as my iPAQ will digest) but it's lot of fun, thanks to its geographical accuracy (well, almost) - in many ways it makes me think of the Conquest map of the USA. I tried to follow actual city lines and allow connection between islands and the main land only where actual bridges exist. You will also notice that "continent" scores are weighted according to the number of territories in it - you may want to downgrade this since when you own a continent you earn a lot of armies each time.
+
+Enjoy and send me your comments.
+
+Max
+
+maximegousse@hotmail.com
