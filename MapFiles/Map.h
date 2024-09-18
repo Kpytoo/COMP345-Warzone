@@ -14,7 +14,7 @@ public:
 //    Player *owner; // need Player object
     std::map<std::string, Territory *> adjacentTerritories;
 
-    std::string to_string();
+    friend std::ostream & operator << (std::ostream &out,  Territory &t);
 };
 
 class Continent
@@ -26,7 +26,7 @@ public:
 //    Player *owner;
     std::map<std::string, Territory *> childTerritories; // Territories that belong to this continent
 
-    std::string to_string();
+    friend std::ostream & operator << (std::ostream &out,  Continent &c);
 };
 
 class Map
@@ -35,7 +35,11 @@ public:
     std::map<std::string, Continent *> continents;
     std::map<std::string, Territory *> territories;
 
-    std::string to_string();
+    bool Validate();
+
+    friend std::ostream & operator << (std::ostream &out,  Map &m);
+
+    virtual ~Map();
 };
 
 class MapLoader

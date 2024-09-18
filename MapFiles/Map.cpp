@@ -5,6 +5,14 @@
 
 #include "MapFiles/Map.h"
 
+/*
+ * TODO: Add more proper error handling for parsing
+ * TODO: Update driver code to test all maps including some invalid ones
+ * TODO: Dump parsed data to files for examination
+ * TODO: Add doc comments to every function
+ * TODO: Limit number of adjacent territories to 10, total territories to 255 and continents to 32
+ */
+
 std::string trim_white(const std::string& str) {
     size_t start = 0;
     while (start < str.size() && std::isspace(str[start])) {
@@ -19,40 +27,61 @@ std::string trim_white(const std::string& str) {
     return str.substr(start, end - start);
 }
 
-std::string Territory::to_string() {
-    std::ostringstream ss;
-    ss << "\t\t\t\tAdjacent Territories:\n";
+std::ostream & operator << (std::ostream &out,  Territory &t) {
+    out << "\t\t\t\tAdjacent Territories:\n";
 
-    for (auto& territory : adjacentTerritories) {
-        ss << "\t\t\t\t\t" << territory.first << "\n";
+    for (auto& territory : t.adjacentTerritories) {
+        out << "\t\t\t\t\t" << territory.first << "\n";
     }
 
-    return ss.str();
+    return out;
 }
 
 Continent::Continent() {
 }
 
-std::string Continent::to_string() {
-    std::ostringstream ss;
-    ss << "\t\tTerritories:\n";
+std::ostream & operator << (std::ostream &out,  Continent &c) {
+    out << " (Bonus Points: " << c.bonusPoints << ")\n\t\tTerritories:\n";
 
-    for (auto& territory : childTerritories) {
-        ss << "\t\t\t" << territory.first << ":\n" << territory.second->to_string();
+    for (auto& territory : c.childTerritories) {
+        out << "\t\t\t" << territory.first << ":\n" << *territory.second;
     }
 
-    return ss.str();
+    return out;
 }
 
-std::string Map::to_string() {
-    std::ostringstream ss;
-    ss << "Continents:\n";
+bool Map::Validate() {
+    // 1) the map is a connected graph,
+    // 2) continents are connected subgraphs
+    // 3) each country belongs to one and only one continent.
 
-    for (auto& continent : continents) {
-        ss << "\t" << continent.first << ":\n" << continent.second->to_string();
+    // For number 1, ensure that every continent has a connection to another continent through an adjacent territory.
+    // For number 2, validate that for every adjacent territory, they have the parent territory as a parent territory.
+    // For number 3, it should already be handled by the parser as it will not process (TODO: this needs to be properly validated and checked in the parser) any lines defining a territory that shares a name with already loaded territory.
+
+
+
+    return true;
+}
+
+std::ostream & operator << (std::ostream &out,  Map &m) {
+    out << "Continents:\n";
+
+    for (auto& continent : m.continents) {
+        out << "\t" << continent.first << "" << *continent.second;
     }
 
-    return ss.str();
+    return out;
+}
+
+Map::~Map() {
+    for (auto& continent : continents) {
+        delete continent.second; // Delete all continent instances that were dynamically allocated.
+    }
+
+    for (auto& territory : territories) {
+        delete territory.second; // Delete all territory instances that were dynamically allocated.
+    }
 }
 
 void MapLoader::LoadMap(std::string sFileName, Map* map) {
@@ -68,7 +97,6 @@ void MapLoader::LoadMap(std::string sFileName, Map* map) {
         else
         {
             ParseContinents(mapFile, map);
-            mapFile.seekg(0, std::ios::beg);
             ParseTerritories(mapFile, map);
         }
     }
@@ -81,11 +109,12 @@ void MapLoader::LoadMap(std::string sFileName, Map* map) {
 }
 
 void MapLoader::ParseContinents(std::ifstream &mapFile, Map *map) {
+    mapFile.seekg(0, std::ios::beg);
 
     std::string line;
     bool inContinentsSection = false;
 
-    while (mapFile.peek()!=EOF) {
+    while (!mapFile.eof() && mapFile.peek() != EOF) {
         std::getline(mapFile, line);
 
         if (line == "[Continents]") {
@@ -93,8 +122,11 @@ void MapLoader::ParseContinents(std::ifstream &mapFile, Map *map) {
             continue;
         }
 
-        // Exit the section if it's empty or we encounter another section
-        if (line.empty() || line[0] == '[') {
+        if (line.empty()) {
+            continue;
+        }
+
+        if (line[0] == '[') {
             inContinentsSection = false;
             continue;
         }
@@ -121,10 +153,12 @@ void MapLoader::ParseContinents(std::ifstream &mapFile, Map *map) {
 }
 
 void MapLoader::ParseTerritories(std::ifstream &mapFile, Map *map) {
+    mapFile.seekg(0, std::ios::beg);
+
     std::string line;
     bool inTerritoriesSection = false;
 
-    while (mapFile.peek()!=EOF) {
+    while (!mapFile.eof() && mapFile.peek() != EOF) {
         std::getline(mapFile, line);
 
         if (line == "[Territories]") {
@@ -132,11 +166,12 @@ void MapLoader::ParseTerritories(std::ifstream &mapFile, Map *map) {
             continue;
         }
 
-        // Exit the section if it's empty or we encounter another section
         if (line.empty()) {
-            if (line[0] == '[') {
-                inTerritoriesSection = false;
-            }
+            continue;
+        }
+
+        if (line[0] == '[') {
+            inTerritoriesSection = false;
             continue;
         }
 
@@ -164,12 +199,12 @@ void MapLoader::ParseTerritories(std::ifstream &mapFile, Map *map) {
             std::getline(iss, token, ',');
             parentContinent = trim_white(token);
 
-            // Read the neighbors
+            // Read the adjacent territories
             while (std::getline(iss, token, ',')) {
                 token.erase(token.begin(), std::find_if(token.begin(), token.end(), [](unsigned char ch) {
                     return !std::isspace(ch);
                 }));
-                newTerritory->adjacentTerritories.insert({token, NULL});
+                newTerritory->adjacentTerritories.insert({token, NULL}); // Set null for now, only attempt to update pointers once all territories are parsed
             }
 
             map->continents.at(parentContinent)->childTerritories.insert({territoryName, newTerritory});

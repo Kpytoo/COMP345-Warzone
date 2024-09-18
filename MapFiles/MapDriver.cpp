@@ -8,9 +8,10 @@ int testLoadMaps()
 
     Map map;
 
-    mapLoader.LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", &map);
+//    mapLoader.LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", &map);
+    mapLoader.LoadMap("../SomeMapsFromOnline/Aden/Aden.map", &map);
 
-    std::cout << map.to_string();
+    std::cout << map;
 
     return 0;
 };
