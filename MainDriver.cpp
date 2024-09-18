@@ -2,6 +2,17 @@
 
 #include "MapFiles/MapDriver.h"
 
+/**
+ * @brief Main function that runs specified test cases based on command-line arguments.
+ *
+ * If no arguments are provided, it runs all available tests (currently just testLoadMaps).
+ * If specific test names are provided as arguments, it runs only those tests.
+ * Unknown test names result in an error message.
+ *
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line arguments.
+ * @return int Returns 0 if successful, otherwise returns an error code.
+ */
 int main(int argc, char* argv[]) {
     if (argc == 1) {
         std::cout << "No specific tests selected. Running all tests...\n";
