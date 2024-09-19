@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(${PROJECT_SOURCE_DIR})
 
 file(GLOB SOURCE_FILES
-        ${PROJECT_SOURCE_DIR}/main.cpp
+        ${PROJECT_SOURCE_DIR}/MainDriver.cpp
         ${PROJECT_SOURCE_DIR}/*/*.cpp
         ${PROJECT_SOURCE_DIR}/*/*.h)
 
