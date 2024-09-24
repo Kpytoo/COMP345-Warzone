@@ -23,7 +23,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
         worked on yet.
         */ 
         playingDeck.deckVector.push_back(*this); //Return the played card at the end of the deck
-        playingHand.handVector.pop_back();
+        playingHand.handVector.pop_back(); //Remove the card from the player's hand
     }
 }
 
@@ -179,53 +179,3 @@ std::ostream& operator<<(std::ostream& COUT, Hand& HAND)
         return COUT;
     }  
 }
-
-
-// int main(){
-
-//     //<<<<Testing the Card methods>>>>
-
-//     // Deck deck1;
-//     // Card card1;
-//     // deck1.deckVector.push_back(card1);
-//     // Card card2("Bomb");
-//     // deck1.deckVector.push_back(card2);
-//     // for(int i = 0; i < deck1.deckVector.size(); i++){
-//     //     std::cout << deck1.deckVector[i];
-//     // }
-//     // std::cout << deck1.deckVector.size() << std::endl;
-
-//     //<<<<Testing the Deck methods>>>>
-
-//     // Deck deck;
-//     // Card c1("Bomb"), c2("Reinforcement"), c3("Blockade"), c4("Airlift"), c5("Diplomacy");
-//     // deck.deckVector.push_back(c1);
-//     // deck.deckVector.push_back(c2);
-//     // deck.deckVector.push_back(c3);
-//     // deck.deckVector.push_back(c4);
-//     // deck.deckVector.push_back(c5);
-    
-//     // std::cout << deck;
-    
-//     //<<<<Testing the Hand methods>>>>
-
-//     // Hand p1;
-//     // Card c1("Bomb"), c2("Reinforcement"), c3("Blockade"), c4("Airlift"), c5("Diplomacy");
-//     // p1.handVector.push_back(c1);
-//     // p1.handVector.push_back(c2);
-//     // p1.handVector.push_back(c3);
-//     // p1.handVector.push_back(c4);
-//     // p1.handVector.push_back(c5);
-    
-//     // std::cout << p1;
-
-//     // Hand p2;
-//     // p2.handVector.push_back(Card("Resupply"));
-//     // std::cout << p2;
-
-//     // p2 = p1;
-
-//     // std::cout << p2;
-
-    
-// }
