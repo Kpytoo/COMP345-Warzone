@@ -1,152 +1,75 @@
-#include <fstream>
-#include <stdexcept>
-#include <sstream>
-#include <algorithm>
+#include <iostream>
 #include "PlayerFiles/Player.h"
+#include "MapFiles/Territory.h"
+#include "/OrdersList.h" //TODO when created
+#include "/Hand.h"       //TODO when created
 
-// default constructor
-Player::Player() : playerName(""), playerHand(nullptr), ordersList(nullptr), numArmies(0)
+void testPlayers()
 {
-    playerHand = new Hand();
-    ordersList = new OrdersList();
-}
 
-// parameterized constructor
-Player::Player(std::string playerName) : playerName(playerName), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
-{
-}
+    Territory *t1 = new Territory("Territory1");
+    Territory *t2 = new Territory("Territory2");
+    Territory *t3 = new Territory("Territory3");
 
-// destructor
-Player::~Player()
-{
-    delete playerHand;
-    delete ordersList;
-}
+    // Creating a player
+    Player player1("Player 1");
 
-// copy constructor
+    // Adding territories to the player's owned territories
+    player1.OwnedTerritories.push_back(t1);
+    player1.OwnedTerritories.push_back(t2);
+    player1.OwnedTerritories.push_back(t3);
 
-Player::Player(const Player &other)
-{
-    playerName = other.playerName;
-    numArmies = other.numArmies;
+    // Display the player info
+    std::cout << "Player Details after Initialization:" << std::endl;
+    std::cout << player1 << std::endl;
 
-    playerHand = new Hand(*other.playerHand);
-    ordersList = new OrdersList(*other.ordersList);
+    // Call toDefend and toAttack methods and print the results
+    std::vector<Territory *> defendTerritories = player1.toDefend();
+    std::vector<Territory *> attackTerritories = player1.toAttack();
 
-    OwnedTerritories = other.OwnedTerritories;
-}
-
-// Assignment operator
-
-Player &Player::operator=(const Player &other)
-{
-    if (this == &other)
-        return *this;
-
-    playerName = other.playerName;
-    numArmies = other.numArmies;
-
-    // Clean up old resources
-    delete playerHand;
-    delete ordersList;
-
-    // Deep copy
-    playerHand = new Hand(*other.playerHand);
-    ordersList = new OrdersList(*other.ordersList);
-
-    // Deep copy of OwnedTerritories
-    OwnedTerritories = other.OwnedTerritories;
-
-    return *this;
-}
-
-// Stream insertion operator overload
-std::ostream &operator<<(std::ostream &os, const Player &obj)
-{
-    os << "Player Name: " << obj.playerName << std::endl;
-    os << "Number of Armies: " << obj.numArmies << std::endl;
-    os << "Owned Territories: ";
-    for (auto &territory : obj.OwnedTerritories)
+    std::cout << "\nTerritories to Defend: ";
+    for (auto &t : defendTerritories)
     {
-        os << territory->getName() << " ";
+        std::cout << t->getName() << " ";
     }
-    os << std::endl;
+    std::cout << std::endl;
 
-    os << "Player Hand: " << *(obj.playerHand) << std::endl;
-    os << "Orders List: " << *(obj.ordersList) << std::endl;
+    std::cout << "Territories to Attack: ";
+    for (auto &t : attackTerritories)
+    {
+        std::cout << t->getName() << " ";
+    }
+    std::cout << std::endl;
 
-    return os;
+    // Issue an order
+    std::cout << "\nIssuing Order..." << std::endl;
+    player1.issueOrder();
+    std::cout << "Order issued. Orders List:" << std::endl;
+    std::cout << *(player1.ordersList) << std::endl;
+
+    // Copy constructor test
+    std::cout << "\nTesting Copy Constructor:" << std::endl;
+    Player player2 = player1;
+    std::cout << "Copied Player:" << std::endl;
+    std::cout << player2 << std::endl;
+
+    // Assignment operator test
+    std::cout << "\nTesting Assignment Operator:" << std::endl;
+    Player player3;
+    player3 = player1;
+    std::cout << "Assigned Player:" << std::endl;
+    std::cout << player3 << std::endl;
+
+    // Clean up dynamic memory
+    delete t1;
+    delete t2;
+    delete t3;
 }
 
-// Getter definitions
-std::string Player::getPlayerName() const
+int main()
 {
-    return playerName;
-}
+    // Run the test function
+    testPlayers();
 
-std::vector<Territory *> Player::getOwnedTerritories() const
-{
-    return OwnedTerritories;
-}
-
-Hand *Player::getPlayerHand() const
-{
-    return playerHand;
-}
-
-OrdersList *Player::getOrdersList() const
-{
-    return ordersList;
-}
-
-int Player::getNumArmies() const
-{
-    return numArmies;
-}
-
-// Setter definitions
-void Player::setPlayerName(const std::string &name)
-{
-    playerName = name;
-}
-
-void Player::setOwnedTerritories(const std::vector<Territory *> &territories)
-{
-    OwnedTerritories = territories;
-}
-
-void Player::setPlayerHand(Hand *hand)
-{
-    playerHand = hand;
-}
-
-void Player::setOrdersList(OrdersList *ordersList)
-{
-    this->ordersList = ordersList;
-}
-
-void Player::setNumArmies(int numArmies)
-{
-    this->numArmies = numArmies;
-}
-
-// toDefend method (returns an arbitrary list of territories to defend)
-std::vector<Territory *> Player::toDefend()
-{
-    // For now, just return the owned territories, idk what its suppose to return...
-    return OwnedTerritories;
-}
-
-// toAttack method (returns an arbitrary list of territories to attack)
-std::vector<Territory *> Player::toAttack()
-{
-    // For now, just return the owned territories, idk what its suppose to return...
-    return OwnedTerritories;
-}
-
-// issueOrder method (creates and adds an order to the player's orders list)
-void Player::issueOrder()
-{
-    Order *newOrder = new Order();
-    ordersList->addOrder(newOrder); // need to create addorder ethod
+    return 0;
 }
