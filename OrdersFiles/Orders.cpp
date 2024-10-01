@@ -8,6 +8,9 @@ orders can be created and put in the list, but their execution will not result i
 
 // <<<< Order Class Definitions >>>> 
 
+OrdersList::OrdersList(){}
+
+Order::Order(){}
 
 
 // <<<< OrdersList Class Definitions >>>> 
