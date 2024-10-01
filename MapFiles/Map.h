@@ -15,7 +15,44 @@ public:
     int numberOfArmies; ///< The number of armies present in this territory.
     int x, y; ///< The x and y coordinates of the center of the territory.
 
+    /**
+     * Default constructor
+     */
+    Territory() : numberOfArmies(0), x(0), y(0) {}
+
     std::map<std::string, Territory *> adjacentTerritories;  ///< A map of adjacent territories.
+
+    /**
+     * Copy constructor for the Territory class.
+     * Creates a deep copy of the adjacentTerritories map, ensuring each pointer is properly duplicated.
+     *
+     * @param other The Territory object to copy from.
+     */
+    Territory(const Territory& other);
+
+    /**
+    * Copy assignment operator for the Territory class.
+    * Assigns values from another Territory object, making sure to release and reallocate memory for the adjacentTerritories map.
+    *
+    * @param other The Territory object to assign from.
+    * @return A reference to the current Territory object.
+    */
+    Territory& operator=(const Territory& other) {
+        if (this == &other) return *this;
+
+        numberOfArmies = other.numberOfArmies;
+        x = other.x;
+        y = other.y;
+
+        adjacentTerritories.clear();
+
+        for (const auto& pair : other.adjacentTerritories)
+        {
+            adjacentTerritories.insert({pair.first, pair.second});
+        }
+
+        return *this;
+    }
 
     /**
      * Overloads the insertion operator to print details of a Territory, including its adjacent territories.
@@ -38,11 +75,41 @@ public:
      * Default constructor for the Continent class.
      * Initializes a new Continent object.
      */
-    Continent();
+    Continent() : bonusPoints(0) {}
 
     int bonusPoints; ///< The bonus points awarded for controlling the continent.
 
     std::map<std::string, Territory *> childTerritories; ///< A map of territories that belong to this continent.
+
+    /**
+     * Copy constructor for the Continent class.
+     * Creates a deep copy of the childTerritories map.
+     *
+     * @param other The Continent object to copy from.
+     */
+    Continent(const Continent& other);
+
+    /**
+     * Copy assignment operator for the Continent class.
+     * Assigns values from another Continent object, ensuring proper memory management for the childTerritories map.
+     *
+     * @param other The Continent object to assign from.
+     * @return A reference to the current Continent object.
+     */
+    Continent& operator=(const Continent& other) {
+        if (this == &other) return *this;
+
+        bonusPoints = other.bonusPoints;
+
+        childTerritories.clear();
+
+        for (const auto& pair : other.childTerritories)
+        {
+            childTerritories.insert({pair.first, pair.second});
+        }
+
+        return *this;
+    }
 
     /**
      * Overloads the insertion operator to print the details of a Continent, including bonus points
@@ -68,6 +135,11 @@ public:
     std::map<std::string, Territory *> territories; ///< A map of all territories on the map.
 
     /**
+     * Default constructor
+     */
+    Map() {}
+
+    /**
      * Validates the map by checking if:
      * 1) The map is a connected graph.
      * 2) Each continent is a connected subgraph.
@@ -76,6 +148,53 @@ public:
      * @return true if the map is valid, false otherwise.
      */
     bool Validate();
+
+    /**
+     * Copy constructor for the Map class.
+     * Performs a deep copy of the continents and territories maps.
+     *
+     * @param other The Map object to copy from.
+     */
+    Map(const Map& other);
+
+    /**
+     * Copy assignment operator for the Map class.
+     * Releases any allocated memory and assigns values from another Map object.
+     *
+     * @param other The Map object to assign from.
+     * @return A reference to the current Map object.
+     */
+    Map& operator=(const Map& other) {
+        if (this == &other) return *this;
+
+        imageFilename = other.imageFilename;
+
+        // Clear continents and territories
+        for (auto& pair : continents)
+        {
+            delete pair.second;
+        }
+        continents.clear();
+
+        for (auto& pair : territories)
+        {
+            delete pair.second;
+        }
+        territories.clear();
+
+        // Deep copy
+        for (const auto& pair : other.continents)
+        {
+            continents.insert({pair.first, new Continent(*pair.second)});
+        }
+
+        for (const auto& pair : other.territories)
+        {
+            territories.insert({pair.first, new Territory(*pair.second)});
+        }
+
+        return *this;
+    }
 
     /**
      * Overloads the insertion operator to print the details of the Map, including its continents and territories.
@@ -115,7 +234,7 @@ public:
      * @param sFileName The name of the map file to load.
      * @param map The Map object to populate.
      */
-    static void LoadMap(std::string sFileName, Map* map);
+    static void LoadMap(const std::string& sFileName, Map* map);
 
 private:
     /**

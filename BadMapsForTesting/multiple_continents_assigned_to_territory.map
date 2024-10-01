@@ -1,0 +1,12 @@
+[Map]
+image=multiple_continents.png
+
+[Continents]
+Continent1=5
+Continent2=5
+
+[Territories]
+A,0,0,Continent1,B
+B,1,0,Continent1,A
+C,2,0,Continent1,B
+C,2,0,Continent2,B
