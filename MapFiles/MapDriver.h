@@ -9,8 +9,6 @@
 
 /**
  * Array of file paths for the map files used in the testLoadMaps function.
- *
- * TODO: add some maps that cause validation errors due to improper graphing and/or parsing errors
  */
 const std::string MAP_FILES[7] = {
         "../SomeMapsFromOnline/3D/3D.map",

@@ -37,22 +37,7 @@ public:
     * @param other The Territory object to assign from.
     * @return A reference to the current Territory object.
     */
-    Territory& operator=(const Territory& other) {
-        if (this == &other) return *this;
-
-        numberOfArmies = other.numberOfArmies;
-        x = other.x;
-        y = other.y;
-
-        adjacentTerritories.clear();
-
-        for (const auto& pair : other.adjacentTerritories)
-        {
-            adjacentTerritories.insert({pair.first, new Territory(*pair.second)});
-        }
-
-        return *this;
-    }
+    Territory& operator=(const Territory& other);
 
     /**
      * Overloads the insertion operator to print details of a Territory, including its adjacent territories.
@@ -96,20 +81,7 @@ public:
      * @param other The Continent object to assign from.
      * @return A reference to the current Continent object.
      */
-    Continent& operator=(const Continent& other) {
-        if (this == &other) return *this;
-
-        bonusPoints = other.bonusPoints;
-
-        childTerritories.clear();
-
-        for (const auto& pair : other.childTerritories)
-        {
-            childTerritories.insert({pair.first, new Territory(*pair.second)});
-        }
-
-        return *this;
-    }
+    Continent& operator=(const Continent& other);
 
     /**
      * Overloads the insertion operator to print the details of a Continent, including bonus points
@@ -137,7 +109,7 @@ public:
     /**
      * Default constructor
      */
-    Map() {}
+    Map() = default;
 
     /**
      * Validates the map by checking if:
@@ -164,37 +136,7 @@ public:
      * @param other The Map object to assign from.
      * @return A reference to the current Map object.
      */
-    Map& operator=(const Map& other) {
-        if (this == &other) return *this;
-
-        imageFilename = other.imageFilename;
-
-        // Clear continents and territories
-        for (auto& pair : continents)
-        {
-            delete pair.second;
-        }
-        continents.clear();
-
-        for (auto& pair : territories)
-        {
-            delete pair.second;
-        }
-        territories.clear();
-
-        // Deep copy
-        for (const auto& pair : other.continents)
-        {
-            continents.insert({pair.first, new Continent(*pair.second)});
-        }
-
-        for (const auto& pair : other.territories)
-        {
-            territories.insert({pair.first, new Territory(*pair.second)});
-        }
-
-        return *this;
-    }
+    Map& operator=(const Map& other);
 
     /**
      * Overloads the insertion operator to print the details of the Map, including its continents and territories.
@@ -220,6 +162,14 @@ private:
      * @return true if the territories form a connected graph, false otherwise.
      */
     static bool IsConnectedGraph(std::map<std::string, Territory *>& territories, const std::map<std::string, Territory *>& validTerritories);
+
+    /**
+     * Helper function to perform deep copy of map data from another Map instance.
+     * Used by both the copy constructor and assignment operator.
+     *
+     * @param other The Map object to copy from.
+     */
+    void DeepCopyMapData(const Map& other);
 };
 
 /**
