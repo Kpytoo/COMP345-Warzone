@@ -48,7 +48,7 @@ public:
 
         for (const auto& pair : other.adjacentTerritories)
         {
-            adjacentTerritories.insert({pair.first, pair.second});
+            adjacentTerritories.insert({pair.first, new Territory(*pair.second)});
         }
 
         return *this;
@@ -105,7 +105,7 @@ public:
 
         for (const auto& pair : other.childTerritories)
         {
-            childTerritories.insert({pair.first, pair.second});
+            childTerritories.insert({pair.first, new Territory(*pair.second)});
         }
 
         return *this;

@@ -108,7 +108,7 @@ bool Map::Validate() {
     for (const auto& continentPair : continents) {
         for (const auto& territoryPair : continentPair.second->childTerritories) {
             if (assignedTerritories.find(territoryPair.first) != assignedTerritories.end()) {
-                std::cerr << "Map validation failed: Territory '" << territoryPair.first
+                std::cerr << imageFilename << " | Map validation failed: Territory '" << territoryPair.first
                           << "' is assigned to multiple continents.\n";
                 return false;
             }
@@ -120,7 +120,7 @@ bool Map::Validate() {
     for (const auto& continentPair : continents) {
         Continent* continent = continentPair.second;
         if (!IsConnectedGraph(continent->childTerritories, continent->childTerritories)) {
-            std::cerr << "Map validation failed: Continent '" << continentPair.first
+            std::cerr << imageFilename << " | Map validation failed: Continent '" << continentPair.first
                       << "' is not a connected subgraph.\n";
             return false;
         }
@@ -128,11 +128,11 @@ bool Map::Validate() {
 
     // Step 1: Check if the entire map is a connected graph
     if (!IsConnectedGraph(territories, territories)) {
-        std::cerr << "Map validation failed: The map is not a connected graph.\n";
+        std::cerr << imageFilename << " | Map validation failed: The map is not a connected graph.\n";
         return false;
     }
 
-    std::cout << "Map validation successful.\n"; // TODO: display name of map here from metadata
+    std::cout << imageFilename << " | Map validation successful.\n"; // TODO: display name of map here from metadata
     return true;
 }
 
