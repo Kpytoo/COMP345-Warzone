@@ -83,39 +83,95 @@ class Card
 
 /**
  * The Deck class represents a deck of cards in the game. A deck has a vector that
- * holds multiple cards which can be drawn with the draw method. It also contains 
+ * holds multiple card pointers and a card can be drawn with the draw method. It also contains 
  * its respective overloaded operators and constructors.
  */
 class Deck
 {
     public:
-        //Deck containing a set of warzone cards
-        std::vector<Card> deckVector;
-        //Draws a card from the deck
+        std::vector<Card*> deckVector; ///< A vector that contains a pointer to each card in the deck.
+
+        /**
+         * Method that draws a card from the deck and places
+         * it in the hand of the given player.
+         * 
+         * @param hand The hand in which the drawn card will be placed.
+         */
         void draw(Hand& hand);
-        //Default constructor
+
+        /**
+         * Default constructor of the Deck class, creates a default deck with 
+         * no cards in it.
+         */     
         Deck();
-        //Copy constructor
+
+        /**
+         * Overloaded Copy constructor of the Deck class, creates a deck given
+         * another instance of a deck. This is a deep copy.
+         * 
+         * @param copyPlayingDeck Deck instance that is being copied from.
+         */
         Deck(const Deck& copyPlayingDeck);
-        //Assignment operator overload
+
+        /**
+         * Overloaded Assignment operator which assigns the deck type of the assigning
+         * deck instance to the assigned deck instance.
+         * 
+         * @param playingDeck Deck instance that is being assigned from.
+         */
         void operator=(const Deck& playingDeck);
-        //Stream insertion operator overload
+
+
+        /**
+         * Overloaded Stream insertion operator which outputs the whole
+         * deck of cards
+         * 
+         * @param COUT The output stream object.
+         * @param DECK The card instance that is being outputted.
+         */
         friend std::ostream& operator<<(std::ostream& COUT, Deck& DECK);
 };
 
-
+/**
+ * The Hand class represents a hand of a player. A hand has a vector that contains
+ * the cards that a player holds. It also contains its respective overloaded 
+ * operators and constructors.
+ */
 class Hand
 {
     public:
-        //Hand containing a set of Warzone cards
-        std::vector<Card> handVector; 
-        //Default constructor
+        
+        std::vector<Card*> handVector; ///< A vector that contains a pointer to each card in the hand.
+        
+        /**
+         * Default constructor of the Hand class, creates a default hand with 
+         * no cards in it.
+         */  
         Hand();
-        //Copy constructor
+
+        /**
+         * Overloaded Copy constructor of the Hand class, creates a hand given
+         * another instance of a hand. This is a deep copy.
+         * 
+         * @param copyHand Hand instance that is being copied from.
+         */
         Hand(const Hand& copyHand);
-        //Assignment operator overload
+
+        /**
+         * Overloaded Assignment operator which assigns the hand type of the assigning
+         * hand instance to the assigned hand instance.
+         * 
+         * @param hand Hand instance that is being assigned from.
+         */ 
         void operator=(const Hand& hand);
-        //Stream insertion operator overload
+
+        /**
+         * Overloaded Stream insertion operator which outputs the whole
+         * hand.
+         * 
+         * @param COUT The output stream object.
+         * @param HAND The card instance that is being outputted.
+         */
         friend std::ostream& operator<<(std::ostream& COUT, Hand& HAND);
 };
 
