@@ -23,10 +23,7 @@ Player::~Player()
 {
     delete playerHand;
     delete ordersList;
-    if (toDefendTerritories)
-    {
-        delete toDefendTerritories;
-    }
+    
 }
 
 // Copy constructor: creates a deep copy of another Player object
@@ -44,7 +41,7 @@ Player::Player(const Player &other)
     // Shallow copy of owned territories (assuming pointer structure is shared)
     OwnedTerritories = other.OwnedTerritories;
     toAttackTerritories = other.toAttackTerritories;
-    toDefendTerritories = new std::vector<Territory *>(*other.toDefendTerritories);
+    toDefendTerritories = other.toDefendTerritories
 }
 
 // Assignment operator: assigns deep copies of resources to the current Player
@@ -60,7 +57,7 @@ Player &Player::operator=(const Player &other)
     // Clean up current resources
     delete playerHand;
     delete ordersList;
-    delete toDefendTerritories;
+    
     // Allocate new copies for playerHand and ordersList
     playerHand = new Hand(*other.playerHand);
     //ordersList = new OrdersList(*other.ordersList);
@@ -70,9 +67,7 @@ Player &Player::operator=(const Player &other)
     // Shallow copy of owned territories
     OwnedTerritories = other.OwnedTerritories;
     toAttackTerritories = other.toAttackTerritories;
-
-    //New territories to defend list
-    toDefendTerritories = new std::vector<Territory *>(*other.toDefendTerritories);
+    toDefendTerritories = other.toDefendTerritories
     return *this;
 }
 
@@ -113,7 +108,7 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
 // Getter definitions: retrieve player details
 std::string Player::getPlayerName() const { return playerName; }
 std::vector<Territory *> Player::getOwnedTerritories() const { return OwnedTerritories; }
-std::vector<Territory *> Player::getToDefendTerritories() const { return *toDefendTerritories; }
+std::vector<Territory *> Player::getToDefendTerritories() const { return toDefendTerritories; }
 std::vector<Territory *> Player::getToAttackTerritories() const { return toAttackTerritories; }
 Hand *Player::getPlayerHand() const { return playerHand; }
 OrdersList *Player::getOrdersList() const { return ordersList; }
@@ -122,7 +117,7 @@ int Player::getNumArmies() const { return numArmies; }
 // Setter definitions: modify player details
 void Player::setPlayerName(const std::string &name) { playerName = name; }
 void Player::setOwnedTerritories(const std::vector<Territory *> &territories) { OwnedTerritories = territories; }
-void Player::setToDefendTerritories(std::vector<Territory *> *territories) { toDefendTerritories = territories; }
+void Player::setToDefendTerritories(std::vector<Territory *> &territories) { toDefendTerritories = territories; }
 void Player::setToAttackTerritories(const std::vector<Territory *> &territories) { toAttackTerritories = territories; }
 void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
 void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
@@ -131,7 +126,7 @@ void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 // toDefend: returns a list of territories to defend
 std::vector<Territory *> Player::toDefend()
 {
-    return *toDefendTerritories;
+    return toDefendTerritories;
 }
 
 // toAttack: returns a list of territories to attack
