@@ -3,150 +3,116 @@
 #include <sstream>
 #include <algorithm>
 #include "PlayerFiles/Player.h"
+#include "CardsFiles/Cards.h"
+#include "/OrdersList.h" // Placeholder for OrdersList, to be included when implemented
+#include "MapFiles/Map.h"
 
-// default constructor
+// Default constructor: initializes player with empty name, zero armies, and new Hand and OrdersList instances
 Player::Player() : playerName(""), playerHand(nullptr), ordersList(nullptr), numArmies(0)
 {
     playerHand = new Hand();
     ordersList = new OrdersList();
 }
 
-// parameterized constructor
+// Parameterized constructor: initializes player with a given name and new Hand and OrdersList instances
 Player::Player(std::string playerName) : playerName(playerName), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
 {
 }
 
-// destructor
+// Destructor: frees memory allocated for player's hand and orders list
 Player::~Player()
 {
     delete playerHand;
     delete ordersList;
 }
 
-// copy constructor
-
+// Copy constructor: creates a deep copy of another Player object
 Player::Player(const Player &other)
 {
     playerName = other.playerName;
     numArmies = other.numArmies;
 
+    // Deep copy for playerHand and ordersList
     playerHand = new Hand(*other.playerHand);
     ordersList = new OrdersList(*other.ordersList);
 
+    // Shallow copy of owned territories (assuming pointer structure is shared)
     OwnedTerritories = other.OwnedTerritories;
 }
 
-// Assignment operator
-
+// Assignment operator: assigns deep copies of resources to the current Player
 Player &Player::operator=(const Player &other)
 {
     if (this == &other)
         return *this;
 
+    // Copy player details
     playerName = other.playerName;
     numArmies = other.numArmies;
 
-    // Clean up old resources
+    // Clean up current resources
     delete playerHand;
     delete ordersList;
 
-    // Deep copy
+    // Allocate new copies for playerHand and ordersList
     playerHand = new Hand(*other.playerHand);
     ordersList = new OrdersList(*other.ordersList);
 
-    // Deep copy of OwnedTerritories
+    // Shallow copy of owned territories
     OwnedTerritories = other.OwnedTerritories;
 
     return *this;
 }
 
-// Stream insertion operator overload
+// Stream insertion operator: outputs player details to an output stream
 std::ostream &operator<<(std::ostream &os, const Player &obj)
 {
     os << "Player Name: " << obj.playerName << std::endl;
     os << "Number of Armies: " << obj.numArmies << std::endl;
+
     os << "Owned Territories: ";
     for (auto &territory : obj.OwnedTerritories)
     {
-        os << territory->getName() << " ";
+        os << territory->getName() << " "; // Outputs each territory's name
     }
     os << std::endl;
 
+    // Outputs player's hand and orders list (assuming operator<< is defined for Hand and OrdersList)
     os << "Player Hand: " << *(obj.playerHand) << std::endl;
     os << "Orders List: " << *(obj.ordersList) << std::endl;
 
     return os;
 }
 
-// Getter definitions
-std::string Player::getPlayerName() const
-{
-    return playerName;
-}
+// Getter definitions: retrieve player details
+std::string Player::getPlayerName() const { return playerName; }
+std::vector<Territory *> Player::getOwnedTerritories() const { return OwnedTerritories; }
+Hand *Player::getPlayerHand() const { return playerHand; }
+OrdersList *Player::getOrdersList() const { return ordersList; }
+int Player::getNumArmies() const { return numArmies; }
 
-std::vector<Territory *> Player::getOwnedTerritories() const
-{
-    return OwnedTerritories;
-}
+// Setter definitions: modify player details
+void Player::setPlayerName(const std::string &name) { playerName = name; }
+void Player::setOwnedTerritories(const std::vector<Territory *> &territories) { OwnedTerritories = territories; }
+void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
+void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
+void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 
-Hand *Player::getPlayerHand() const
-{
-    return playerHand;
-}
-
-OrdersList *Player::getOrdersList() const
-{
-    return ordersList;
-}
-
-int Player::getNumArmies() const
-{
-    return numArmies;
-}
-
-// Setter definitions
-void Player::setPlayerName(const std::string &name)
-{
-    playerName = name;
-}
-
-void Player::setOwnedTerritories(const std::vector<Territory *> &territories)
-{
-    OwnedTerritories = territories;
-}
-
-void Player::setPlayerHand(Hand *hand)
-{
-    playerHand = hand;
-}
-
-void Player::setOrdersList(OrdersList *ordersList)
-{
-    this->ordersList = ordersList;
-}
-
-void Player::setNumArmies(int numArmies)
-{
-    this->numArmies = numArmies;
-}
-
-// toDefend method (returns an arbitrary list of territories to defend)
+// toDefend: returns a list of territories to defend (placeholder behavior returning owned territories)
 std::vector<Territory *> Player::toDefend()
 {
-    // For now, just return the owned territories, idk what its suppose to return...
     return OwnedTerritories;
 }
 
-// toAttack method (returns an arbitrary list of territories to attack)
+// toAttack: returns a list of territories to attack (placeholder behavior returning owned territories)
 std::vector<Territory *> Player::toAttack()
 {
-    // For now, just return the owned territories, idk what its suppose to return...
     return OwnedTerritories;
 }
 
-// issueOrder method (creates and adds an order to the player's orders list)
+// issueOrder: creates a new order and adds it to the player's orders list
 void Player::issueOrder()
 {
     Order *newOrder = new Order();
-    ordersList->addOrder(newOrder); // need to create addorder ethod
+    ordersList->addOrder(newOrder); // Placeholder for adding order functionality
 }
