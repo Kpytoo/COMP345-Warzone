@@ -14,7 +14,7 @@ class Player
 private:
     std::string playerName;               // Player's name
     std::vector<Territory *> OwnedTerritories; // List of territories owned by the player
-    std::vector<Territory *> *toDefendTerritories; // Pointer list to OwnedTerritories elements to defend
+    std::vector<Territory *> toDefendTerritories; // Pointer list to OwnedTerritories elements to defend
     std::vector<Territory *> toAttackTerritories; // List of territories the player wants to attack
     Hand *playerHand;                     // Pointer to the player's hand of cards
     OrdersList *ordersList;               // Pointer to the player's orders list
@@ -42,7 +42,7 @@ public:
     void setPlayerName(const std::string &name);
     void setOwnedTerritories(const std::vector<Territory *> &territories);
     void setToAttackTerritories(const std::vector<Territory *> &territories);
-    void setToDefendTerritories(std::vector<Territory *> *territories);
+    void setToDefendTerritories(std::vector<Territory *> &territories);
     void setPlayerHand(Hand *hand);
     void setOrdersList(OrdersList *ordersList);
     void setNumArmies(int numArmies);
