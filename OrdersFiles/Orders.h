@@ -28,7 +28,7 @@ class OrdersList
 {   
     public:
         //Vector that contains a list of orders
-        std::vector<Order> ordersVector;
+        std::vector<Order*> ordersVector;
         //move() method to move an order in the list of orders
         void move();
         //remove() method that deletes an order from the list
