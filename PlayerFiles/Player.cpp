@@ -117,5 +117,5 @@ std::vector<Territory *> Player::toAttack()
 // issueOrder: creates a new order and adds it to the player's orders list
 void Player::issueOrder()
 {
-    ordersList->ordersVector.push_back(new Order()); // Placeholder for adding order functionality
+    ordersList->ordersVector.push_back(new AdvanceOrder()); // Use advanced order for now
 }

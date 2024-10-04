@@ -4,6 +4,7 @@
 #include "CardsFiles/CardsDriver.h"
 #include "PlayerFiles/PlayerDriver.h"
 #include "GameEngineFiles/GameEngineDriver.h"
+#include "OrdersFiles/OrdersDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -22,6 +23,7 @@ int main(int argc, char* argv[]) {
         testLoadMaps();
         testCards();
         testPlayers();
+        testOrdersLists();
     } else {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
@@ -41,6 +43,10 @@ int main(int argc, char* argv[]) {
             if (arg == "testGameStates") {
                 std::cout << "Running test: testGameStates...\n";
                 testGameStates();
+            }
+            if (arg == "testOrdersLists") {
+                std::cout << "Running test: testOrdersLists...\n";
+                testOrdersLists();
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";

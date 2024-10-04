@@ -23,11 +23,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
     }
     else ///< If hand has at least a card.
     {
-        Order tempOrder;///< Create a new order
-        /*Add tempOrder to the Orders List of the player,
-        this message is temporary since OrderFiles hasn't been
-        worked on yet.
-        */ 
+        ordersList.ordersVector.push_back(new AdvanceOrder()); // For now just create advance orders for each card
         playingDeck.deckVector.push_back(this); ///< Return the pointer of the played card at the end of the deck.
         playingHand.handVector.pop_back(); ///< Remove the pointer of the card from the player's hand.
     }
