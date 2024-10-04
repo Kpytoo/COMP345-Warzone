@@ -28,6 +28,46 @@ std::string trim_white(const std::string& str) {
 }
 
 /**
+ * Copy constructor for the Territory class.
+ * Creates a deep copy of the adjacentTerritories map, ensuring each pointer is properly duplicated.
+ *
+ * @param other The Territory object to copy from.
+ */
+Territory::Territory(const Territory& other) {
+    numberOfArmies = other.numberOfArmies;
+    x = other.x;
+    y = other.y;
+
+    for (const auto& pair : other.adjacentTerritories)
+    {
+        adjacentTerritories.insert({pair.first, pair.second}); // These pointers are updated by the Map copy constructor
+    }
+}
+
+/**
+* Copy assignment operator for the Territory class.
+* Assigns values from another Territory object, making sure to release and reallocate memory for the adjacentTerritories map.
+*
+* @param other The Territory object to assign from.
+* @return A reference to the current Territory object.
+*/
+Territory& Territory::operator=(const Territory& other) {
+    if (this == &other) return *this;
+
+    numberOfArmies = other.numberOfArmies;
+    x = other.x;
+    y = other.y;
+
+    adjacentTerritories.clear();
+    for (const auto& pair : other.adjacentTerritories)
+    {
+        adjacentTerritories.insert({pair.first, new Territory(*pair.second)});
+    }
+
+    return *this;
+}
+
+/**
  * Overloads the insertion operator to output a Territory's position and adjacent territories.
  *
  * @param out The output stream.
@@ -45,9 +85,45 @@ std::ostream & operator << (std::ostream &out,  Territory &t) {
 }
 
 /**
- * Default constructor for the Continent class. Initializes a new Continent object.
+ * Copy constructor for the Continent class.
+ * Creates a deep copy of the childTerritories map.
+ *
+ * @param other The Continent object to copy from.
  */
-Continent::Continent() {};
+Continent::Continent(const Continent& other)
+{
+    bonusPoints = other.bonusPoints;
+
+    for (const auto& pair : other.childTerritories)
+    {
+        childTerritories.insert({pair.first, pair.second}); // These pointers are updated by the Map copy constructor
+    }
+}
+
+/**
+     * Copy assignment operator for the Continent class.
+     * Assigns values from another Continent object, ensuring proper memory management for the childTerritories map.
+     *
+     * @param other The Continent object to assign from.
+     * @return A reference to the current Continent object.
+     */
+Continent& Continent::operator=(const Continent& other) {
+    if (this == &other) return *this;
+
+    bonusPoints = other.bonusPoints;
+
+    // Deallocate existing child territories
+    for (auto& pair : childTerritories) {
+        delete pair.second;  // Release the memory for the territories in this continent
+    }
+    childTerritories.clear();
+
+    for (const auto& pair : other.childTerritories) {
+        childTerritories.insert({pair.first, new Territory(*pair.second)});
+    }
+
+    return *this;
+}
 
 /**
  * Overloads the insertion operator to output a Continent's bonus points and its territories.
@@ -75,28 +151,12 @@ std::ostream & operator << (std::ostream &out,  Continent &c) {
  * @return true if the map is valid, false otherwise.
  */
 bool Map::Validate() {
-    // Step 1: Check if the entire map is a connected graph
-    if (!IsConnectedGraph(territories, territories)) {
-        std::cerr << "Map validation failed: The map is not a connected graph.\n";
-        return false;
-    }
-
-    // Step 2: Check if each continent is a connected subgraph
-    for (const auto& continentPair : continents) {
-        Continent* continent = continentPair.second;
-        if (!IsConnectedGraph(continent->childTerritories, continent->childTerritories)) {
-            std::cerr << "Map validation failed: Continent '" << continentPair.first
-                      << "' is not a connected subgraph.\n";
-            return false;
-        }
-    }
-
     // Step 3: Ensure each territory belongs to one and only one continent
     std::unordered_set<std::string> assignedTerritories;
     for (const auto& continentPair : continents) {
         for (const auto& territoryPair : continentPair.second->childTerritories) {
             if (assignedTerritories.find(territoryPair.first) != assignedTerritories.end()) {
-                std::cerr << "Map validation failed: Territory '" << territoryPair.first
+                std::cerr << imageFilename << " | Map validation failed: Territory '" << territoryPair.first
                           << "' is assigned to multiple continents.\n";
                 return false;
             }
@@ -104,8 +164,60 @@ bool Map::Validate() {
         }
     }
 
-    std::cout << "Map validation successful.\n"; // TODO: display name of map here from metadata
+    // Step 2: Check if each continent is a connected subgraph
+    for (const auto& continentPair : continents) {
+        Continent* continent = continentPair.second;
+        if (!IsConnectedGraph(continent->childTerritories, continent->childTerritories)) {
+            std::cerr << imageFilename << " | Map validation failed: Continent '" << continentPair.first
+                      << "' is not a connected subgraph.\n";
+            return false;
+        }
+    }
+
+    // Step 1: Check if the entire map is a connected graph
+    if (!IsConnectedGraph(territories, territories)) {
+        std::cerr << imageFilename << " | Map validation failed: The map is not a connected graph.\n";
+        return false;
+    }
+
+    std::cout << imageFilename << " | Map validation successful.\n";
     return true;
+}
+
+/**
+ * Copy constructor for the Map class.
+ * Performs a deep copy of the continents and territories maps.
+ *
+ * @param other The Map object to copy from.
+ */
+Map::Map(const Map& other) {
+    DeepCopyMapData(other);
+}
+
+/**
+ * Copy assignment operator for the Map class.
+ * Releases any allocated memory and assigns values from another Map object.
+ *
+ * @param other The Map object to assign from.
+ * @return A reference to the current Map object.
+ */
+Map& Map::operator=(const Map& other) {
+    if (this == &other) return *this;
+
+    // Clear existing continents and territories
+    for (auto& pair : continents) {
+        delete pair.second;  // Delete old continents
+    }
+    continents.clear();
+
+    for (auto& pair : territories) {
+        delete pair.second;  // Delete old territories
+    }
+    territories.clear();
+
+    DeepCopyMapData(other);
+
+    return *this;
 }
 
 /**
@@ -132,10 +244,12 @@ Map::~Map() {
     for (auto& continent : continents) {
         delete continent.second; // Delete all continent instances that were dynamically allocated.
     }
+    continents.clear();
 
     for (auto& territory : territories) {
         delete territory.second; // Delete all territory instances that were dynamically allocated.
     }
+    territories.clear();
 }
 
 /**
@@ -177,12 +291,56 @@ bool Map::IsConnectedGraph(std::map<std::string, Territory *>& territories, cons
 }
 
 /**
+     * Helper function to perform deep copy of map data from another Map instance.
+     * Used by both the copy constructor and assignment operator.
+     *
+     * @param other The Map object to copy from.
+     */
+void Map::DeepCopyMapData(const Map& other) {
+    imageFilename = other.imageFilename;
+
+    /*
+     * In order to do a proper deep copy, new territory instances have to be made and properly assigned to each of the
+     * adjacent and child territory maps.
+     */
+
+    // Temporary mapping of old to new territories to manage pointers
+    std::map<Territory*, Territory*> territoryMapping;
+
+    // Step 1: Deep copy territories and store them in a map for reference
+    for (const auto& pair : other.territories) {
+        auto newTerritory = new Territory(*pair.second);
+        territories[pair.first] = newTerritory;
+        territoryMapping[pair.second] = newTerritory;  // Map old to new territories
+    }
+
+    // Step 2: Deep copy continents, assigning the correct new territory pointers
+    for (const auto& pair : other.continents) {
+        auto newContinent = new Continent(*pair.second);
+        continents[pair.first] = newContinent;
+
+        // Reassign childTerritories in the new Continent to the new Territory pointers
+        for (auto& childPair : newContinent->childTerritories) {
+            childPair.second = territoryMapping[childPair.second];
+        }
+    }
+
+    // Step 3: Update the adjacentTerritories in each new Territory to point to the new Territory instances using old to new map
+    for (const auto& pair : territories) {
+        Territory* territory = pair.second;
+        for (auto& adjPair : territory->adjacentTerritories) {
+            adjPair.second = territoryMapping[adjPair.second];
+        }
+    }
+}
+
+/**
  * Loads a map from a file and populates the Map object.
  *
  * @param sFileName The name of the file to load.
  * @param map The Map object to populate.
  */
-void MapLoader::LoadMap(std::string sFileName, Map* map) {
+void MapLoader::LoadMap(const std::string& sFileName, Map* map) {
     try
     {
         std::ifstream mapFile(sFileName);
@@ -285,7 +443,7 @@ void MapLoader::ParseContinents(std::ifstream &mapFile, Map *map) {
         if (inContinentsSection) {
             std::istringstream iss(line);
 
-            Continent *newContinent = new Continent();
+            auto *newContinent = new Continent();
             std::string continentName;
 
             std::string token;
@@ -335,7 +493,7 @@ void MapLoader::ParseTerritories(std::ifstream &mapFile, Map *map) {
         if (inTerritoriesSection) {
             std::istringstream iss(line);
 
-            Territory *newTerritory = new Territory();
+            auto *newTerritory = new Territory();
             std::string territoryName;
             std::string parentContinent;
 

@@ -3,7 +3,7 @@ project(COMP345_Warzone)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/*)
 
 file(GLOB SOURCE_FILES
         ${PROJECT_SOURCE_DIR}/MainDriver.cpp
