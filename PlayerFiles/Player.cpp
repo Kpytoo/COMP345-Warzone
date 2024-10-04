@@ -33,8 +33,8 @@ Player::Player(const Player &other)
     numArmies = other.numArmies;
 
     // Deep copy for playerHand and ordersList
-//    playerHand = new Hand(*other.playerHand);
-//    ordersList = new OrdersList(*other.ordersList);
+    playerHand = new Hand(*other.playerHand);
+    ordersList = new OrdersList(*other.ordersList);
     playerHand = new Hand();
     ordersList = new OrdersList();
 
@@ -60,7 +60,7 @@ Player &Player::operator=(const Player &other)
     
     // Allocate new copies for playerHand and ordersList
     playerHand = new Hand(*other.playerHand);
-    //ordersList = new OrdersList(*other.ordersList);
+    ordersList = new OrdersList(*other.ordersList);
     playerHand = new Hand();
     ordersList = new OrdersList();
 
@@ -99,8 +99,8 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
     os << std::endl;
     
     // Outputs player's hand and orders list (assuming operator<< is defined for Hand and OrdersList)
-//    os << "Player Hand: " << *(obj.playerHand) << std::endl; // TODO: uncomment this and the ones in the copy functions
-//    os << "Orders List: " << *(obj.ordersList) << std::endl;
+    os << "Player Hand: " << *(obj.playerHand) << std::endl;
+    os << "Orders List: " << *(obj.ordersList) << std::endl;
 
     return os;
 }

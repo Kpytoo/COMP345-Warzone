@@ -20,12 +20,11 @@ void testPlayers()
     auto t4 = new Territory();
     t4->name = "Territory4";
 
-    // Create a player with a name
-    Player player1("Player 1");
-
     // Add territories to the player's owned territories
     std::vector<Territory *> territories = {t1, t2, t3};
-    player1.setOwnedTerritories(territories);
+
+    // Create a player with a name
+    Player player1("Player 1", territories);
 
     // Define which territories to defend (for testing, we’ll pick the first two)
     std::vector<Territory *> defendSubset = {t1, t2};
@@ -59,7 +58,7 @@ void testPlayers()
     std::cout << "\nIssuing Order..." << std::endl;
     player1.issueOrder();
     std::cout << "Order issued. Orders List:" << std::endl;
-//    std::cout << *(player1.getOrdersList()) << std::endl; // TODO: uncomment
+    std::cout << *(player1.getOrdersList()) << std::endl;
 
     // Test the copy constructor by creating a copy of player1
     std::cout << "\nTesting Copy Constructor:" << std::endl;
