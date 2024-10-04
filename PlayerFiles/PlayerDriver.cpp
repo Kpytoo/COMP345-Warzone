@@ -28,7 +28,7 @@ void testPlayers()
     player1.setOwnedTerritories(territories);
 
     // Define which territories to defend (for testing, we’ll pick the first two)
-    auto defendSubset = new std::vector<Territory *>{t1, t2};
+    std::vector<Territory *> defendSubset = {t1, t2};
     player1.setToDefendTerritories(defendSubset);
 
     std::vector<Territory *> attackSubset = {t3, t4};
@@ -79,5 +79,5 @@ void testPlayers()
     delete t2;
     delete t3;
     delete t4;
-    delete defendSubset;
+    
 }
