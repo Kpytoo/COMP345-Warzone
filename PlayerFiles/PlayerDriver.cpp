@@ -1,8 +1,8 @@
 #include <iostream>
 #include "PlayerFiles/Player.h"
 #include "MapFiles/Map.h"
-#include "/OrdersList.h"      
-#include "CardsFiles/Cards.h" // Placeholder for Hand class, to be included when implemented
+#include "/OrdersList.h"      //placeholder
+#include "CardsFiles/Cards.h" 
 
 
 // Function to test the Player class functionality
