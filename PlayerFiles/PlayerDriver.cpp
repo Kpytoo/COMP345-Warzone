@@ -17,38 +17,43 @@ void testPlayers()
     t2->name = "Territory2";
     auto t3 = new Territory();
     t3->name = "Territory3";
+    auto t4 = new Territory();
+    t4->name = "Territory4";
 
     // Create a player with a name
     Player player1("Player 1");
 
     // Add territories to the player's owned territories
-    std::vector<Territory *> territories;
-    territories.push_back(t1);
-    territories.push_back(t2);
-    territories.push_back(t3);
+    std::vector<Territory *> territories = {t1, t2, t3};
     player1.setOwnedTerritories(territories);
 
+    // Define which territories to defend (for testing, we’ll pick the first two)
+    std::vector<Territory *> defendSubset = {t1, t2};
+    player1.setToDefendTerritories(defendSubset);
+
+    std::vector<Territory *> attackSubset = {t3, t4};
+    player1.setToAttackTerritories(attackSubset);
     // Display player details using overloaded << operator
     std::cout << "Player Details after Initialization:" << std::endl;
     std::cout << player1 << std::endl;
 
-    // Call toDefend and toAttack methods to retrieve territories and print them
-    std::vector<Territory *> defendTerritories = player1.toDefend();
-    std::vector<Territory *> attackTerritories = player1.toAttack();
+    
 
     std::cout << "\nTerritories to Defend: ";
-    for (auto &t : defendTerritories)
+    for (auto &t : player1.toDefend())
     {
-        std::cout << t->name << " "; // Display names of territories to defend
+        std::cout << t->name << " ";
     }
     std::cout << std::endl;
 
     std::cout << "Territories to Attack: ";
-    for (auto &t : attackTerritories)
+    for (auto &t : player1.toAttack())
     {
-        std::cout << t->name << " "; // Display names of territories to attack
+        std::cout << t->name << " ";
     }
     std::cout << std::endl;
+
+   
 
     // Issue an order and display the updated orders list
     std::cout << "\nIssuing Order..." << std::endl;
@@ -73,4 +78,5 @@ void testPlayers()
     delete t1;
     delete t2;
     delete t3;
+    delete t4
 }
