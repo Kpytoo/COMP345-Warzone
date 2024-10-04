@@ -3,6 +3,7 @@
 #include "MapFiles/MapDriver.h"
 #include "CardsFiles/CardsDriver.h"
 #include "PlayerFiles/PlayerDriver.h"
+#include "GameEngineFiles/GameEngineDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -17,7 +18,7 @@
  */
 int main(int argc, char* argv[]) {
     if (argc == 1) {
-        std::cout << "No specific tests selected. Running all tests...\n";
+        std::cout << "No specific tests selected. Running all tests... \n(except for game engine, testGameStates arg is required)\n";
         testLoadMaps();
         testCards();
         testPlayers();
@@ -30,12 +31,16 @@ int main(int argc, char* argv[]) {
                 testLoadMaps();
             }
             if (arg == "testCards") {
-                std::cout << "Running test: testLoadMaps...\n";
+                std::cout << "Running test: testCards...\n";
                 testCards();
             }
             if (arg == "testPlayers") {
-                std::cout << "Running test: testLoadMaps...\n";
+                std::cout << "Running test: testPlayers...\n";
                 testPlayers();
+            }
+            if (arg == "testGameStates") {
+                std::cout << "Running test: testGameStates...\n";
+                testGameStates();
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";
