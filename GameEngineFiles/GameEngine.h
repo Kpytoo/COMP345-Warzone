@@ -7,61 +7,130 @@
 #include <vector>
 #include <algorithm>
 
-
-// Game state/phase
+/**
+ * Enum representing various game states/phases.
+ */
 enum class GameState
 {
-    Start,
-    Map_Loaded,
-    Map_Validated,
-    Players_Added,
-    Assign_Reinforcement,
-    Issue_Orders,
-    Execute_Orders,
-    Win,
-    End
+    // Initial state of the game
+    Start,   
+
+    // State when the map has been loaded
+    Map_Loaded,   
+
+    // State when the map has been validated
+    Map_Validated,  
+
+    // State when players have been added to the game
+    Players_Added,  
+
+    // State when players are assigning reinforcements to their territories
+    Assign_Reinforcement,   
+
+    // State for players to issue their orders
+    Issue_Orders,    
+
+    // State for executing the issued orders
+    Execute_Orders,    
+
+    // State when a player wins the game
+    Win,    
+
+    // State indicating the end of the game
+    End                     
 };
 
-// Command object which holds a game state with its description
+/**
+ * Command struct that holds a game state along with its description.
+ */
 struct Command
 {
-    GameState nextState;
-    std::string description;
+    // The game state triggered from the command input by the player
+    GameState nextState;        
+
+    // A description of what the command does
+    std::string description;    
 };
 
+/**
+ * GameEngine class responsible for managing the game states and commands.
+ */
 class GameEngine
 {
 private:
     // Pointer to the current game state
     GameState* currentGameState;
-    // Pointer to the map of commands where each user input string corresponds to a game state with its description
+
+    // Map of commands with their descriptions
     std::map<std::string, Command>* mapCommand;
-    // Pointer to the map of valid commands which for each game state, there is a list of valid command(s)
+
+    // Valid commands for each game state
     std::map<GameState, std::vector<std::string>>* mapValidCommands;
 
-    // Helper function to convert all user string inputs to lowercase
+    /**
+     * Helper function to convert a string to lowercase.
+     * 
+     * @param str The input string to convert to lower case.
+     * @return The lowercase version of the input string.
+     */
     std::string toLowerCase(const std::string& str) const;
 
 public:
     // Default Constructor
     GameEngine();
-    // Deep copy constructor to create independent copies of the resources for each object
+
+    /** 
+     * Deep copy constructor for creating independent copies of GameEngine objects.
+     * 
+     * @param gameCopy The GameEngine object to copy.
+     */
     GameEngine(const GameEngine& gameCopy);
-    // Destructor
+
+    // Destructor to clean up dynamically allocated resources.
     ~GameEngine();
 
-    // Assignment operator overload to copy values from one object to another after that have been created
+     /**
+     * Assignment operator overload for copying values from one GameEngine object to another.
+     * 
+     * @param gameCopy The GameEngine object to copy from.
+     * @return Reference to the current object.
+     */
     GameEngine& operator = (const GameEngine& gameCopy);
-    // Stream insertion operation overload, how a custom object (Game Engine) would be printed
+
+    /**
+     * Stream insertion operator overload to define how a GameEngine object is printed.
+     * 
+     * @param os The output stream where the game state and commands will be printed.
+     * @param gameEngine The GameEngine object whose state and commands are to be printed.
+     * @return The output stream after printing the game state and valid commands.
+     */
     friend std::ostream& operator<<(std::ostream& os, const GameEngine& gameCopy);
 
-    // Function to check user input and trigger the appropriate state transitions
+     /**
+     * Function to process user input and make the respective transition.
+     * 
+     * @param command The user input command to manage.
+     */
     void manageCommand(const std::string &command);
-    // Function to get the current state as a string
+
+     /**
+     * Function to get the current game state as a string.
+     * 
+     * @return The current game state as a string.
+     */
     std::string getCurrentState() const;
-    // Function to display the valid commands
+
+    /**
+     * Function to display the valid commands for the current state.
+     */
     void displayCommands() const;
-    // Function to check if the command is valid in the current game state
+
+    /**
+     * Function to check if a command is valid in the current game state.
+     * 
+     * @param command The command to check.
+     * @return True if the command is valid, false otherwise.
+     */
     bool isCommandValid(const std::string& command) const;
 };
 
