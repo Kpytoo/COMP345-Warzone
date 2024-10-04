@@ -8,14 +8,13 @@
 #include "MapFiles/Map.h"
 
 // Default constructor: initializes player with empty name, zero armies, and new Hand and OrdersList instances
-Player::Player() : playerName(""), playerHand(nullptr), ordersList(nullptr), numArmies(0)
+Player::Player() : playerName(""), OwnedTerritories(), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
 {
-    playerHand = new Hand();
-    ordersList = new OrdersList();
 }
 
 // Parameterized constructor: initializes player with a given name and new Hand and OrdersList instances
-Player::Player(std::string playerName) : playerName(playerName), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
+Player::Player(std::string playerName, const std::vector<Territory *> &ownedTerritories) 
+    : playerName(playerName), OwnedTerritories(ownedTerritories), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
 {
 }
 
