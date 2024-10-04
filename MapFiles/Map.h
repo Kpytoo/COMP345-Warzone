@@ -14,6 +14,7 @@ class Territory
 public:
     int numberOfArmies; ///< The number of armies present in this territory.
     int x, y; ///< The x and y coordinates of the center of the territory.
+    std::string name;
 
     /**
      * Default constructor

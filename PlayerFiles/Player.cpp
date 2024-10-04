@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "PlayerFiles/Player.h"
 #include "CardsFiles/Cards.h"
-#include "/OrdersList.h" // Placeholder for OrdersList, to be included when implemented
+#include "OrdersFiles/Orders.h"
 #include "MapFiles/Map.h"
 
 // Default constructor: initializes player with empty name, zero armies, and new Hand and OrdersList instances
@@ -33,8 +33,10 @@ Player::Player(const Player &other)
     numArmies = other.numArmies;
 
     // Deep copy for playerHand and ordersList
-    playerHand = new Hand(*other.playerHand);
-    ordersList = new OrdersList(*other.ordersList);
+//    playerHand = new Hand(*other.playerHand);
+//    ordersList = new OrdersList(*other.ordersList);
+    playerHand = new Hand();
+    ordersList = new OrdersList();
 
     // Shallow copy of owned territories (assuming pointer structure is shared)
     OwnedTerritories = other.OwnedTerritories;
@@ -55,8 +57,10 @@ Player &Player::operator=(const Player &other)
     delete ordersList;
 
     // Allocate new copies for playerHand and ordersList
-    playerHand = new Hand(*other.playerHand);
-    ordersList = new OrdersList(*other.ordersList);
+//    playerHand = new Hand(*other.playerHand);
+//    ordersList = new OrdersList(*other.ordersList);
+    playerHand = new Hand();
+    ordersList = new OrdersList();
 
     // Shallow copy of owned territories
     OwnedTerritories = other.OwnedTerritories;
@@ -73,13 +77,13 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
     os << "Owned Territories: ";
     for (auto &territory : obj.OwnedTerritories)
     {
-        os << territory->getName() << " "; // Outputs each territory's name
+        os << territory->name << " "; // Outputs each territory's name
     }
     os << std::endl;
 
     // Outputs player's hand and orders list (assuming operator<< is defined for Hand and OrdersList)
-    os << "Player Hand: " << *(obj.playerHand) << std::endl;
-    os << "Orders List: " << *(obj.ordersList) << std::endl;
+//    os << "Player Hand: " << *(obj.playerHand) << std::endl; // TODO: uncomment this and the ones in the copy functions
+//    os << "Orders List: " << *(obj.ordersList) << std::endl;
 
     return os;
 }
@@ -113,6 +117,5 @@ std::vector<Territory *> Player::toAttack()
 // issueOrder: creates a new order and adds it to the player's orders list
 void Player::issueOrder()
 {
-    Order *newOrder = new Order();
-    ordersList->addOrder(newOrder); // Placeholder for adding order functionality
+    ordersList->ordersVector.push_back(new Order()); // Placeholder for adding order functionality
 }

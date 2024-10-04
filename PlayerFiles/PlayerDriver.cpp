@@ -1,7 +1,9 @@
+#include "PlayerFiles/PlayerDriver.h"
+
 #include <iostream>
 #include "PlayerFiles/Player.h"
 #include "MapFiles/Map.h"
-#include "/OrdersList.h"      //placeholder
+#include "OrdersFiles/Orders.h"
 #include "CardsFiles/Cards.h" 
 
 
@@ -9,17 +11,22 @@
 void testPlayers()
 {
     // Create territories dynamically
-    Territory *t1 = new Territory("Territory1");
-    Territory *t2 = new Territory("Territory2");
-    Territory *t3 = new Territory("Territory3");
+    auto t1 = new Territory();
+    t1->name = "Territory1";
+    auto t2 = new Territory();
+    t2->name = "Territory2";
+    auto t3 = new Territory();
+    t3->name = "Territory3";
 
     // Create a player with a name
     Player player1("Player 1");
 
     // Add territories to the player's owned territories
-    player1.OwnedTerritories.push_back(t1);
-    player1.OwnedTerritories.push_back(t2);
-    player1.OwnedTerritories.push_back(t3);
+    std::vector<Territory *> territories;
+    territories.push_back(t1);
+    territories.push_back(t2);
+    territories.push_back(t3);
+    player1.setOwnedTerritories(territories);
 
     // Display player details using overloaded << operator
     std::cout << "Player Details after Initialization:" << std::endl;
@@ -32,14 +39,14 @@ void testPlayers()
     std::cout << "\nTerritories to Defend: ";
     for (auto &t : defendTerritories)
     {
-        std::cout << t->getName() << " "; // Display names of territories to defend
+        std::cout << t->name << " "; // Display names of territories to defend
     }
     std::cout << std::endl;
 
     std::cout << "Territories to Attack: ";
     for (auto &t : attackTerritories)
     {
-        std::cout << t->getName() << " "; // Display names of territories to attack
+        std::cout << t->name << " "; // Display names of territories to attack
     }
     std::cout << std::endl;
 
@@ -47,7 +54,7 @@ void testPlayers()
     std::cout << "\nIssuing Order..." << std::endl;
     player1.issueOrder();
     std::cout << "Order issued. Orders List:" << std::endl;
-    std::cout << *(player1.ordersList) << std::endl;
+//    std::cout << *(player1.getOrdersList()) << std::endl; // TODO: uncomment
 
     // Test the copy constructor by creating a copy of player1
     std::cout << "\nTesting Copy Constructor:" << std::endl;
@@ -66,12 +73,4 @@ void testPlayers()
     delete t1;
     delete t2;
     delete t3;
-}
-
-int main()
-{
-    // Run the test function to verify Player class functionality
-    testPlayers();
-
-    return 0;
 }

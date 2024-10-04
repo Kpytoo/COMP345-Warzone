@@ -502,6 +502,7 @@ void MapLoader::ParseTerritories(std::ifstream &mapFile, Map *map) {
             // Read the territory name
             std::getline(iss, token, ',');
             territoryName = token;
+            newTerritory->name = territoryName;
 
             // Read the coordinates
             std::getline(iss, token, ',');

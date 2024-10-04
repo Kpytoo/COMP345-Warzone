@@ -2,6 +2,7 @@
 
 #include "MapFiles/MapDriver.h"
 #include "CardsFiles/CardsDriver.h"
+#include "PlayerFiles/PlayerDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -30,6 +31,10 @@ int main(int argc, char* argv[]) {
             if (arg == "testCards") {
                 std::cout << "Running test: testLoadMaps...\n";
                 testCards();
+            }
+            if (arg == "testPlayers") {
+                std::cout << "Running test: testLoadMaps...\n";
+                testPlayers();
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";
