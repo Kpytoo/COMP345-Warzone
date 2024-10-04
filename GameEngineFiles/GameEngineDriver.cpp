@@ -1,3 +1,4 @@
+#include "GameEngineDriver.h"
 #include <iostream>
 #include "GameEngine.h"
 #include <string>
@@ -50,21 +51,4 @@ void testGameStates()
 
     // Free memory allocated for the GameEngine object
     delete game;
-}
-
-/**
- * Main function to run the test game states.
- *
- * This function serves as the entry point for the program,
- * initiating the testing of game states.
- *
- * @return An integer representing the exit status of the program.
- */
-int main()
-{
-    // Call the test function to initiate the game state testing
-    testGameStates();
-
-    // Return success exit code
-    return 0;
 }
