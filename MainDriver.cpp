@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
         std::cout << "No specific tests selected. Running all tests...\n";
         testLoadMaps();
         testCards();
+        testPlayers();
     } else {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
