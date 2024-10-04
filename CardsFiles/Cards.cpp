@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <ctime>
 #include "Cards.h"
-#include "../OrdersFiles/Orders.h"
 
 
 // <<<< Card Class Definitions >>>> 
@@ -133,7 +132,7 @@ Deck::Deck(const Deck& copyPlayingDeck)
 {
     for(int i = 0; i < copyPlayingDeck.deckVector.size(); i++)
     {
-        this->deckVector.push_back(copyPlayingDeck.deckVector[i]); ///< Append all contents of passed deck to our deck.
+        this->deckVector.push_back(new Card(*copyPlayingDeck.deckVector[i])); ///< Append all contents of passed deck to our deck.
     }
 }
 
@@ -145,10 +144,13 @@ Deck::Deck(const Deck& copyPlayingDeck)
  */
 void Deck::operator=(const Deck& playingDeck)
 {
+    for (Card* cardPointer : deckVector){ ///< Free memory leaks by freeing each card instance.
+        delete cardPointer;
+    }
     this->deckVector.clear(); ///< Clear the contents of our deck.
     for(int i = 0; i < playingDeck.deckVector.size(); i++)
     {
-        this->deckVector.push_back(playingDeck.deckVector[i]); ///< Append all contents of passed deck to our deck.
+        this->deckVector.push_back(new Card(*playingDeck.deckVector[i])); ///< Append all contents of passed deck to our deck.
     }
 }
 
@@ -180,6 +182,16 @@ std::ostream& operator<<(std::ostream& COUT, Deck& DECK)
     }
 }
 
+/**
+ * Destructor for the Hand class. Frees all dynamically allocated memory used for Cards.
+ */
+Deck::~Deck() {
+    for (Card* cardPointer : deckVector){ ///< Free memory leaks by freeing each card instance.
+        delete cardPointer;
+    }
+    deckVector.clear(); ///< Reset the deck to size 0.
+}
+
 
 // <<<< Hand Class Definitions >>>> 
 
@@ -203,7 +215,7 @@ Hand::Hand(const Hand& copyHand)
 {
     for(int i = 0; i < copyHand.handVector.size(); i++)
     {
-        this->handVector.push_back(copyHand.handVector[i]); ///< Append all contents of passed hand to our hand.
+        this->handVector.push_back(new Card(*copyHand.handVector[i])); ///< Append all contents of passed hand to our hand.
     }
 }
 
@@ -215,10 +227,13 @@ Hand::Hand(const Hand& copyHand)
  */
 void Hand::operator=(const Hand& hand)
 {
+    for (Card* cardPointer : handVector){ ///< Free memory leaks by freeing each card instance.
+        delete cardPointer;
+    }
     this->handVector.clear(); ///< Clear the contents of our hand.
     for(int i = 0; i < hand.handVector.size(); i++)
     {
-        this->handVector.push_back(hand.handVector[i]); ///< Append all contents of passed hand to our hand.
+        this->handVector.push_back(new Card(*hand.handVector[i])); ///< Append all contents of passed hand to our hand.
     }
 }
 
@@ -248,4 +263,14 @@ std::ostream& operator<<(std::ostream& COUT, Hand& HAND)
 
         return COUT;
     }  
+}
+
+/**
+ * Destructor for the Hand class. Frees all dynamically allocated memory used for Cards.
+ */
+Hand::~Hand() {
+    for (Card* cardPointer : handVector){ ///< Prevent memory leaks by deleting each card instance.
+        delete cardPointer;
+    }
+    handVector.clear(); ///< Reset the hand to size 0.
 }

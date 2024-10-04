@@ -1,3 +1,5 @@
+#include "CardsDriver.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -63,24 +65,4 @@ void testCards()
     std::cout << hand_holding_cards; ///< Display the hand after playing all 5 cards.
 
     std::cout << deck_of_cards; ///< Display the deck after 5 cards have been played.
-
-    for (Card* cardPointer : deck_of_cards.deckVector){ ///< Free memory leaks by deleting each card pointer.
-        cardPointer = NULL;
-        delete cardPointer;
-    }
-    deck_of_cards.deckVector.clear(); ///< Reset the deck to size 0.
-
-    for (Card* cardPointer : hand_holding_cards.handVector){ ///< Free memory leaks by deleting each card pointer.
-        cardPointer = NULL;
-        delete cardPointer;
-    }
-    hand_holding_cards.handVector.clear(); ///< Reset the hand to size 0.
 }
-
-int main()
-{
-    testCards();
-    
-    return 0;
-}
-

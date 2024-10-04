@@ -130,6 +130,11 @@ class Deck
          * @param DECK The card instance that is being outputted.
          */
         friend std::ostream& operator<<(std::ostream& COUT, Deck& DECK);
+
+    /**
+     * Destructor for the Deck class. Frees all dynamically allocated memory used for Cards.
+     */
+    virtual ~Deck();
 };
 
 /**
@@ -173,6 +178,11 @@ class Hand
          * @param HAND The card instance that is being outputted.
          */
         friend std::ostream& operator<<(std::ostream& COUT, Hand& HAND);
+
+    /**
+     * Destructor for the Hand class. Frees all dynamically allocated memory used for Cards.
+     */
+    virtual ~Hand();
 };
 
 #endif
