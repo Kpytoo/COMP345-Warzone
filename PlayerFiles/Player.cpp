@@ -41,7 +41,7 @@ Player::Player(const Player &other)
     // Shallow copy of owned territories (assuming pointer structure is shared)
     OwnedTerritories = other.OwnedTerritories;
     toAttackTerritories = other.toAttackTerritories;
-    toDefendTerritories = other.toDefendTerritories
+    toDefendTerritories = other.toDefendTerritories;
 }
 
 // Assignment operator: assigns deep copies of resources to the current Player
@@ -67,7 +67,7 @@ Player &Player::operator=(const Player &other)
     // Shallow copy of owned territories
     OwnedTerritories = other.OwnedTerritories;
     toAttackTerritories = other.toAttackTerritories;
-    toDefendTerritories = other.toDefendTerritories
+    toDefendTerritories = other.toDefendTerritories;
     return *this;
 }
 
@@ -85,7 +85,7 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
     os << std::endl;
 
      os << "To Defend Territories: ";
-    for (auto &territory : *(obj.toDefendTerritories))
+    for (auto &territory : obj.toDefendTerritories)
     {
         os << territory->name << " "; // Outputs each territory's name
     }
