@@ -41,15 +41,27 @@ enum class GameState
 };
 
 /**
- * Command struct that holds a game state along with its description.
+ * Command class that holds a game state along with its description and methods.
  */
-struct Command
+class Command
 {
+    public:
     // The game state triggered from the command input by the player
     GameState nextState;        
 
     // A description of what the command does
-    std::string description;    
+    std::string description;
+
+    // The effect of the command
+    std::string effect;
+
+    /**
+    * Once a command gets executed, we can save its effect by using
+    * saveEffect() and entering a string that relfects its effect.
+    * 
+    * @param effect The effect of the command as a string.
+    */
+    void saveEffect(std::string effect); 
 };
 
 /**

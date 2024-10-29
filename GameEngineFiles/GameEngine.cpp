@@ -1,6 +1,17 @@
 #include "GameEngine.h"
 
 /**
+ * Once a command gets executed, we can save its effect by using
+ * saveEffect() and entering a string that relfects its effect.
+ * 
+ * @param effect The effect of the command as a string.
+ */
+void Command::saveEffect(std::string effect)
+{
+    this->effect = effect;
+}
+
+/**
  * Default constructor for the GameEngine class.
  * Initializes the game engine to the starting state and allocates memory for command maps.
  */
