@@ -15,9 +15,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
     //check if command is in commandprocessor
     switch(cmd.nextState)
     {
-        case GameState::Map_Loaded:
+        case GameState::Map_Loaded: ///> "loadmap" command has its nextstate as "Map_Loaded"
         {
-            if(currentGame.getCurrentState() == "Start" && currentGame.getCurrentState() == "Load Map")
+            if(currentGame.getCurrentState() == "Start" || currentGame.getCurrentState() == "Load Map") ///> We can load a map if the game has started or if a map has already been added
             {
                 std::cout << "\"loadmap\" command is in its valide state" << std::endl;
             }
@@ -28,9 +28,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
             }
             break;
         }
-        case GameState::Map_Validated:
+        case GameState::Map_Validated: ///> "validatemap" command has its nextstate as "Map_Validated"
         {
-            if(currentGame.getCurrentState() == "Load Map")
+            if(currentGame.getCurrentState() == "Load Map") ///> We can validate the map if the map has been loaded
             {
                 std::cout << "\"validate\" command is in its valide state" << std::endl;
             }
@@ -41,9 +41,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
             }
             break;
         }
-        case GameState::Players_Added:
+        case GameState::Players_Added: ///> "addplayer" command has its nextstate as "Players_Added"
         {
-            if(currentGame.getCurrentState() == "Validate Map" && currentGame.getCurrentState() == "Add Player")
+            if(currentGame.getCurrentState() == "Validate Map" || currentGame.getCurrentState() == "Add Player") ///> We can add players if the map has been validated or one player has already been added
             {
                 std::cout << "\"addplayer\" command is in its valide state" << std::endl;
             }
@@ -54,9 +54,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
             }
             break;
         }
-        case GameState::Assign_Reinforcement:
+        case GameState::Assign_Reinforcement: ///> "gamestart" command has its nextstate as "Assign_Reinforcement"
         {
-            if(currentGame.getCurrentState() == "Add Player")
+            if(currentGame.getCurrentState() == "Add Player") ///> We can start the game if players have been added
             {
                 std::cout << "\"gamestart\" command is in its valide state" << std::endl;
             }
@@ -67,9 +67,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
             }
             break;
         }
-        case GameState::Start:
+        case GameState::Start: ///> "replay" command has its nextstate as "Start"
         {
-            if(currentGame.getCurrentState() == "End")
+            if(currentGame.getCurrentState() == "End") ///> We can replay the game if it has ended
             {
                 std::cout << "\"replay\" command is in its valide state" << std::endl;
             }
@@ -80,9 +80,9 @@ void CommandProcessor::validate(Command& cmd, GameEngine& currentGame)
             }
             break;
         }
-        case GameState::End:
+        case GameState::End: ///> "quit" command has its nextstate as "End"
         {
-            if(currentGame.getCurrentState() == "End")
+            if(currentGame.getCurrentState() == "End") ///> We can quit the game if it has ended
             {
                 std::cout << "\"quit\" command is in its valide state" << std::endl;
             }
@@ -140,6 +140,12 @@ std::ostream& operator<<(std::ostream& COUT, CommandProcessor& CMDPRC)
     
 }
 
+/**
+ * This function prompts the user to enter a command 
+ * from the console and stores it in a string. 
+ * This string is then returned to the caller. 
+ * Note: This function is used in accordance with the saveCommand() function.
+ */
 std::string CommandProcessor::readCommand()
 {
     std::string stringCommand;
@@ -153,6 +159,17 @@ std::string CommandProcessor::readCommand()
     return stringCommand;
 }
 
+/**
+ * This function takes in a constant string, and parses it
+ * to determine the specific command. If the command entered
+ * is not valid, an error message is displayed to the user.
+ * If it is a valid command, the command is stored into the
+ * Command Collection list of the Command Processor object.
+ * 
+ * Possible types of command: {loadmap <mapfile>, validatemap, addplayer <playername>, gamestart, replay, quit}.
+ * 
+ * @param stringCommand Constant string that contains the specified command.
+ */
 void CommandProcessor::saveCommand(const std::string stringCommand)
 {
     
@@ -237,8 +254,11 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
         this->commandCollection.push_back(command);
         std::cout << "*** quit command added to command collection ***" << std::endl;
     }
-    else
+    else ///> Invalid command has been entered
     {
         std::cout << "Invalid command has been entered." << std::endl;
     } 
 }
+
+
+// <<<< FileCommandProcessorAdapter Class Definitions >>>> 
