@@ -4,8 +4,19 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <fstream>
 #include "GameEngine.h"
 
+class FileLineReader;
+
+/**
+ * The CommandProcessor class is used to get
+ * commands from the console as a string using its 
+ * readCommand() method which store the command internally in
+ * a collection of Command objects using the saveCommand() method.
+ * It also provides a public getCommand() method to other objects
+ * such as the GameEngine or the Player.
+ */
 class CommandProcessor
 {
     public:
@@ -29,7 +40,7 @@ class CommandProcessor
         * @param command String that holds a command.
         * @param currentGame GameEngine instance passed by reference.
         */
-        void validate(std::string command, GameEngine& currentGame);
+        bool validate(std::string command, GameEngine& currentGame);
 
         /**
         * Default CommandProcessor constructor.
@@ -47,7 +58,7 @@ class CommandProcessor
          * CommandProcessor destructor that deletes
          * every command pointer in its command collection list.
          */
-        ~CommandProcessor();
+        virtual ~CommandProcessor();
 
         /**
          * Overloaded assignment operator for the Command Processor class.
@@ -76,7 +87,7 @@ class CommandProcessor
         * This string is then returned to the caller. 
         * Note: This function is used in accordance with the saveCommand() function.
         */
-        std::string readCommand();
+        virtual std::string readCommand();
 
         /**
         * This function takes in a constant string, and parses it
@@ -92,9 +103,43 @@ class CommandProcessor
         void saveCommand(const std::string stringCommand);
 };
 
-class FileCommandProcessorAdapter
+/**
+ * The FileCommandProcessorAdapter class inherits from and provides 
+ * the same functionality as the CommandProcessor class, 
+ * except that it reads the commands sequentially from
+ * a previously saved text file. This class is known as 
+ * the "Adapter" class, implementing the Adapter design patter.
+ */
+class FileCommandProcessorAdapter : public CommandProcessor
 {
+    private:
 
+        /**
+         * Adaptee instance of FileLineReader.
+         */
+        FileLineReader* fileReader;
+
+    public:
+    
+        FileCommandProcessorAdapter(std::string fileName);
+        ~FileCommandProcessorAdapter();
+        std::string readCommand();
+
+};
+
+/**
+ * The FileLineReader class is the
+ * "Adaptee" class that provides features to 
+ * be able to read from a previously saved
+ * text file. It is used by the FileCommandProcessorAdapter class.
+ */
+class FileLineReader
+{
+    private:
+        std::string fileName;
+    public:
+        FileLineReader(std::string fileName);
+        std::string readLineFromFile();
 };
 
 #endif

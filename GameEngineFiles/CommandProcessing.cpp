@@ -10,8 +10,8 @@
 void CommandProcessor::getCommand()
 {   
     std::string stringCommand;
-    stringCommand = readCommand();
-    saveCommand(stringCommand);
+    stringCommand = readCommand(); ///> returns a command as a string
+    saveCommand(stringCommand); ///> saves the command in the command collection, if the command is valid
 }
 
 /**
@@ -27,13 +27,13 @@ void CommandProcessor::getCommand()
  * @param command String that holds a command.
  * @param currentGame GameEngine instance passed by reference.
  */
-void CommandProcessor::validate(std::string command, GameEngine& currentGame)
+bool CommandProcessor::validate(std::string command, GameEngine& currentGame)
 {
     //check if the Command Collection is empty
     if(this->commandCollection.empty() == true)
     {
         std::cout << "Can't find " << command << " inside an empty Command Collection" << std::endl;
-        return;
+        return false;
     }
     
     if(command.substr(0,7) == "loadmap") ///> loadmap command
@@ -50,24 +50,24 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                     if(currentGame.getCurrentState() == "Start" || currentGame.getCurrentState() == "Load Map")///> Check game state if valid
                     {
                         std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        return;
+                        return true;
                     } 
                     else ///< if command is not valid in current game state
                     {
                         std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).saveEffect("Error: loadmap is not valid in current game state: " + currentGame.getCurrentState());
+                        (*(*i)).saveEffect("Error: loadmap is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                         std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                        return;
+                        return false;
                     }
                 }
             }  
             std::cout << command << " was not found in the Command Collection" << std::endl;   
-            return;    
+            return false;    
         }
         else
         {
             std::cout << "No file name was given" << std::endl;
-            return;
+            return false;
         }
     }
     else if (command == "validatemap") ///> validatemap command
@@ -80,19 +80,19 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 if(currentGame.getCurrentState() == "Load Map")///> Check game state if valid
                 {
                     std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return;
+                    return true;
                 } 
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: validatemap is not valid in current game state: " + currentGame.getCurrentState());
+                    (*(*i)).saveEffect("Error: validatemap is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                    return;
+                    return false;
                 }
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;   
-        return;  
+        return false;  
     }
     else if (command.substr(0,9) == "addplayer") ///> addplayer command
     {
@@ -107,24 +107,24 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                     if(currentGame.getCurrentState() == "Validate Map" || currentGame.getCurrentState() == "Add Player")///> Check game state if valid
                     {
                         std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        return;
+                        return true;
                     } 
                     else ///< if command is not valid in current game state
                     {
                         std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).saveEffect("Error: addplayer is not valid in current game state: " + currentGame.getCurrentState());
+                        (*(*i)).saveEffect("Error: addplayer is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                         std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                        return;
+                        return false;
                     }
                 }
             }  
             std::cout << command << " was not found in the Command Collection" << std::endl;   
-            return;    
+            return false;    
         }
         else
         {
             std::cout << "No player name was given" << std::endl;
-            return;
+            return false;
         } 
     }
     else if (command == "gamestart") ///> gamestart command
@@ -137,19 +137,19 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 if(currentGame.getCurrentState() == "Add Player")///> Check game state if valid
                 {
                     std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return;
+                    return true;
                 } 
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: gamestart is not valid in current game state: " + currentGame.getCurrentState());
+                    (*(*i)).saveEffect("Error: gamestart is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                    return;
+                    return false;
                 }
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;   
-        return;
+        return false;
     }
     else if(command == "replay") ///> replay command
     {
@@ -161,19 +161,19 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 if(currentGame.getCurrentState() == "Win")///> Check game state if valid
                 {
                     std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return;
+                    return true;
                 } 
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: replay is not valid in current game state: " + currentGame.getCurrentState());
+                    (*(*i)).saveEffect("Error: replay is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                    return;
+                    return false;
                 }
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;   
-        return;
+        return false;
     }
     else if (command == "quit") ///> quit command
     {
@@ -185,23 +185,24 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 if(currentGame.getCurrentState() == "Win")///> Check game state if valid
                 {
                     std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return;
+                    return true;
                 } 
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: quit is not valid in current game state: " + currentGame.getCurrentState());
+                    (*(*i)).saveEffect("Error: quit is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
-                    return;
+                    return false;
                 }
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;   
-        return;
+        return false;
     }
     else ///> Invalid command has been entered
     {
         std::cout << "Can't validate an invalid command!\n" << std::endl;
+        return false;
     }     
 }
 
@@ -222,11 +223,11 @@ CommandProcessor::CommandProcessor(CommandProcessor& cmdprc)
 {
     for(std::list<Command*>::iterator i = cmdprc.commandCollection.begin(); i != cmdprc.commandCollection.end(); i++)
     {
-        Command* tempCommand = new Command();
-        tempCommand->description = (*(*i)).description;
-        tempCommand->effect = (*(*i)).effect;
-        tempCommand->nextState = (*(*i)).nextState;
-        this->commandCollection.push_back(tempCommand);
+        Command* tempCommand = new Command(); ///> create a new command on the heap
+        tempCommand->description = (*(*i)).description; ///> assign the description
+        tempCommand->effect = (*(*i)).effect; ///> assign the effect
+        tempCommand->nextState = (*(*i)).nextState; ///> assign the next state
+        this->commandCollection.push_back(tempCommand); ///> add the command pointer to the command collection
     }
 }
 
@@ -236,9 +237,9 @@ CommandProcessor::CommandProcessor(CommandProcessor& cmdprc)
  */
 CommandProcessor::~CommandProcessor()
 {
-        for(std::list<Command*>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
+    for(std::list<Command*>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
     {
-        delete *i;
+        delete *i; ///> free the memory held by each command pointer
     }
 }
 
@@ -249,15 +250,15 @@ void CommandProcessor::operator=(CommandProcessor& cmdprc)
 {
     for(std::list<Command*>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
     {
-        delete *i;
+        delete *i; ///> free the memory held by each command pointer
     }
         for(std::list<Command*>::iterator i = cmdprc.commandCollection.begin(); i != cmdprc.commandCollection.end(); i++)
     {
-        Command* tempCommand = new Command();
-        tempCommand->description = (*(*i)).description;
-        tempCommand->effect = (*(*i)).effect;
-        tempCommand->nextState = (*(*i)).nextState;
-        this->commandCollection.push_back(tempCommand);
+        Command* tempCommand = new Command(); ///> create a new command on the heap
+        tempCommand->description = (*(*i)).description; ///> assign the new description
+        tempCommand->effect = (*(*i)).effect; ///> assign the new effect
+        tempCommand->nextState = (*(*i)).nextState; ///> assign the new next state
+        this->commandCollection.push_back(tempCommand); ///> add the command pointer to the command collection
     }
 }
 
@@ -277,9 +278,9 @@ std::ostream& operator<<(std::ostream& COUT, CommandProcessor& CMDPRC)
     else ///> if the command collection has at least one command
     {
         COUT << "<< Command Collection >>" << std::endl;
-        for(std::list<Command*>::iterator i = CMDPRC.commandCollection.begin(); i != CMDPRC.commandCollection.end(); i++)
+        for(std::list<Command*>::iterator i = CMDPRC.commandCollection.begin(); i != CMDPRC.commandCollection.end(); i++) ///> iterate through each command
         {
-           COUT << (*(*i)).description << " - Effect: " << (*(*i)).effect << std::endl;
+           COUT << (*(*i)).description << " - Effect: " << (*(*i)).effect << std::endl; ///> prints out the effect of each command
         }
     } 
     return COUT; 
@@ -300,10 +301,10 @@ std::string CommandProcessor::readCommand()
                                     "gamestart, replay, quit}" << std::endl;
     std::cout << "Enter a command: ";
 
-    std::getline(std::cin, stringCommand);
+    std::getline(std::cin, stringCommand); ///> get the input line from the console
     std::cout << std::endl;
 
-    return stringCommand;
+    return stringCommand; ///> return the input line
 }
 
 /**
@@ -335,29 +336,29 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
                 Command* command = new Command;
                 command->nextState = GameState::Map_Loaded; ///> state transitions to maploaded
                 command->description = fileName; ///> File name is added to the description of the command
-                command->effect = "To load a map";
-                this->commandCollection.push_back(command);
+                command->effect = "To load a map"; ///> update the effect
+                this->commandCollection.push_back(command); ///> add the command to the collection
                 std::cout << "*** loadmap command added to command collection (file name: " << fileName << ") ***" << std::endl;
             }
             
         }
         else
         {
-           std::cout << "Please enter a file name after using the \"loadmap\" command." << std::endl; 
+           std::cout << "Please enter a file name after using the \"loadmap\" command." << std::endl; ///> if no file name was provided
         }  
     }
     else if (stringCommand == "validatemap") ///> validatemap command
     {
         Command* command = new Command;
         command->nextState = GameState::Map_Validated; ///> state transitions to mapvalidated
-        command->description = "validatemap";
-        command->effect = "To validate a map";
-        this->commandCollection.push_back(command);
+        command->description = "validatemap"; ///> description holds "validatemap"
+        command->effect = "To validate a map"; ///> update the effect
+        this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** validatemap command added to command collection ***" << std::endl;
     }
     else if (stringCommand.substr(0,9) == "addplayer") ///> addplayer command
     {
-        if(stringCommand.size()>9)
+        if(stringCommand.size()>9) ///> addplayer xxxxx....
         {
             if(stringCommand.at(9) != ' ') ///> checks so there is a space between "addplayer" and the player name
             {
@@ -369,42 +370,42 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
                 Command* command = new Command;
                 command->nextState = GameState::Players_Added; ///> state transitions to maploaded
                 command->description = playerName; ///> Player name is added to the description of the command
-                command->effect = "To add a player";
-                this->commandCollection.push_back(command);
+                command->effect = "To add a player"; ///> update the effect
+                this->commandCollection.push_back(command); ///> add the command to the collection
                 std::cout << "*** playerName command added to command collection (player name: " << playerName << ") ***" << std::endl;   
             }
 
         }
         else
         {
-           std::cout << "Please enter a player name after using the \"addplayer\" command." << std::endl; 
+           std::cout << "Please enter a player name after using the \"addplayer\" command." << std::endl; ///> if no name was provided
         }  
     }
     else if (stringCommand == "gamestart") ///> gamestart command
     {
         Command* command = new Command;
         command->nextState = GameState::Assign_Reinforcement; ///> state transitions to assignreinforcement
-        command->description = "gamestart";
-        command->effect = "To start a game";
-        this->commandCollection.push_back(command);
+        command->description = "gamestart"; ///> description holds "gamestart"
+        command->effect = "To start a game"; ///> update the effect
+        this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** gamestart command added to command collection ***" << std::endl;
     }
     else if(stringCommand == "replay") ///> replay command
     {
         Command* command = new Command;
         command->nextState = GameState::Start; ///> state transitions to start
-        command->description = "replay";
-        command->effect = "To replay a game";
-        this->commandCollection.push_back(command);
+        command->description = "replay"; ///> description holds "replay"
+        command->effect = "To replay a game"; ///> update the effect
+        this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** replay command added to command collection ***" << std::endl;
     }
     else if (stringCommand == "quit") ///> quit command
     {
         Command* command = new Command;
         command->nextState = GameState::End; ///> state transitions to exit program
-        command->description = "quit";
-        command->effect = "To quit a game";
-        this->commandCollection.push_back(command);
+        command->description = "quit"; ///> description holds "quit"
+        command->effect = "To quit a game"; ///> update the effect
+        this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** quit command added to command collection ***" << std::endl;
     }
     else ///> Invalid command has been entered
@@ -413,5 +414,90 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
     } 
 }
 
-
 // <<<< FileCommandProcessorAdapter Class Definitions >>>> 
+
+/**
+ * Parametrized FileCommandProcessorAdapter constructor
+ * that in a file name string and assigns it to
+ * an instance of FileLineReader.
+ * 
+ * @param fileName A file name string.
+ */
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName)
+{
+    this->fileReader = new FileLineReader(fileName);
+}
+
+
+/**
+ * FileCommandProcessorAdapter destructor that
+ * frees the memory of its FileLineReader instance.
+ */
+FileCommandProcessorAdapter::~FileCommandProcessorAdapter()
+{
+    delete fileReader; ///> free memory held by fileReader
+}
+
+/**
+ * Overriden readCommand() method from the CommandProcessor base class
+ * to be able to read a line from a file using the readLineFromFile() method
+ * of the FileLineReader instance: fileReader.
+ */
+std::string FileCommandProcessorAdapter::readCommand()
+{
+    return this->fileReader->readLineFromFile(); ///> returns the command read from the file
+}
+
+
+// <<<< FileLineReader Class Definitions >>>> 
+
+/**
+ * Parametrized FileLineReader constructor that 
+ * takes a string as input and assigns it to its
+ * fileName variable.
+ * 
+ * @param fileName A file name string.
+ */
+FileLineReader::FileLineReader(std::string fileName)
+{
+    this->fileName = fileName;
+}
+
+/**
+ * readLineFromFile() method that reads a line from a 
+ * file and returns the command.
+ * 
+ * Notice: Given the restrictions in Assignment 2, part 1,
+ * especially the graph "Sum-up of the proposed design for Part 1",
+ * it is impossible to read more than one command from a file since
+ * the saveCommand() method has to be inside the getCommand().
+ */
+std::string FileLineReader::readLineFromFile()
+{
+    std::fstream file;
+    std::string command;
+
+    file.open(this->fileName, std::ios::in); ///> read mode
+
+    if(file.is_open()) ///> if the file can be opened
+    {
+        if(getline(file, command)) ///> get the line
+        {
+            file.close(); 
+            return command;
+        }
+        else
+        {
+            std::cout << this->fileName << " is empty" << std::endl;
+            file.close();
+            return "Nothing"; ///> if the file is empty
+        }
+    }
+    else
+    {
+        std::cout << this->fileName << " was not found!" << std::endl; ///> if the file wasn't found
+    }
+    file.close();
+    return "Nothing"; ///> if the file couldn't be opened
+
+}
