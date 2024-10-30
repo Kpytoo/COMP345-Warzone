@@ -306,6 +306,10 @@ std::string GameEngine::getCurrentState() const
         case GameState::Execute_Orders:
             return "Execute Orders";
 
+        // Return "Win" if the state is Win
+        case GameState::Win:
+            return "Win";
+            
         // Return "End" if the state is End
         case GameState::End:
             return "End";
