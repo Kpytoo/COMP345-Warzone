@@ -3,6 +3,10 @@
 
 // <<<< CommandProcessor Class Definitions >>>> 
 
+/**
+ * This function calls readCommand() and use its
+ * output as an argument for saveCommand().
+ */
 void CommandProcessor::getCommand()
 {   
     std::string stringCommand;
@@ -51,7 +55,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                     else ///< if command is not valid in current game state
                     {
                         std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).effect = "Error: loadmap is not valid in current game state: " + currentGame.getCurrentState();
+                        (*(*i)).saveEffect("Error: loadmap is not valid in current game state: " + currentGame.getCurrentState());
                         std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                         return;
                     }
@@ -81,7 +85,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).effect = "Error: validatemap is not valid in current game state: " + currentGame.getCurrentState();
+                    (*(*i)).saveEffect("Error: validatemap is not valid in current game state: " + currentGame.getCurrentState());
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                     return;
                 }
@@ -108,7 +112,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                     else ///< if command is not valid in current game state
                     {
                         std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).effect = "Error: addplayer is not valid in current game state: " + currentGame.getCurrentState();
+                        (*(*i)).saveEffect("Error: addplayer is not valid in current game state: " + currentGame.getCurrentState());
                         std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                         return;
                     }
@@ -138,7 +142,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).effect = "Error: gamestart is not valid in current game state: " + currentGame.getCurrentState();
+                    (*(*i)).saveEffect("Error: gamestart is not valid in current game state: " + currentGame.getCurrentState());
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                     return;
                 }
@@ -162,7 +166,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).effect = "Error: replay is not valid in current game state: " + currentGame.getCurrentState();
+                    (*(*i)).saveEffect("Error: replay is not valid in current game state: " + currentGame.getCurrentState());
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                     return;
                 }
@@ -186,7 +190,7 @@ void CommandProcessor::validate(std::string command, GameEngine& currentGame)
                 else ///< if command is not valid in current game state
                 {
                     std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).effect = "Error: quit is not valid in current game state: " + currentGame.getCurrentState();
+                    (*(*i)).saveEffect("Error: quit is not valid in current game state: " + currentGame.getCurrentState());
                     std::cout << "Effect saved: " << (*(*i)).effect << "\n" << std::endl;
                     return;
                 }
@@ -209,19 +213,52 @@ CommandProcessor::CommandProcessor()
   ///> does nothing
 }
 
-CommandProcessor::CommandProcessor(const CommandProcessor& cmdprc)
+/**
+* Copy CommandProcessor constructor.
+* 
+* @param cmdprc A command processor instance that is copied from.
+*/
+CommandProcessor::CommandProcessor(CommandProcessor& cmdprc)
 {
-    
+    for(std::list<Command*>::iterator i = cmdprc.commandCollection.begin(); i != cmdprc.commandCollection.end(); i++)
+    {
+        Command* tempCommand = new Command();
+        tempCommand->description = (*(*i)).description;
+        tempCommand->effect = (*(*i)).effect;
+        tempCommand->nextState = (*(*i)).nextState;
+        this->commandCollection.push_back(tempCommand);
+    }
 }
 
+/**
+ * CommandProcessor destructor that deletes
+ * every command pointer in its command collection list.
+ */
 CommandProcessor::~CommandProcessor()
 {
-
+        for(std::list<Command*>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
+    {
+        delete *i;
+    }
 }
 
-void CommandProcessor::operator=(const CommandProcessor& cmdprc)
+/**
+ * Overloaded assignment operator for the Command Processor class.
+ */
+void CommandProcessor::operator=(CommandProcessor& cmdprc)
 {
-
+    for(std::list<Command*>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
+    {
+        delete *i;
+    }
+        for(std::list<Command*>::iterator i = cmdprc.commandCollection.begin(); i != cmdprc.commandCollection.end(); i++)
+    {
+        Command* tempCommand = new Command();
+        tempCommand->description = (*(*i)).description;
+        tempCommand->effect = (*(*i)).effect;
+        tempCommand->nextState = (*(*i)).nextState;
+        this->commandCollection.push_back(tempCommand);
+    }
 }
 
 /**

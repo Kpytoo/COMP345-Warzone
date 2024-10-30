@@ -10,6 +10,10 @@ class CommandProcessor
 {
     public:
         
+        /**
+        * This function calls readCommand() and use its
+        * output as an argument for saveCommand().
+        */
         void getCommand();
 
         /**
@@ -31,9 +35,24 @@ class CommandProcessor
         * Default CommandProcessor constructor.
         */
         CommandProcessor();
-        CommandProcessor(const CommandProcessor& cmdprc);
+
+        /**
+         * Copy CommandProcessor constructor.
+         * 
+         * @param cmdprc A command processor instance that is copied from.
+         */
+        CommandProcessor(CommandProcessor& cmdprc);
+
+        /**
+         * CommandProcessor destructor that deletes
+         * every command pointer in its command collection list.
+         */
         ~CommandProcessor();
-        void operator=(const CommandProcessor& cmdprc);
+
+        /**
+         * Overloaded assignment operator for the Command Processor class.
+         */
+        void operator=(CommandProcessor& cmdprc);
 
         /**
         * Overloaded Stream insertion operator which outputs the Command Collection
@@ -45,6 +64,7 @@ class CommandProcessor
         friend std::ostream& operator<<(std::ostream& COUT, CommandProcessor& CMDPRC);
 
     private:
+
         /**
          * A list that contains a collection of Command pointers.
          */

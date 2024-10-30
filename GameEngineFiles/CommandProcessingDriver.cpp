@@ -20,21 +20,24 @@ int main()
     GameEngine engine;
     CommandProcessor comProc;
     comProc.getCommand();
-    // comProc.getCommand();
-    // comProc.getCommand();
+    comProc.getCommand();
+    comProc.getCommand();
     // comProc.getCommand();
     // comProc.getCommand();
     // comProc.getCommand();
     std::cout << comProc << std::endl;
-    engine.manageCommand("loadmap");
-    engine.manageCommand("validatemap");
-    engine.manageCommand("addplayer");
-    engine.manageCommand("assigncountries");
-    engine.manageCommand("issueorder");
-    engine.manageCommand("endissueorders");
-    engine.manageCommand("win");
-    comProc.validate("qui",engine);
-    std::cout << comProc << std::endl;
+    CommandProcessor comProc2(comProc);
+    comProc2.getCommand();
+    std::cout << comProc2 << std::endl;
+    // engine.manageCommand("loadmap");
+    // engine.manageCommand("validatemap");
+    // engine.manageCommand("addplayer");
+    // engine.manageCommand("assigncountries");
+    // engine.manageCommand("issueorder");
+    // engine.manageCommand("endissueorders");
+    // engine.manageCommand("win");
+    // comProc.validate("loadmap l",engine);
+    // std::cout << comProc << std::endl;
 
 
     return 0;
