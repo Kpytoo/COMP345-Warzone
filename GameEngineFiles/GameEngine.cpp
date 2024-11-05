@@ -72,6 +72,9 @@ GameEngine::GameEngine()
 
     // Valid commands for Win state
     (*mapValidCommands)[GameState::Win] = {"play", "end"};
+
+    playersList = {};
+    currentMap = nullptr;
 }
 
 /**
@@ -105,6 +108,12 @@ GameEngine::~GameEngine()
 
     // Delete the pointer and free memory allocated for the valid commands map
     delete mapValidCommands;
+
+    delete currentMap;
+    for(auto player : playersList)
+    {
+        delete player;
+    }
 }
 
 /**
@@ -350,4 +359,166 @@ bool GameEngine::isCommandValid(const std::string& command) const
 
     // The command wasn't found in the list of valid commands for the current game state
     return false;
+}
+
+void GameEngine::mainGameLoop()
+{
+    while(playersList.size() > 1)
+    {
+        for(int i = 0; i < playersList.size(); i++)
+        {
+            if(playersList[i]->getOwnedTerritories().empty())
+            {
+                delete playersList[i];
+                playersList.erase(playersList.begin() + i);
+                i--;
+                continue;
+            }
+
+            reinforcementPhase(playersList[i]);
+        }
+
+        for(int i = 0; i < playersList.size(); i++)
+        {
+            issueOrdersPhase(playersList[i]);
+        }
+
+        executeOrdersPhase();
+    }
+
+    std::cout << "\nGame Over! Player " << playersList[0]->getPlayerName() << "has won! \n\n";
+}
+
+void GameEngine::reinforcementPhase(Player* player)
+{
+    // Display whose turn it is for their reinforcement phase 
+    std::cout << "Reinforcement Phase for " << player->getPlayerName() << std::endl;
+
+    // number of territories that the current player owns
+    int numberOfTerritories = player->getOwnedTerritories().size();
+    // give the number of army units in their reinforcement pool depending on the number of territories owned
+    player->setNumArmies(std::max(static_cast<int>(3), static_cast<int>(std::floor(numberOfTerritories / 3))));
+
+    // for each continent in the current map
+    for(const auto& continentPair : currentMap->continents)
+    {
+        // get the continent value from the pair
+        Continent* continent = continentPair.second;
+        // assume player owns the current continent
+        bool continentOwned = true;
+
+        // for each territory in the current continent
+        for(const auto& territoryPair : continent->childTerritories)
+        {
+            // get the territory value from the pair
+            Territory* territory = territoryPair.second;
+            // assume the player do not own the current territory
+            bool territoryOwned = false;
+
+            // for each territory in the player's owned territories
+            for(const auto& ownedTerritory : player->getOwnedTerritories())
+            {
+                // if we find the current territory's name in the list of the player's owned territories
+                if(ownedTerritory->name == territory->name)
+                {
+                    // then the player owns the territory
+                    territoryOwned = true;
+                    break;
+                }
+            }
+
+            // if we find that the current territory isn't owned by the player
+            if(!territoryOwned)
+            {
+                // then the player do not own the continent
+                continentOwned = false;
+                break;
+            }
+        }
+
+        // if the player owns the current continent
+        if(continentOwned)
+        {
+            // then update the number of army units in their reinforcement pool by adding the extra army units from the continent's bonus
+            player->setNumArmies(player->getNumArmies() + continent->bonusPoints);
+        }
+    }
+}
+
+void GameEngine::issueOrdersPhase(Player* player)
+{
+    // Display whose turn it is for their issuing order phase 
+    std::cout << "Issuing Orders Phase for " << player->getPlayerName() << std::endl;
+    std::cout << "Invalid Orders will be ignored and won't be executed so please issue your orders carefully!\n\n";
+
+    bool noMoreOrders = false;
+    bool invalidO = false;
+    std::string inputO;
+    std::string inputOrderType;
+
+    while(!noMoreOrders)
+    {
+        do
+        {
+            invalidO = false;
+            std::cout << "Issue an Order? (Y/N): ";
+            std::cin >> inputO;
+            std::cout << "\n\n";
+
+            if(toLowerCase(inputO) == "y")
+            {
+                std::cout << "- Order Types -\n\n";
+                std::cout << "\t- Deploy\n\t- Advance\n\t- Airlift\n\t- Bomb\n\t- Blockade\n\t- Negotiate\n\n";
+                std::cout << "Please issue an order type: ";
+                std::cin >> inputOrderType;
+
+                player->issueOrder(toLowerCase(inputOrderType));
+            }
+            else if(toLowerCase(inputO) == "n")
+            {
+                noMoreOrders = true;
+            }
+            else
+            {
+                std::cout << "Invalid Statement! Try again!\n\n ";
+                invalidO = true;
+            }
+        } 
+        while (invalidO);
+    }
+
+    std::cout << "Current list of territories to attack:\n";
+    for(Territory* t : player->getToAttackTerritories())
+    {
+        std::cout << t->name << std::endl;
+    }
+
+    std::cout << "\nCurrent list of territories to defend:\n";
+    for(Territory* t : player->getToDefendTerritories())
+    {
+        std::cout << t->name << std::endl;
+    }
+    
+}
+
+void GameEngine::executeOrdersPhase()
+{
+    bool ordersLeft = true;
+
+    while(ordersLeft)
+    {
+        ordersLeft = false;
+        
+        for(int i = 0; i < playersList.size(); i++)
+        {
+            if(playersList[i]->getOrdersList()->ordersVector.empty())
+            {
+                continue;
+            }
+
+            ordersLeft = true;
+            playersList[i]->getOrdersList()->ordersVector.front()->execute();
+            playersList[i]->getOrdersList()->ordersVector.erase(playersList[i]->getOrdersList()->ordersVector.begin());
+        } 
+    }
 }

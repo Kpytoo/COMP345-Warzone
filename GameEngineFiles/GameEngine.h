@@ -7,6 +7,9 @@
 #include <vector>
 #include <algorithm>
 
+#include "PlayerFiles/Player.h"
+#include "MapFiles/Map.h"
+
 /**
  * Enum representing various game states/phases.
  */
@@ -66,6 +69,12 @@ private:
 
     // Valid commands for each game state
     std::map<GameState, std::vector<std::string>>* mapValidCommands;
+    
+    // The list of players in the game
+    std::vector<Player*> playersList;
+    
+    // The map used for the game
+    Map* currentMap;
 
     /**
      * Helper function to convert a string to lowercase.
@@ -132,6 +141,11 @@ public:
      * @return True if the command is valid, false otherwise.
      */
     bool isCommandValid(const std::string& command) const;
+
+    void mainGameLoop();
+    void reinforcementPhase(Player* player);
+    void issueOrdersPhase(Player* player);
+    void executeOrdersPhase();
 };
 
 #endif

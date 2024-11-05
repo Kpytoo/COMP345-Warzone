@@ -136,7 +136,101 @@ std::vector<Territory *> Player::toAttack()
 }
 
 // issueOrder: creates a new order and adds it to the player's orders list
-void Player::issueOrder()
+void Player::issueOrder(std::string orderType)
 {
-    ordersList->ordersVector.push_back(new AdvanceOrder()); // Use advanced order for now
+    if(orderType != "deploy" && getNumArmies == 0)
+    {
+        std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
+        return;
+    }
+
+    std::string sourceTName;
+    std::string targetTName;
+    int armies;
+
+    if(orderType == "deploy")
+    {
+        std:: string territoryName;
+            int armyUnits = getNumArmies();
+            int armyDeployed = 0;
+
+            std::cout << "- Owned Territories -\n";
+            for(Territory* t : getOwnedTerritories())
+            {
+                std::cout << t->name << std::endl;
+            }
+
+            std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
+            std::cin >> territoryName;
+
+            std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
+            std::cout << "Please enter the number of army units you want to deploy in " << territoryName << ": ";
+            std::cin >> armyDeployed;
+            armyUnits = armyUnits - armyDeployed;
+
+            if(armyUnits < 0)
+            {
+                setNumArmies(0);
+            }
+            else
+            {
+                setNumArmies(armyUnits);
+            }
+            
+            ordersList->ordersVector.push_back(new DeployOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else if(orderType == "advance")
+    {
+        std::cout << "\nChoose a source territory (army units should be on standby there): ";
+        std::cin >> sourceTName;
+
+        std::cout << "\nChoose a target territory to advance to: ";
+        std::cin >> targetTName;
+
+        std::cout << "\nEnter the number of army units to execute an advance order: ";
+        std::cin >> armies;
+
+        // implement logic for toAttack() and toDefend() lists creation?
+
+        ordersList->ordersVector.push_back(new AdvanceOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else if(orderType == "airlift")
+    {
+        std::cout << "\nChoose a source territory (army units should be on standby there): ";
+        std::cin >> sourceTName;
+
+        std::cout << "\nChoose a target territory to move to: ";
+        std::cin >> targetTName;
+
+        std::cout << "\nEnter the number of army units to execute an airlift order: ";
+        std::cin >> armies;
+
+        ordersList->ordersVector.push_back(new AirliftOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else if(orderType == "bomb")
+    {
+        std::cout << "\nChoose a target territory to execute a bomb order: ";
+        std::cin >> targetTName;
+
+        ordersList->ordersVector.push_back(new BombOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else if(orderType == "blockade")
+    {
+        std::cout << "\nChoose a target territory to execute a blockade order: ";
+        std::cin >> targetTName;
+
+        ordersList->ordersVector.push_back(new BlockadeOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else if(orderType == "negotiate")
+    {
+        std::string targetPName;
+        std::cout << "\nChoose a target player to execute a negotiate order: ";
+        std::cin >> targetPName;
+
+        ordersList->ordersVector.push_back(new NegotiateOrder()); // Need to have some logic that registers the details from the player's input
+    }
+    else
+    {
+        std::cout << "Invalid Order Type! Please try again! \n\n";
+    }
 }
