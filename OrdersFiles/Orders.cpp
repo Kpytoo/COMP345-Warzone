@@ -1,3 +1,4 @@
+#include <sstream>
 #include "Orders.h"
 
 /*
@@ -55,6 +56,13 @@ std::ostream& operator<<(std::ostream &COUT, const Order &ORDER) {
 void Order::execute() {
     validate();  // Validate first
     std::cout << "Executing " << orderType << " order." << std::endl;
+    notify(this);
+}
+
+std::string Order::stringToLog() const {
+    std::stringstream SS;
+    SS << "Order Executed: " << *this;
+    return SS.str();
 }
 
 // ---------------------- Deploy Order ----------------------
@@ -280,6 +288,7 @@ void OrdersList::operator=(const OrdersList &ordersList) {
  */
 void OrdersList::add(Order* order) {
     ordersVector.push_back(order);
+    notify(this);
 }
 
 /**
@@ -346,6 +355,12 @@ OrdersList::~OrdersList() {
     for (Order* order : ordersVector) { // Free up dynamically allocated Order instances in list.
         delete order;
     }
+}
+
+std::string OrdersList::stringToLog() const {
+    std::stringstream SS;
+    SS << "Order Issued: " << *ordersVector.back();
+    return SS.str();
 }
 
 // <<<< OrdersList Class Definitions >>>>

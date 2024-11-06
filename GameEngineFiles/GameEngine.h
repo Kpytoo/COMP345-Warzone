@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include "LogFiles/LoggingObserver.h"
 
 /**
  * Enum representing various game states/phases.
@@ -55,7 +56,7 @@ struct Command
 /**
  * GameEngine class responsible for managing the game states and commands.
  */
-class GameEngine
+class GameEngine : public Subject, public ILoggable
 {
 private:
     // Pointer to the current game state
@@ -132,6 +133,8 @@ public:
      * @return True if the command is valid, false otherwise.
      */
     bool isCommandValid(const std::string& command) const;
+
+    std::string stringToLog() const override;
 };
 
 #endif
