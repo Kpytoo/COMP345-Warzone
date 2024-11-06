@@ -32,19 +32,19 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running test: testLoadMaps...\n";
                 testLoadMaps();
             }
-            if (arg == "testCards") {
+            else if (arg == "testCards") {
                 std::cout << "Running test: testCards...\n";
                 testCards();
             }
-            if (arg == "testPlayers") {
+            else if (arg == "testPlayers") {
                 std::cout << "Running test: testPlayers...\n";
                 testPlayers();
             }
-            if (arg == "testGameStates") {
+            else if (arg == "testGameStates") {
                 std::cout << "Running test: testGameStates...\n";
                 testGameStates();
             }
-            if (arg == "testOrdersLists") {
+            else if (arg == "testOrdersLists") {
                 std::cout << "Running test: testOrdersLists...\n";
                 testOrdersLists();
             }
