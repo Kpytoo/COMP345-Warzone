@@ -25,7 +25,7 @@ class CommandProcessor
         * This function calls readCommand() and use its
         * output as an argument for saveCommand().
         */
-        void getCommand();
+        Command& getCommand();
 
         /**
         * This function takes in a string that stores a command and a GameEngine object
@@ -100,7 +100,7 @@ class CommandProcessor
         * 
         * @param stringCommand Constant string that contains the specified command.
         */
-        void saveCommand(const std::string stringCommand);
+        Command& saveCommand(const std::string stringCommand);
 };
 
 /**

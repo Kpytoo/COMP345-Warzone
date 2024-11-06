@@ -7,11 +7,11 @@
  * This function calls readCommand() and use its
  * output as an argument for saveCommand().
  */
-void CommandProcessor::getCommand()
+Command& CommandProcessor::getCommand()
 {   
     std::string stringCommand;
     stringCommand = readCommand(); ///> returns a command as a string
-    saveCommand(stringCommand); ///> saves the command in the command collection, if the command is valid
+    return saveCommand(stringCommand); ///> saves the command in the command collection, if the command is valid
 }
 
 /**
@@ -318,8 +318,9 @@ std::string CommandProcessor::readCommand()
  * 
  * @param stringCommand Constant string that contains the specified command.
  */
-void CommandProcessor::saveCommand(const std::string stringCommand)
-{
+Command& CommandProcessor::saveCommand(const std::string stringCommand)
+{   
+    Command* command = new Command;
     
     if(stringCommand.substr(0,7) == "loadmap") ///> loadmap command
     {
@@ -333,28 +334,29 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
             else
             {
                 std::string fileName = stringCommand.substr(8);
-                Command* command = new Command;
                 command->nextState = GameState::Map_Loaded; ///> state transitions to maploaded
                 command->description = fileName; ///> File name is added to the description of the command
                 command->effect = "To load a map"; ///> update the effect
                 this->commandCollection.push_back(command); ///> add the command to the collection
                 std::cout << "*** loadmap command added to command collection (file name: " << fileName << ") ***" << std::endl;
+                return *command;
             }
             
         }
         else
         {
            std::cout << "Please enter a file name after using the \"loadmap\" command." << std::endl; ///> if no file name was provided
+           return *command;
         }  
     }
     else if (stringCommand == "validatemap") ///> validatemap command
     {
-        Command* command = new Command;
         command->nextState = GameState::Map_Validated; ///> state transitions to mapvalidated
         command->description = "validatemap"; ///> description holds "validatemap"
         command->effect = "To validate a map"; ///> update the effect
         this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** validatemap command added to command collection ***" << std::endl;
+        return *command;
     }
     else if (stringCommand.substr(0,9) == "addplayer") ///> addplayer command
     {
@@ -367,50 +369,52 @@ void CommandProcessor::saveCommand(const std::string stringCommand)
             else
             {
                 std::string playerName = stringCommand.substr(10);
-                Command* command = new Command;
                 command->nextState = GameState::Players_Added; ///> state transitions to maploaded
                 command->description = playerName; ///> Player name is added to the description of the command
                 command->effect = "To add a player"; ///> update the effect
                 this->commandCollection.push_back(command); ///> add the command to the collection
-                std::cout << "*** playerName command added to command collection (player name: " << playerName << ") ***" << std::endl;   
+                std::cout << "*** playerName command added to command collection (player name: " << playerName << ") ***" << std::endl;
+                return *command;   
             }
 
         }
         else
         {
            std::cout << "Please enter a player name after using the \"addplayer\" command." << std::endl; ///> if no name was provided
+           return *command;
         }  
     }
     else if (stringCommand == "gamestart") ///> gamestart command
     {
-        Command* command = new Command;
         command->nextState = GameState::Assign_Reinforcement; ///> state transitions to assignreinforcement
         command->description = "gamestart"; ///> description holds "gamestart"
         command->effect = "To start a game"; ///> update the effect
         this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** gamestart command added to command collection ***" << std::endl;
+        return *command;
     }
     else if(stringCommand == "replay") ///> replay command
     {
-        Command* command = new Command;
         command->nextState = GameState::Start; ///> state transitions to start
         command->description = "replay"; ///> description holds "replay"
         command->effect = "To replay a game"; ///> update the effect
         this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** replay command added to command collection ***" << std::endl;
+        return *command;
     }
     else if (stringCommand == "quit") ///> quit command
     {
-        Command* command = new Command;
         command->nextState = GameState::End; ///> state transitions to exit program
         command->description = "quit"; ///> description holds "quit"
         command->effect = "To quit a game"; ///> update the effect
         this->commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** quit command added to command collection ***" << std::endl;
+        return *command;
     }
     else ///> Invalid command has been entered
     {
         std::cout << "Invalid command has been entered.\n" << std::endl;
+        return *command;
     } 
 }
 
