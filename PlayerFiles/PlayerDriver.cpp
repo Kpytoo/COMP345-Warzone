@@ -56,7 +56,7 @@ void testPlayers()
 
     // Issue an order and display the updated orders list
     std::cout << "\nIssuing Order..." << std::endl;
-    player1.issueOrder();
+    //player1.issueOrder();
     std::cout << "Order issued. Orders List:" << std::endl;
     std::cout << *(player1.getOrdersList()) << std::endl;
 

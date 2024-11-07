@@ -1,4 +1,5 @@
 #include "Orders.h"
+#include "PlayerFiles/Player.h"
 
 /*
 Note that the orders’ actions do not need to be implemented at this point. Invalid
@@ -50,10 +51,10 @@ std::ostream& operator<<(std::ostream &COUT, const Order &ORDER) {
 
 /**
  * @brief Executes the Order.
- * Validates the order and displays a message if executed.
+ * Displays a message if executed.
  */
-void Order::execute() {
-    validate();  // Validate first
+void Order::execute() 
+{
     std::cout << "Executing " << orderType << " order." << std::endl;
 }
 
@@ -63,7 +64,13 @@ void Order::execute() {
  * @brief Constructor for the DeployOrder class.
  * Initializes the orderType as "deploy".
  */
-DeployOrder::DeployOrder() { orderType = "deploy"; }
+DeployOrder::DeployOrder() { orderType = "deploy"; validOrder = false;}
+
+DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
+{
+    orderType = "deploy";
+    validOrder = false;
+}
 
 /**
  * @brief Validates the DeployOrder.
@@ -71,19 +78,68 @@ DeployOrder::DeployOrder() { orderType = "deploy"; }
  */
 void DeployOrder::validate() {
     std::cout << "Validating deploy order..." << std::endl;
-    // Assume validation logic here
+    
+    bool tFound = false;
+    bool enoughArmy = false;
+    for(Territory* t : player->getOwnedTerritories())
+    {
+        if(t->name == territoryDeployName)
+        {
+            tFound = true;
+
+            if(player->getNumArmies() >= army)
+            {
+                enoughArmy = true;
+            }
+
+            break;
+        }
+    }
+
+    if(!tFound)
+    {
+        std::cout << "Order Invalid: Target territory not found in " << player->getPlayerName() << "'s owned territories.\n";
+        validOrder = false;
+    }
+    else if(!enoughArmy)
+    {
+        std::cout << "Order Invalid: Not enough army units in " << player->getPlayerName() << "'s reinforcement pool to deploy.\n";
+        validOrder = false;
+    }
+    else
+    {
+        validOrder = true;
+    }
+
 }
 
 /**
  * @brief Executes the DeployOrder.
  * Validates and then performs the deployment if valid.
  */
-void DeployOrder::execute() {
-    if (true /* assume valid */) {
+void DeployOrder::execute() 
+{
+    DeployOrder::validate();
+
+    if (validOrder) 
+    {
         Order::execute();
-        std::cout << "Deploying troops." << std::endl;
-    } else {
-        std::cout << "Deploy order is invalid." << std::endl;
+
+        for(Territory* t : player->getOwnedTerritories())
+        {
+            if(t->name == territoryDeployName)
+            {
+                t->numberOfArmies += army;
+                player->setNumArmies(player->getNumArmies() - army);
+                std::cout << "Successfully deployed " << army << " units to " << t->name << ".\n";
+                break;
+            }
+        }
+        
+    } 
+    else 
+    {
+        std::cout << "Deploy order is invalid and will not be executed.\n";
     }
 }
 

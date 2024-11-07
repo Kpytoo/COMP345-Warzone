@@ -138,7 +138,7 @@ std::vector<Territory *> Player::toAttack()
 // issueOrder: creates a new order and adds it to the player's orders list
 void Player::issueOrder(std::string orderType)
 {
-    if(orderType != "deploy" && getNumArmies == 0)
+    if(orderType != "deploy" && getNumArmies() == 0)
     {
         std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
         return;
@@ -166,18 +166,8 @@ void Player::issueOrder(std::string orderType)
             std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
             std::cout << "Please enter the number of army units you want to deploy in " << territoryName << ": ";
             std::cin >> armyDeployed;
-            armyUnits = armyUnits - armyDeployed;
-
-            if(armyUnits < 0)
-            {
-                setNumArmies(0);
-            }
-            else
-            {
-                setNumArmies(armyUnits);
-            }
             
-            ordersList->ordersVector.push_back(new DeployOrder()); // Need to have some logic that registers the details from the player's input
+            ordersList->ordersVector.push_back(new DeployOrder(this, territoryName, armyDeployed));
     }
     else if(orderType == "advance")
     {

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "PlayerFiles/Player.h"
 
 /**
  * @brief The base class representing an Order in the game.
@@ -16,6 +17,7 @@ public:
      * @brief The type of the order (e.g., deploy, advance, bomb, etc.).
      */
     std::string orderType;
+    bool validOrder;
 
     /**
      * @brief Validates whether the order is valid.
@@ -143,11 +145,17 @@ public:
  */
 class DeployOrder : public Order {
 public:
+    std::string territoryDeployName;
+    int army;
+    Player* player;
+
     /**
      * @brief Constructor for DeployOrder.
      * Initializes the orderType to "deploy".
      */
     DeployOrder();
+
+    DeployOrder(Player* p, const std::string tName, int armyUnits);
 
     /**
      * @brief Validates the DeployOrder.

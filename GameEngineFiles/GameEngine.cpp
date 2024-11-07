@@ -451,42 +451,58 @@ void GameEngine::issueOrdersPhase(Player* player)
     std::cout << "Issuing Orders Phase for " << player->getPlayerName() << std::endl;
     std::cout << "Invalid Orders will be ignored and won't be executed so please issue your orders carefully!\n\n";
 
+    // assume player still has orders to issue
     bool noMoreOrders = false;
+    // assume that the user input is valid
     bool invalidO = false;
+    // user input to issue an order or not
     std::string inputO;
+    // user input for order type
     std::string inputOrderType;
 
+    // while the player still has orders to issue
     while(!noMoreOrders)
     {
+        // prompt the player to ask if they want to issue an order or not while making sure the user input is valid
         do
         {
+            // assume the user input is valid
             invalidO = false;
+            // prompt user and get user input
             std::cout << "Issue an Order? (Y/N): ";
             std::cin >> inputO;
             std::cout << "\n\n";
 
+            // if the player wants to issue an order
             if(toLowerCase(inputO) == "y")
             {
+                // then prompt the user and get user input for the order type to issue
                 std::cout << "- Order Types -\n\n";
                 std::cout << "\t- Deploy\n\t- Advance\n\t- Airlift\n\t- Bomb\n\t- Blockade\n\t- Negotiate\n\n";
                 std::cout << "Please issue an order type: ";
                 std::cin >> inputOrderType;
 
+                // call the method in Player to issue an order depending on the order type from user input
                 player->issueOrder(toLowerCase(inputOrderType));
             }
+            // else if the player doesn't want to issue an order
             else if(toLowerCase(inputO) == "n")
             {
+                // then the player has finished issuing orders
                 noMoreOrders = true;
             }
+            // else it's an invalid user input
             else
             {
+                // display a message to notify the player that the user input was invalid
                 std::cout << "Invalid Statement! Try again!\n\n ";
                 invalidO = true;
             }
         } 
         while (invalidO);
     }
-
+    
+    // Dunno what to do with these lists
     std::cout << "Current list of territories to attack:\n";
     for(Territory* t : player->getToAttackTerritories())
     {
@@ -503,21 +519,30 @@ void GameEngine::issueOrdersPhase(Player* player)
 
 void GameEngine::executeOrdersPhase()
 {
+    // assume there are orders left to execute
     bool ordersLeft = true;
 
+    // while there are still orders left in the orders list of the players
     while(ordersLeft)
     {
+        // assume there are no more orders left to execute in all players' orders list
         ordersLeft = false;
         
+        // for each player
         for(int i = 0; i < playersList.size(); i++)
         {
+            // if the current player has no order left to execute from their orders list
             if(playersList[i]->getOrdersList()->ordersVector.empty())
             {
+                // skip this player and move on to the next player
                 continue;
             }
 
+            // the current player still has orders left to execute from their orders list
             ordersLeft = true;
+            // Execute the first order in the list
             playersList[i]->getOrdersList()->ordersVector.front()->execute();
+            // Erase the order from the list
             playersList[i]->getOrdersList()->ordersVector.erase(playersList[i]->getOrdersList()->ordersVector.begin());
         } 
     }
