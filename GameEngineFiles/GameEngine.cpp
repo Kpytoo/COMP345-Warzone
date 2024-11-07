@@ -501,20 +501,6 @@ void GameEngine::issueOrdersPhase(Player* player)
         } 
         while (invalidO);
     }
-    
-    // Dunno what to do with these lists
-    std::cout << "Current list of territories to attack:\n";
-    for(Territory* t : player->getToAttackTerritories())
-    {
-        std::cout << t->name << std::endl;
-    }
-
-    std::cout << "\nCurrent list of territories to defend:\n";
-    for(Territory* t : player->getToDefendTerritories())
-    {
-        std::cout << t->name << std::endl;
-    }
-    
 }
 
 void GameEngine::executeOrdersPhase()

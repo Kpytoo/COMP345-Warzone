@@ -1,3 +1,7 @@
+#include <cstdlib>
+#include <ctime>
+#include <random>
+
 #include "Orders.h"
 #include "PlayerFiles/Player.h"
 
@@ -76,12 +80,13 @@ DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) :
  * @brief Validates the DeployOrder.
  * Displays a validation message.
  */
-void DeployOrder::validate() {
+void DeployOrder::validate() 
+{
     std::cout << "Validating deploy order..." << std::endl;
     
     bool tFound = false;
     bool enoughArmy = false;
-    for(Territory* t : player->getOwnedTerritories())
+    for(Territory* t : player->toDefend())
     {
         if(t->name == territoryDeployName)
         {
@@ -125,7 +130,7 @@ void DeployOrder::execute()
     {
         Order::execute();
 
-        for(Territory* t : player->getOwnedTerritories())
+        for(Territory* t : player->toDefend())
         {
             if(t->name == territoryDeployName)
             {
@@ -151,25 +156,136 @@ void DeployOrder::execute()
  */
 AdvanceOrder::AdvanceOrder() { orderType = "advance"; }
 
+AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) : 
+player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
+{
+    orderType = "advance";
+    validOrder = false;
+}
+
 /**
  * @brief Validates the AdvanceOrder.
  * Displays a validation message.
  */
-void AdvanceOrder::validate() {
+void AdvanceOrder::validate() 
+{
     std::cout << "Validating advance order..." << std::endl;
-    // Assume validation logic here
+    bool sFound = false;
+    bool adjacent = false;
+    Territory* sourceT = nullptr;
+    Territory* targetT = nullptr;
+
+    for(Territory* t : player->toDefend())
+    {
+        if(t->name == territoryAdvanceSName)
+        {
+            sFound = true;
+            sourceT = t;
+            break;
+        }
+    }
+
+    if(!sFound)
+    {
+        std::cout << "Order Invalid: Source territory not found in " << player->getPlayerName() << "'s owned territories.\n";
+        validOrder = false;
+        return;
+    }
+
+    for(const auto& pair : sourceT->adjacentTerritories)
+    {
+        if(pair.second->name == territoryAdvanceTName)
+        {
+            adjacent = true;
+            targetT = pair.second;
+            break;
+        }
+    }
+
+    if(!adjacent)
+    {
+        std::cout << "Order Invalid: Target territory is not found to source territory " << targetT->name << ".\n";
+        validOrder = false;
+        return;
+    }
+
+    if(sourceT->numberOfArmies >= army)
+    {
+        validOrder = true;
+    }
+    else
+    {
+        std::cout << "Order Invalid: Number of army units to advance surpass the number of army units available in source territoty" << sourceT->name << ".\n";
+        validOrder = false;
+    }
 }
 
 /**
  * @brief Executes the AdvanceOrder.
  * Validates and then performs the advancement if valid.
  */
-void AdvanceOrder::execute() {
-    if (true /* assume valid */) {
+void AdvanceOrder::execute() 
+{
+    AdvanceOrder::validate();
+
+    if (validOrder) 
+    {
         Order::execute();
-        std::cout << "Advancing troops." << std::endl;
-    } else {
-        std::cout << "Advance order is invalid." << std::endl;
+
+        bool ownT = false;
+        for(Territory* t : player->toDefend())
+        {
+            if(t->name == territoryAdvanceSName)
+            {
+                t->numberOfArmies -= army;
+            }
+
+            if(t->name == territoryAdvanceTName)
+            {
+                ownT = true;
+                t->numberOfArmies += army;
+            }
+        }
+
+        if(!ownT)
+        {
+            for(Territory* t : player->toAttack())
+            {
+                if(t->name == territoryAdvanceTName)
+                {
+                    int attackingUnits = army;
+                    int defendingUnits = t->numberOfArmies;
+
+                    std::mt19937 rng(static_cast<unsigned>(std::time(0))); 
+                    std::uniform_int_distribution<int> dist(1, 100);    
+
+                    while(attackingUnits > 0 && defendingUnits > 0)
+                    {
+                        if(dist(rng) < 60)
+                        {
+                            defendingUnits--;
+                        }
+
+                        if(dist(rng) < 70)
+                        {
+                            attackingUnits--;
+                        }
+                    }
+
+                    if(defendingUnits == 0)
+                    {
+                        t->numberOfArmies = attackingUnits;
+                        // to be continued                        
+                    }
+                }
+            }
+        }
+
+        std::cout << "Advancing troops from " << territoryAdvanceSName << " to " << territoryAdvanceTName << ".\n";
+    } 
+    else 
+    {
+        std::cout << "Advance order is invalid and will not be executed.\n";
     }
 }
 

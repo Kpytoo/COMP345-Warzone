@@ -176,11 +176,18 @@ public:
  */
 class AdvanceOrder : public Order {
 public:
+    std::string territoryAdvanceTName;
+    std::string territoryAdvanceSName;
+    int army;
+    Player* player;
+
     /**
      * @brief Constructor for AdvanceOrder.
      * Initializes the orderType to "advance".
      */
     AdvanceOrder();
+
+    AdvanceOrder(Player* p, const std::string sName, const std::string tName, int armyUnits);
 
     /**
      * @brief Validates the AdvanceOrder.

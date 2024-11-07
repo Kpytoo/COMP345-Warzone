@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
+#include <set>
+
 #include "PlayerFiles/Player.h"
 #include "CardsFiles/Cards.h"
 #include "OrdersFiles/Orders.h"
@@ -126,12 +128,38 @@ void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 // toDefend: returns a list of territories to defend
 std::vector<Territory *> Player::toDefend()
 {
+    setToDefendTerritories(getOwnedTerritories());
     return toDefendTerritories;
 }
 
 // toAttack: returns a list of territories to attack
 std::vector<Territory *> Player::toAttack()
 {
+    std::set<Territory*> enemyTerritories;
+    for(Territory* t : toDefend())
+    {
+        for(const auto& pair : t->adjacentTerritories)
+        {
+            bool isEnemyT = true;
+            for(Territory* ownedT : toDefend())
+            {
+                if(pair.second == ownedT)
+                {
+                    isEnemyT = false;
+                    break;
+                }
+            }
+            
+            if(isEnemyT)
+            {
+                enemyTerritories.insert(pair.second);
+            }
+        }
+    }
+
+    std::vector<Territory*> enemyTerritoriesVector(enemyTerritories.begin(), enemyTerritories.end());
+    setToAttackTerritories(enemyTerritoriesVector);
+    
     return toAttackTerritories;
 }
 
@@ -144,34 +172,42 @@ void Player::issueOrder(std::string orderType)
         return;
     }
 
-    std::string sourceTName;
-    std::string targetTName;
-    int armies;
+    std::string sourceTName = "";
+    std::string targetTName = "";
+    int armies = 0;
 
     if(orderType == "deploy")
     {
-        std:: string territoryName;
-            int armyUnits = getNumArmies();
-            int armyDeployed = 0;
+        std::cout << "- Owned Territories -\n";
+        for(Territory* t : getOwnedTerritories())
+        {
+            std::cout << t->name << std::endl;
+        }
 
-            std::cout << "- Owned Territories -\n";
-            for(Territory* t : getOwnedTerritories())
-            {
-                std::cout << t->name << std::endl;
-            }
+        std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
+        std::cin >> targetTName;
 
-            std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
-            std::cin >> territoryName;
-
-            std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
-            std::cout << "Please enter the number of army units you want to deploy in " << territoryName << ": ";
-            std::cin >> armyDeployed;
-            
-            ordersList->ordersVector.push_back(new DeployOrder(this, territoryName, armyDeployed));
+        std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
+        std::cout << "Please enter the number of army units you want to deploy in " << targetTName << ": ";
+        std::cin >> armies;
+        
+        ordersList->ordersVector.push_back(new DeployOrder(this, targetTName, armies));
     }
     else if(orderType == "advance")
     {
-        std::cout << "\nChoose a source territory (army units should be on standby there): ";
+        std::cout << "Current list of territories to attack:\n";
+        for(Territory* t : toAttack())
+        {
+            std::cout << t->name << std::endl;
+        }
+
+        std::cout << "\nCurrent list of territories to defend:\n";
+        for(Territory* t : toDefend())
+        {
+            std::cout << t->name << std::endl;
+        }
+    
+        std::cout << "\n\nChoose a source territory (army units should be on standby there): ";
         std::cin >> sourceTName;
 
         std::cout << "\nChoose a target territory to advance to: ";
@@ -180,9 +216,7 @@ void Player::issueOrder(std::string orderType)
         std::cout << "\nEnter the number of army units to execute an advance order: ";
         std::cin >> armies;
 
-        // implement logic for toAttack() and toDefend() lists creation?
-
-        ordersList->ordersVector.push_back(new AdvanceOrder()); // Need to have some logic that registers the details from the player's input
+        ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies)); 
     }
     else if(orderType == "airlift")
     {
