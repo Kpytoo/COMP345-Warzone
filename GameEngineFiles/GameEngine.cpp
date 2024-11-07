@@ -1,3 +1,4 @@
+#include <sstream>
 #include "GameEngine.h"
 
 /**
@@ -350,4 +351,10 @@ bool GameEngine::isCommandValid(const std::string& command) const
 
     // The command wasn't found in the list of valid commands for the current game state
     return false;
+}
+
+std::string GameEngine::stringToLog() const {
+    std::stringstream SS;
+    SS << "Game Engine's new state: " << getCurrentState();
+    return SS.str();
 }

@@ -1,0 +1,10 @@
+//
+// Created by william on 06/11/24.
+//
+
+#ifndef COMP345_WARZONE_LOGGINGOBSERVERDRIVER_H
+#define COMP345_WARZONE_LOGGINGOBSERVERDRIVER_H
+
+void testLoggingObserver();
+
+#endif //COMP345_WARZONE_LOGGINGOBSERVERDRIVER_H
