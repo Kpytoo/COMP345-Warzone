@@ -76,6 +76,11 @@ DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) :
     validOrder = false;
 }
 
+void DeployOrder::print(size_t index) const
+{
+    std::cout << "Order " <<  index + 1 << " - Deploy Order: Deploy " << army << " army units to territory " << territoryDeployName << ".\n";
+}
+
 /**
  * @brief Validates the DeployOrder.
  * Displays a validation message.
@@ -163,6 +168,11 @@ player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(army
     validOrder = false;
 }
 
+void AdvanceOrder::print(size_t index) const
+{
+    std::cout << "Order " <<  index + 1 << " - Advance Order: Move " << army << " army units from territory" << territoryAdvanceSName << " to territory " << territoryAdvanceTName << ".\n";
+}
+
 /**
  * @brief Validates the AdvanceOrder.
  * Displays a validation message.
@@ -244,6 +254,7 @@ void AdvanceOrder::execute()
             {
                 ownT = true;
                 t->numberOfArmies += army;
+                std::cout << "Advancing troops from " << territoryAdvanceSName << " to defend " << territoryAdvanceTName << ".\n";
             }
         }
 
@@ -253,6 +264,8 @@ void AdvanceOrder::execute()
             {
                 if(t->name == territoryAdvanceTName)
                 {
+                    std::cout << "Advancing troops from " << territoryAdvanceSName << " to attack " << territoryAdvanceTName << ".\n";
+
                     int attackingUnits = army;
                     int defendingUnits = t->numberOfArmies;
 
@@ -275,13 +288,11 @@ void AdvanceOrder::execute()
                     if(defendingUnits == 0)
                     {
                         t->numberOfArmies = attackingUnits;
-                        // to be continued                        
+                        // continue here    
                     }
                 }
             }
         }
-
-        std::cout << "Advancing troops from " << territoryAdvanceSName << " to " << territoryAdvanceTName << ".\n";
     } 
     else 
     {
@@ -467,11 +478,21 @@ void OrdersList::move(int orderPos, int newOrderPos) {
     int newIndex = newOrderPos - 1;
 
     if (currentIndex >= 0 && currentIndex < ordersVector.size() &&
-        newIndex >= 0 && newIndex < ordersVector.size()) {
+        newIndex >= 0 && newIndex < ordersVector.size()) 
+    {
         Order* orderToMove = ordersVector.at(currentIndex);
-        ordersVector.erase(ordersVector.begin() + currentIndex);
-        ordersVector.insert(ordersVector.begin() + newIndex, orderToMove);
-    } else {
+        if(orderToMove->orderType == "deploy" || ordersVector.at(newIndex)->orderType == "deploy")
+        {
+            std::cerr << "Cannot move a Deploy order.\n";
+        }
+        else
+        {
+            ordersVector.erase(ordersVector.begin() + currentIndex);
+            ordersVector.insert(ordersVector.begin() + newIndex, orderToMove);
+        }
+    } 
+    else 
+    {
         std::cerr << "Invalid positions for move operation." << std::endl;
     }
 }
@@ -486,10 +507,20 @@ void OrdersList::remove(int orderPos) {
     // Convert from 1-based to 0-based indexing
     int index = orderPos - 1;
 
-    if (index >= 0 && index < ordersVector.size()) {
-        delete ordersVector.at(index); // Free the memory
-        ordersVector.erase(ordersVector.begin() + index);
-    } else {
+    if (index >= 0 && index < ordersVector.size()) 
+    {
+        if(ordersVector.at(index)->orderType == "deploy")
+        {
+            std::cerr << "Cannot remove a Deploy order.\n";
+        }
+        else
+        {
+            delete ordersVector.at(index); // Free the memory
+            ordersVector.erase(ordersVector.begin() + index);
+        }
+    } 
+    else 
+    {
         std::cerr << "Invalid position for remove operation." << std::endl;
     }
 }

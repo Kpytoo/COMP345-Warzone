@@ -443,6 +443,8 @@ void GameEngine::reinforcementPhase(Player* player)
             player->setNumArmies(player->getNumArmies() + continent->bonusPoints);
         }
     }
+
+    std::cout << "Player " << player->getPlayerName() << " has " << player->getNumArmies() << " army units in their reinforcement pool.\n\n";
 }
 
 void GameEngine::issueOrdersPhase(Player* player)
@@ -455,10 +457,14 @@ void GameEngine::issueOrdersPhase(Player* player)
     bool noMoreOrders = false;
     // assume that the user input is valid
     bool invalidO = false;
+    // assume player still want to manage their orders list
+    bool finalOrders = false;
     // user input to issue an order or not
     std::string inputO;
     // user input for order type
     std::string inputOrderType;
+    // user input for orders list action
+    std::string inputOrderAction;
 
     // while the player still has orders to issue
     while(!noMoreOrders)
@@ -500,6 +506,91 @@ void GameEngine::issueOrdersPhase(Player* player)
             }
         } 
         while (invalidO);
+        
+    }
+
+    while(!finalOrders)
+    {
+        do
+        {
+            // assume the user input is valid
+            invalidO = false;
+
+            // display the player's orders list
+            std::cout << "- Orders List -\n";
+            for(size_t i = 0; i < player->getOrdersList()->ordersVector.size(); ++i)
+            {
+                player->getOrdersList()->ordersVector[i]->print(i);
+            }
+
+            // prompt user and get user input
+            std::cout << "Would you like to manage your orders list before Orders Execution Phase? (Y/N): ";
+            std::cin >> inputO;
+            std::cout << "\n\n";
+
+            // if the player wants to manage their orders list
+            if(toLowerCase(inputO) == "y")
+            {
+                std::cout << "\nMove Order (m)\nRemove Order (r)\n\n";
+                std::cout << "Please choose an option: ";
+                std::cin >> inputOrderAction;
+
+                if(toLowerCase(inputOrderAction) == "m")
+                {
+                    int oldPos;
+                    int newPos;
+
+                    // Ask the player for the current position of the order to move
+                    std::cout << "Enter the current position of the order you want to move: ";
+                    std::cin >> oldPos;
+                    std::cout << "Enter the new position for the order: ";
+                    std::cin >> newPos;
+
+                    // Call the move method to move the order
+                    player->getOrdersList()->move(oldPos, newPos);
+
+                    if(oldPos > 0 && oldPos <= player->getOrdersList()->ordersVector.size() && 
+                    newPos > 0 && newPos <= player->getOrdersList()->ordersVector.size())
+                    {
+                        std::cout << "Order moved successfully.\n\n";
+                    }  
+                }
+                else if(toLowerCase(inputOrderAction) == "r")
+                {
+                    int orderPos;
+
+                    // Ask the player for the position of the order to remove
+                    std::cout << "Enter the position of the order you want to remove: ";
+                    std::cin >> orderPos;
+
+                    // Call the remove method to remove the order
+                    player->getOrdersList()->remove(orderPos);
+
+                    if(orderPos > 0 && orderPos <= player->getOrdersList()->ordersVector.size())
+                    {
+                        std::cout << "Order removed successfully.\n\n"; 
+                    }                    
+                }
+                else
+                {
+                    std::cout << "Invalid Statement! No change in the orders list.\n\n ";
+                }
+            }
+            // else if the player doesn't want to change their orders list
+            else if(toLowerCase(inputO) == "n")
+            {
+                // then the player has finished managing their order lists
+                finalOrders = true;
+            }
+            // else it's an invalid user input
+            else
+            {
+                // display a message to notify the player that the user input was invalid
+                std::cout << "Invalid Statement! Try again!\n\n ";
+                invalidO = true;
+            }
+        } 
+        while (invalidO);
     }
 }
 
@@ -517,9 +608,14 @@ void GameEngine::executeOrdersPhase()
         // for each player
         for(int i = 0; i < playersList.size(); i++)
         {
+            // Display whose turn it is for their Orders execution phase 
+            std::cout << "Orders Execution Phase for " << playersList[i]->getPlayerName() << std::endl;
+
             // if the current player has no order left to execute from their orders list
             if(playersList[i]->getOrdersList()->ordersVector.empty())
             {
+                std::cout << "No more orders to execute for " << playersList[i]->getPlayerName() << ".\n";
+
                 // skip this player and move on to the next player
                 continue;
             }

@@ -31,6 +31,8 @@ public:
      */
     virtual void execute() = 0;
 
+    virtual void print(size_t index) const = 0;
+
     /**
      * @brief Default constructor for the Order class.
      * Initializes the orderType to "unknown".
@@ -157,6 +159,8 @@ public:
 
     DeployOrder(Player* p, const std::string tName, int armyUnits);
 
+    void print(size_t index) const override;
+
     /**
      * @brief Validates the DeployOrder.
      * Checks whether the deployment is valid.
@@ -189,6 +193,8 @@ public:
 
     AdvanceOrder(Player* p, const std::string sName, const std::string tName, int armyUnits);
 
+    void print(size_t index) const override;
+
     /**
      * @brief Validates the AdvanceOrder.
      * Checks whether advancing troops is valid.
@@ -213,6 +219,8 @@ public:
      * Initializes the orderType to "bomb".
      */
     BombOrder();
+
+    void print(size_t index) const override;
 
     /**
      * @brief Validates the BombOrder.
@@ -239,6 +247,8 @@ public:
      */
     BlockadeOrder();
 
+    void print(size_t index) const override;
+
     /**
      * @brief Validates the BlockadeOrder.
      * Checks whether the blockade is valid.
@@ -264,6 +274,8 @@ public:
      */
     AirliftOrder();
 
+    void print(size_t index) const override;
+
     /**
      * @brief Validates the AirliftOrder.
      * Checks whether airlifting is valid.
@@ -288,6 +300,8 @@ public:
      * Initializes the orderType to "negotiate".
      */
     NegotiateOrder();
+
+    void print(size_t index) const override;
 
     /**
      * @brief Validates the NegotiateOrder.
