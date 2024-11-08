@@ -7,6 +7,29 @@
 
 const std::vector<std::string> cardTypes = {"Bomb", "Reinforcement", "Blockade", "Airlift", "Diplomacy"};
 
+
+/**
+ * Method that plays the card, which creates an order and adds it 
+ * to the player's list of orders and then returns the card to the deck.
+ * 
+ * @param ordersList The orders list to which the created order will be added to.
+ * @param playingDeck The deck to which the card will be returned to.
+ * @param playingHand The hand from which the card is played.
+ */
+void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
+{
+    if(playingHand.handVector.size() == 0) ///< If hand is empty.
+    {
+        std::cout << "Hand is empty, no card available to play" << std::endl;
+    }
+    else ///< If hand has at least a card.
+    {
+        ordersList.ordersVector.push_back(new AdvanceOrder()); // For now just create advance orders for each card
+        playingDeck.deckVector.push_back(this); ///< Return the pointer of the played card at the end of the deck.
+        playingHand.handVector.pop_back(); ///< Remove the pointer of the card from the player's hand.
+    }
+}
+
 /**
  * Default constructor for the Card class, creates a card with a random type.
  */
@@ -44,7 +67,6 @@ void Card::setCardType(std::string newCardType) { cardType = std::move(newCardTy
  */
 Deck::Deck()
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr))); // Seed RNG
     for (int i = 0; i < 50; ++i) // Arbitrary deck size
     {
         deckVector.push_back(new Card()); // Create a card with a random type
