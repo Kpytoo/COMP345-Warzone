@@ -1,9 +1,10 @@
+#include <sstream>
 #include "GameEngine.h"
 #include <ctime>
 #include <cstdlib>
 /**
  * Once a command gets executed, we can save its effect by using
- * saveEffect() and entering a string that relfects its effect.
+ * saveEffect() and entering a string that reflects its effect.
  *
  * @param effect The effect of the command as a string.
  */
@@ -519,4 +520,10 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
 
     setCurrentState(GameState::Assign_Reinforcement);
     std::cout << "Game setup complete. Game is now in the play phase.\n";
+}
+
+std::string GameEngine::stringToLog() const {
+    std::stringstream SS;
+    SS << "Game Engine's new state: " << getCurrentState();
+    return SS.str();
 }

@@ -10,6 +10,8 @@
 #include "MapFiles/Map.h"
 #include "CardsFiles/Cards.h"
 #include "CommandProcessing.h"
+#include "LogFiles/LoggingObserver.h"
+
 /**
  * Enum representing various game states/phases.
  */
@@ -70,7 +72,7 @@ public:
 /**
  * GameEngine class responsible for managing the game states and commands.
  */
-class GameEngine
+class GameEngine : public Subject, public ILoggable
 {
 private:
     // Pointer to the current game state
@@ -168,6 +170,8 @@ public:
      * @param gameDeck Reference to the Deck object used for drawing initial cards for players.
      */
     void startupPhase(CommandProcessor &commandProcessor, Map &gameMap, Deck &gameDeck);
+
+    std::string stringToLog() const override;
 };
 
 #endif
