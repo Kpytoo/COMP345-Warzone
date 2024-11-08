@@ -12,7 +12,7 @@ const std::vector<std::string> cardTypes = {"Bomb", "Reinforcement", "Blockade",
  */
 Card::Card()
 {
-    // Seed the random generator only once (in main or some setup function)
+   //assign cartType at random
     cardType = cardTypes[rand() % cardTypes.size()];
 }
 
