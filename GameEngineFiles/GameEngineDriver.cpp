@@ -63,7 +63,7 @@ void testMainGameLoop()
     GameEngine* gameEngine = new GameEngine();
     Map* gameMap = new Map();
 
-    gameEngine->getCurrentMap() = gameMap;
+    gameEngine->setCurrentMap(gameMap);
 
     // Create territories manually
     Territory* t1 = new Territory();
@@ -103,20 +103,23 @@ void testMainGameLoop()
     continent1->childTerritories.insert({"Territory3", t3});
 
     // Add the continent to the game map
-    gameMap.continents.insert({"Continent1", continent1});
+    gameMap->continents.insert({"Continent1", continent1});
 
     // Create players
-    Player* player1 = new Player("Player1");
-    Player* player2 = new Player("Player2");
+    Player* player1 = new Player();
+    Player* player2 = new Player();
 
-    player1->getOwnedTerritories().insert(t1);
-    player1->getOwnedTerritories().insert(t2);
-    player1->getOwnedTerritories().insert(t3);
-    player1->getOwnedTerritories().insert(t6);
+    player1->setPlayerName("Player1");
+    player2->setPlayerName("Player2");
 
-    player2->getOwnedTerritories().insert(t4);
-    player2->getOwnedTerritories().insert(t5);
-    player2->getOwnedTerritories().insert(t7);
+    player1->getOwnedTerritories().push_back(t1);
+    player1->getOwnedTerritories().push_back(t2);
+    player1->getOwnedTerritories().push_back(t3);
+    player1->getOwnedTerritories().push_back(t6);
+
+    player2->getOwnedTerritories().push_back(t4);
+    player2->getOwnedTerritories().push_back(t5);
+    player2->getOwnedTerritories().push_back(t7);
 
     gameEngine->getPlayersList().push_back(player1);
     gameEngine->getPlayersList().push_back(player2);

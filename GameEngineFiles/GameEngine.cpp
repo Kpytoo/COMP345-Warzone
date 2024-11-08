@@ -366,9 +366,9 @@ bool GameEngine::isCommandValid(const std::string& command) const
     return playersList;
  }
 
- Map* GameEngine::getCurrentMap() const
+ void GameEngine::setCurrentMap(Map* map)
  {
-    return currentMap;
+    currentMap = map;
  }
 
 void GameEngine::mainGameLoop()
