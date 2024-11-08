@@ -361,6 +361,16 @@ bool GameEngine::isCommandValid(const std::string& command) const
     return false;
 }
 
+ std::vector<Player*> GameEngine::getPlayersList() const
+ {
+    return playersList;
+ }
+
+ Map* GameEngine::getCurrentMap() const
+ {
+    return currentMap;
+ }
+
 void GameEngine::mainGameLoop()
 {
     while(playersList.size() > 1)
