@@ -76,6 +76,9 @@ private:
     // The map used for the game
     Map* currentMap;
 
+    // The deck used for the game
+    Deck* mainDeck;
+
     /**
      * Helper function to convert a string to lowercase.
      * 
@@ -145,6 +148,7 @@ public:
     // can delete these methods if not needed, created for GameEngineDriver
     std::vector<Player*>& getPlayersList();
     void setCurrentMap(Map* map);
+    void setGameDeck(Deck* deck);
 
     /**
      * Main game loop that runs the core gameplay sequence.

@@ -298,7 +298,7 @@ void AdvanceOrder::validate()
     else
     {
         // Print an error message indicating insufficient armies
-        std::cout << "Order Invalid: Number of army units to advance surpass the number of army units available in source territoty" << sourceT->name << ".\n";
+        std::cout << "Order Invalid: Number of army units to advance surpass the number of army units available in source territoty " << sourceT->name << ".\n";
         // Set the order as invalid
         validOrder = false;
     }
@@ -382,6 +382,21 @@ void AdvanceOrder::execute()
  */
 BombOrder::BombOrder() { orderType = "bomb"; }
 
+/**
+ * Parameterized constructor for the BombOrder class.
+ * 
+ * This constructor initializes the BombOrder with the target territory for the bomb.
+ * 
+ * @param tBombName The name of the territory to bomb.
+ */
+BombOrder::BombOrder(std::string tBombName) : territoryBombName(tBombName)
+{
+    // Sets the order type to "bomb"
+    orderType = "bomb";
+    // Initially invalid until validated
+    validOrder = false;
+}
+
 std::ostream& operator<<(std::ostream &COUT, const BombOrder &ORDER) {
     COUT << ORDER.orderType << std::endl;
     return COUT;
@@ -417,6 +432,21 @@ void BombOrder::execute() {
  */
 BlockadeOrder::BlockadeOrder() {
     orderType = "blockade";
+}
+
+/**
+ * Parameterized constructor for the BlockadeOrder class.
+ * 
+ * This constructor initializes the BlockadeOrder with the target territory for the blockade.
+ * 
+ * @param tBlockadeName The name of the territory to blockade.
+ */
+BlockadeOrder::BlockadeOrder(std::string tBlockadeName) : terriitoryBlockadeName(tBlockadeName)
+{
+    // Sets the order type to "blockade"
+    orderType = "blockade";
+    // Initially invalid until validated
+    validOrder = false;
 }
 
 std::ostream& operator<<(std::ostream &COUT, const BlockadeOrder &ORDER) {
@@ -456,6 +486,24 @@ AirliftOrder::AirliftOrder() {
     orderType = "airlift";
 }
 
+/**
+ * Parameterized constructor for the AirliftOrder class.
+ * 
+ * This constructor initializes the AirliftOrder with the source and target territories 
+ * and the number of army units to airlift.
+ * 
+ * @param airSName The name of the source territory from which the army units will be airlifted.
+ * @param airTName The name of the target territory to which the army units will be airlifted.
+ * @param units The number of army units to airlift.
+ */
+AirliftOrder::AirliftOrder(std::string airSName, std::string airTName, int units) : territoryAirliftSName(airSName), territoryAirliftTName(airTName), army(units)
+{
+    // Sets the order type to "airlift"
+    orderType = "airlift";
+    // Initially invalid until validated
+    validOrder = false;
+}
+
 std::ostream& operator<<(std::ostream &COUT, const AirliftOrder &ORDER) {
     COUT << ORDER.orderType << std::endl;
     return COUT;
@@ -491,6 +539,21 @@ void AirliftOrder::execute() {
  */
 NegotiateOrder::NegotiateOrder() {
     orderType = "negotiate";
+}
+
+/**
+ * Parameterized constructor for the NegotiateOrder class.
+ * 
+ * This constructor initializes the NegotiateOrder with the target player for the negotiation.
+ * 
+ * @param pTargetName The name of the player to negotiate with.
+ */
+NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme)
+{
+    // Sets the order type to "negotiate"
+    orderType = "negotiate";
+    // Initially invalid until validated
+    validOrder = false;
 }
 
 std::ostream& operator<<(std::ostream &COUT, const NegotiateOrder &ORDER) {

@@ -37,8 +37,9 @@ class Card
          * @param ordersList The orders list to which the created order will be added to.
          * @param playingDeck The deck to which the card will be returned to.
          * @param playingHand The hand from which the card is played.
+         * @param cardOrder A string representing the type of order to be created from the card.
          */
-        void play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand);
+        void play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, std::string cardOrder);
 
         /**
          * Default constructor of the Card class, creates a default card with "undefinedCardType"

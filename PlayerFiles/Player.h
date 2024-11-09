@@ -50,7 +50,7 @@ public:
     // Core gameplay methods
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
-    void issueOrder(std::string orderType); // Issues an order for the player
+    void issueOrder(std::string orderType, Deck* deck); // Issues an order for the player
 };
 
 #endif

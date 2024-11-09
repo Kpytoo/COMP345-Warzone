@@ -14,8 +14,9 @@
  * @param ordersList The orders list to which the created order will be added to.
  * @param playingDeck The deck to which the card will be returned to.
  * @param playingHand The hand from which the card is played.
+ * @param cardOrder A string representing the type of order to be created from the card.
  */
-void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
+void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, std::string cardOrder)
 {
     if(playingHand.handVector.size() == 0) ///< If hand is empty.
     {
@@ -23,7 +24,71 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
     }
     else ///< If hand has at least a card.
     {
-        ordersList.ordersVector.push_back(new AdvanceOrder()); // For now just create advance orders for each card
+        // Stores the name of the source territory for the order.
+        std::string sourceTName = "";
+        // Stores the name of the target territory for the order.
+        std::string targetTName = "";
+        // Stores the number of army units involved in the order.
+        int armies = 0;
+
+        // Check if the order to be issued is an "airlift" type.
+        if(cardOrder == "airlift")
+        {
+            // Prompt the player to choose a source territory for the airlift.
+            std::cout << "\nChoose a source territory (army units should be on standby there): ";
+            // Get the name of the source territory.
+            std::cin >> sourceTName;
+
+            // Prompt the player to choose a target territory to move to with the airlift.
+            std::cout << "\nChoose a target territory to move to: ";
+            // Get the name of the target territory.
+            std::cin >> targetTName;
+
+            // Prompt the player to enter the number of army units to be moved by airlift.
+            std::cout << "\nEnter the number of army units to execute an airlift order: ";
+            // Get the number of army units for the airlift.
+            std::cin >> armies;
+
+            // Create a new AirliftOrder object and add it to the orders list.
+            ordersList.ordersVector.push_back(new AirliftOrder(sourceTName, targetTName, armies)); // Need to have some logic that registers the details from the player's input
+        }
+        // Check if the order to be issued is a "bomb" type.
+        else if(cardOrder == "bomb")
+        {
+            // Prompt the player to choose a target territory to execute a bomb order.
+            std::cout << "\nChoose a target territory to execute a bomb order: ";
+            // Get the name of the target territory for the bomb.
+            std::cin >> targetTName;
+
+            // Create a new BombOrder object and add it to the orders list.
+            ordersList.ordersVector.push_back(new BombOrder(targetTName)); // Need to have some logic that registers the details from the player's input
+        }
+        // Check if the order to be issued is a "blockade" type.
+        else if(cardOrder == "blockade")
+        {
+            // Prompt the player to choose a target territory for the blockade.
+            std::cout << "\nChoose a target territory to execute a blockade order: ";
+            // Get the name of the target territory for the blockade.
+            std::cin >> targetTName;
+
+            // Create a new BlockadeOrder object and add it to the orders list.
+            ordersList.ordersVector.push_back(new BlockadeOrder(targetTName)); // Need to have some logic that registers the details from the player's input
+        }
+        // Check if the order to be issued is a "negotiate" type.
+        else if(cardOrder == "negotiate")
+        {
+            // Declare a variable to store the name of the target player for negotiation.
+            std::string targetPName;
+
+            // Prompt the player to choose the target player for the negotiate order.
+            std::cout << "\nChoose a target player to execute a negotiate order: ";
+            // Get the name of the target player.
+            std::cin >> targetPName;
+
+            // Create a new NegotiateOrder object and add it to the orders list.
+            ordersList.ordersVector.push_back(new NegotiateOrder(targetPName)); // Need to have some logic that registers the details from the player's input
+        }
+        
         playingDeck.deckVector.push_back(this); ///< Return the pointer of the played card at the end of the deck.
         playingHand.handVector.pop_back(); ///< Remove the pointer of the card from the player's hand.
     }
@@ -253,7 +318,7 @@ std::ostream& operator<<(std::ostream& COUT, Hand& HAND)
         COUT << " <<< Player's Hand >>>>\n";
         for(int i = 0; i < HAND.handVector.size(); i++)
         {
-            COUT << *(HAND.handVector[i]); ///< Dereference the card pointer to print out the card.
+            COUT << *(HAND.handVector[i]) << std::endl; ///< Dereference the card pointer to print out the card.
         }
         COUT << std::endl;
 

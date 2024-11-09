@@ -74,8 +74,10 @@ GameEngine::GameEngine()
     // Valid commands for Win state
     (*mapValidCommands)[GameState::Win] = {"play", "end"};
 
+    // Might need to modify these values for other parts
     playersList = {};
     currentMap = nullptr;
+    mainDeck = nullptr;
 }
 
 /**
@@ -362,16 +364,22 @@ bool GameEngine::isCommandValid(const std::string& command) const
     return false;
 }
 
-// get players list, was just created for GameEngineDriver - can be deleted if not needed
+// get players list, was just created for GameEngineDriver - can delete method if not needed
  std::vector<Player*>& GameEngine::getPlayersList()
  {
     return playersList;
  }
 
-// set a game map, was just created for GameEngineDriver - can delete if not needed
+// set a game map, was just created for GameEngineDriver - can delete method if not needed
  void GameEngine::setCurrentMap(Map* map)
  {
     currentMap = map;
+ }
+
+// set a game map, was just created for GameEngineDriver - can delete method if not needed
+ void GameEngine::setGameDeck(Deck* deck)
+ {
+    mainDeck = deck;
  }
 
 /**
@@ -390,6 +398,9 @@ void GameEngine::mainGameLoop()
     // Loop continues as long as there is more than one player
     while(playersList.size() > 1)
     {
+        // Switch to the game state Assign_Reinforcement
+        *currentGameState = GameState::Assign_Reinforcement;
+
          // Iterate through each player to perform the reinforcement phase
         for(int i = 0; i < playersList.size(); i++)
         {
@@ -410,19 +421,25 @@ void GameEngine::mainGameLoop()
             reinforcementPhase(playersList[i]);
         }
 
-         // Iterate through each player to perform the issue orders phase
+        //Switch to game state Issue_Orders
+        *currentGameState = GameState::Issue_Orders;
+        // Iterate through each player to perform the issue orders phase
         for(int i = 0; i < playersList.size(); i++)
         {
             // Issue orders phase for the player (player decides actions)
             issueOrdersPhase(playersList[i]);
         }
 
+        //Switch to game state Execute_Orders
+        *currentGameState = GameState::Execute_Orders;
         // Execute the orders that have been issued by the players
         executeOrdersPhase();
     }
 
     // When one player remains, announce them as the winner
     std::cout << "\nGame Over! Player " << playersList[0]->getPlayerName() << "has won! \n\n";
+    // Switch to the game state Win
+    *currentGameState = GameState::Win;
 }
 
 /**
@@ -508,10 +525,10 @@ void GameEngine::reinforcementPhase(Player* player)
  * 
  * @param player The player who is issuing orders. Their orders list will be updated as they issue new orders or modify existing ones.
  * 
- * @see Player::issueOrder(std::string orderType)           The method to issue a specific type of order based on player input.
- * @see Player::getOrdersList()                             Method to retrieve the player's orders list for review and management.
- * @see OrdersList::move(int oldPos, int newPos)            Method to move an order in the player's orders list.
- * @see OrdersList::remove(int position)                    Method to remove an order from the player's orders list.
+ * @see Player::issueOrder(std::string orderType, Deck* deck)       The method to issue a specific type of order based on player input.
+ * @see Player::getOrdersList()                                     Method to retrieve the player's orders list for review and management.
+ * @see OrdersList::move(int oldPos, int newPos)                    Method to move an order in the player's orders list.
+ * @see OrdersList::remove(int position)                            Method to remove an order from the player's orders list.
  */
 void GameEngine::issueOrdersPhase(Player* player)
 {
@@ -549,14 +566,19 @@ void GameEngine::issueOrdersPhase(Player* player)
             // If the player wants to issue an order, ask for the order type
             if(toLowerCase(inputO) == "y")
             {
-                // Display available order types and prompt for selection
+                // Display available order types 
                 std::cout << "- Order Types -\n\n";
-                std::cout << "\t- Deploy\n\t- Advance\n\t- Airlift\n\t- Bomb\n\t- Blockade\n\t- Negotiate\n\n";
+                std::cout << "\t- Deploy\n\t- Advance\n\t- Airlift (Use one Airlift card)\n\t- Bomb (Use one Bomb card)\n\t- Blockade (Use one Blockade card)\n\t- Negotiate (Use one Diplomacy card)\n\n";
+                
+                // Print out the player's hand
+                std::cout << *(player->getPlayerHand()) << std::endl;
+                
+                // Prompt player for selection
                 std::cout << "Please issue an order type: ";
                 std::cin >> inputOrderType;
 
                 // Issue the order based on user input (order type)
-                player->issueOrder(toLowerCase(inputOrderType));
+                player->issueOrder(toLowerCase(inputOrderType), mainDeck);
             }
             // If the player doesn't want to issue an order, exit the loop
             else if(toLowerCase(inputO) == "n")
@@ -687,6 +709,8 @@ void GameEngine::executeOrdersPhase()
 {
     // Flag to check if there are any orders left to execute in any player's orders list
     bool ordersLeft = true;
+    // Flag to check if there are any deploy orders left to execute in any player's orders list
+    bool deployOver = false;
 
     // Loop until all orders in the players' orders lists are executed
     while(ordersLeft)
@@ -694,6 +718,49 @@ void GameEngine::executeOrdersPhase()
         // Assume that there are no more orders left to execute across all players initially
         ordersLeft = false;
         
+        if(!deployOver)
+        {
+            // Iterate through each player in the players list
+            for(int i = 0; i < playersList.size(); i++)
+            {
+                // Display whose turn it is for the deploy orders execution phase
+                std::cout << "Deploy Orders Execution Phase for " << playersList[i]->getPlayerName() << std::endl;
+
+                // If the current player has no orders left in their orders list
+                if(playersList[i]->getOrdersList()->ordersVector.empty())
+                {
+                    // Inform the player that they have no deploy orders to execute
+                    std::cout << "No deploy orders to execute for " << playersList[i]->getPlayerName() << ".\n";
+
+                    // Skip the current player and move on to the next player
+                    continue;
+                }
+
+                // Iterate through the orders list of the current player
+                for(int j = 0; j < playersList[i]->getOrdersList()->ordersVector.size(); j++)
+                {
+                    // If the order is of type "deploy", the order will be executed.
+                    if(playersList[i]->getOrdersList()->ordersVector[j]->orderType == "deploy")
+                    {
+                        // If the player still has orders to execute, set ordersLeft to true to continue executing orders
+                        ordersLeft = true;
+                        // Executes the first deploy order in the player's orders list.
+                        playersList[i]->getOrdersList()->ordersVector.front()->execute();
+                        // After executing the order, remove it from the player's orders list
+                        playersList[i]->getOrdersList()->ordersVector.erase(playersList[i]->getOrdersList()->ordersVector.begin());
+                    }
+                    // Stop checking further orders if the current order is not "deploy"
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            // Every player has finished executing their deploy orders in their orders list
+            deployOver = true;
+        }
+
         // Iterate through each player in the game
         for(int i = 0; i < playersList.size(); i++)
         {
@@ -712,6 +779,7 @@ void GameEngine::executeOrdersPhase()
 
             // If the player still has orders to execute, set ordersLeft to true to continue executing orders
             ordersLeft = true;
+
             // Execute the first order in the player's orders list
             playersList[i]->getOrdersList()->ordersVector.front()->execute();
             // After executing the order, remove it from the player's orders list

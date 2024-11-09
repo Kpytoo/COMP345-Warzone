@@ -195,96 +195,198 @@ std::vector<Territory *> Player::toAttack()
     return toAttackTerritories;
 }
 
-// issueOrder: creates a new order and adds it to the player's orders list
-void Player::issueOrder(std::string orderType)
+/**
+ * Issues a new order based on the provided order type and adds it to the player's orders list.
+ * 
+ * The function handles different types of orders, including "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
+ * The method will check if the player has army units left in the reinforcement pool before issuing an order other than "deploy".
+ * Depending on the order type, it will prompt the player for additional details.
+ * 
+ * @param orderType The type of the order to be issued. Possible values include "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
+ */
+void Player::issueOrder(std::string orderType, Deck* deck)
 {
-    if(orderType != "deploy" && getNumArmies() == 0)
+    // Check if the player has no army units left in the reinforcement pool and tries to issue another order than deploy.
+    if(orderType != "deploy" && getNumArmies() != 0)
     {
+        // Print a message informing the player they still have army units in the reinforcement pool and should deploy them.
         std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
+        // Exit the function without issuing the order if the player needs to deploy.
         return;
     }
 
+    // Stores the name of the source territory for the order.
     std::string sourceTName = "";
+    // Stores the name of the target territory for the order.
     std::string targetTName = "";
+    // Stores the number of army units involved in the order.
     int armies = 0;
+    // Flag to track if the player has the required card in their hand
+    bool hasCard = false;
 
+    // Handle the "deploy" order type.
     if(orderType == "deploy")
     {
         std::cout << "- Owned Territories -\n";
+        // Display a list of the player's owned territories to choose from.
         for(Territory* t : getOwnedTerritories())
         {
+            // Print each owned territory's name.
             std::cout << t->name << std::endl;
         }
 
+        // Prompt the player to enter the name of the target territory to deploy army units.
         std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
+        // Get the name of the target territory.
         std::cin >> targetTName;
 
+        // Display how many army units the player has left in their reinforcement pool.
         std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
+        // Prompt the player to enter the number of army units they wish to deploy to the selected territory.
         std::cout << "Please enter the number of army units you want to deploy in " << targetTName << ": ";
+        // Get the number of army units to deploy.
         std::cin >> armies;
-        
+        // Create a new DeployOrder object and add it to the orders list.
         ordersList->ordersVector.push_back(new DeployOrder(this, targetTName, armies));
     }
+    // Handle the "advance" order type.
     else if(orderType == "advance")
     {
+        // Display a list of territories the player can attack.
         std::cout << "Current list of territories to attack:\n";
         for(Territory* t : getToAttackTerritories())
         {
+            // Print each territory available for attack.
             std::cout << t->name << std::endl;
         }
 
+        // Display a list of territories the player needs to defend.
         std::cout << "\nCurrent list of territories to defend:\n";
         for(Territory* t : getToDefendTerritories())
         {
+            // Print each territory that needs defending.
             std::cout << t->name << std::endl;
         }
     
+        // Prompt the player to choose a source territory (where they have army units stationed).
         std::cout << "\n\nChoose a source territory (army units should be on standby there): ";
+        // Get the name of the source territory.
         std::cin >> sourceTName;
 
+        // Prompt the player to choose a target territory to advance to.
         std::cout << "\nChoose a target territory to advance to: ";
+        // Get the name of the target territory.
         std::cin >> targetTName;
 
+        // Prompt the player to enter the number of army units they want to advance.
         std::cout << "\nEnter the number of army units to execute an advance order: ";
+        // Get the number of army units to advance.
         std::cin >> armies;
 
-
+        // Create a new AdvanceOrder object and add it to the orders list.
         ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies)); 
     }
+    // Handle the "airlift" order type.
     else if(orderType == "airlift")
     {
-        std::cout << "\nChoose a source territory (army units should be on standby there): ";
-        std::cin >> sourceTName;
+        // Loop through each card in the player's hand to check for an "airlift" card
+        for(Card* c : this->getPlayerHand()->handVector)
+        {
+            // If an airlift card is found
+            if(c->cardType == "airlift")
+            {
+                // Set the flag to true when an "airlift" card is found
+                hasCard = true;
+                // Issue the order by playing the card
+                c->play(*this->ordersList, *deck, *this->getPlayerHand(), "airlift");
+                // Exit the loop early since we've found the card
+                break;
+            }
+        }
 
-        std::cout << "\nChoose a target territory to move to: ";
-        std::cin >> targetTName;
-
-        std::cout << "\nEnter the number of army units to execute an airlift order: ";
-        std::cin >> armies;
-
-        ordersList->ordersVector.push_back(new AirliftOrder()); // Need to have some logic that registers the details from the player's input
+        // If no "airlift" card is found 
+        if(!hasCard)
+        {
+            // Print an error message and exit the function
+            std::cout << "You do not have an Airlift card in your hand!\n";
+            return;
+        }
+        
     }
+    // Handle the "bomb" order type.
     else if(orderType == "bomb")
     {
-        std::cout << "\nChoose a target territory to execute a bomb order: ";
-        std::cin >> targetTName;
+        // Loop through each card in the player's hand to check for a "bomb" card
+        for(Card* c : this->getPlayerHand()->handVector)
+        {
+            // If a bomb card is found
+            if(c->cardType == "bomb")
+            {
+                // Set the flag to true when a "bomb" card is found
+                hasCard = true;
+                // Issue the order by playing the card
+                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "bomb");
+                // Exit the loop early since we've found the card
+                break;
+            }
+        }
 
-        ordersList->ordersVector.push_back(new BombOrder()); // Need to have some logic that registers the details from the player's input
+        // If no "bomb" card is found 
+        if(!hasCard)
+        {
+            // Print an error message and exit the function
+            std::cout << "You do not have a Bomb card in your hand!\n";
+        }
     }
+    // Handle the "blockade" order type.
     else if(orderType == "blockade")
     {
-        std::cout << "\nChoose a target territory to execute a blockade order: ";
-        std::cin >> targetTName;
+        // Loop through each card in the player's hand to check for a "blockade" card
+        for(Card* c : this->getPlayerHand()->handVector)
+        {
+            // If a blockade card is found
+            if(c->cardType == "blockade")
+            {
+                // Set the flag to true when a "blockade" card is found
+                hasCard = true;
+                // Issue the order by playing the card
+                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "blockade");
+                // Exit the loop early since we've found the card
+                break;
+            }
+        }
 
-        ordersList->ordersVector.push_back(new BlockadeOrder()); // Need to have some logic that registers the details from the player's input
+        // If no "blockade" card is found 
+        if(!hasCard)
+        {
+            // Print an error message and exit the function
+            std::cout << "You do not have a Blockade card in your hand!\n";
+        }
     }
+    // Handle the "negotiate" order type.
     else if(orderType == "negotiate")
     {
-        std::string targetPName;
-        std::cout << "\nChoose a target player to execute a negotiate order: ";
-        std::cin >> targetPName;
+        // Loop through each card in the player's hand to check for a "diplomacy" card
+        for(Card* c : this->getPlayerHand()->handVector)
+        {
+            // If a diplomacy card is found
+            if(c->cardType == "diplomacy")
+            {
+                // Set the flag to true when a "diplomacy" card is found
+                hasCard = true;
+                // Issue the order by playing the card
+                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "negotiate");
+                // Exit the loop early since we've found the card
+                break;
+            }
+        }
 
-        ordersList->ordersVector.push_back(new NegotiateOrder()); // Need to have some logic that registers the details from the player's input
+        // If no "blockade" card is found 
+        if(!hasCard)
+        {
+            // Print an error message and exit the function
+            std::cout << "You do not have a Diplomacy card in your hand!\n";
+        }
     }
     else
     {
