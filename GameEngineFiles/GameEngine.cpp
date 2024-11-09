@@ -1,3 +1,4 @@
+#include <cmath>
 #include "GameEngine.h"
 
 /**
@@ -361,7 +362,7 @@ bool GameEngine::isCommandValid(const std::string& command) const
     return false;
 }
 
- std::vector<Player*> GameEngine::getPlayersList() const
+ std::vector<Player*>& GameEngine::getPlayersList()
  {
     return playersList;
  }
@@ -530,7 +531,7 @@ void GameEngine::issueOrdersPhase(Player* player)
             std::cout << "- Orders List -\n";
             for(size_t i = 0; i < player->getOrdersList()->ordersVector.size(); ++i)
             {
-                player->getOrdersList()->ordersVector[i]->print(i);
+                std::cout << "Order " <<  i + 1 << " - " << player->getOrdersList()->ordersVector[i];
             }
 
             // prompt user and get user input

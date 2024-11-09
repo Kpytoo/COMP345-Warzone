@@ -142,7 +142,7 @@ public:
      */
     bool isCommandValid(const std::string& command) const;
 
-    std::vector<Player*> getPlayersList() const;
+    std::vector<Player*>& getPlayersList();
     void setCurrentMap(Map* map);
 
     void mainGameLoop();

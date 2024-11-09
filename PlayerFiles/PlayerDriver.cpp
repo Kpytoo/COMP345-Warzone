@@ -38,15 +38,15 @@ void testPlayers()
 
     
 
-    std::cout << "\nTerritories to Defend: ";
-    for (auto &t : player1.toDefend())
+    std::cout << "\nTerritories to Defend: "; // TODO: prob just print player object, should display everything needed
+    for (auto &t : player1.getToDefendTerritories())
     {
         std::cout << t->name << " ";
     }
     std::cout << std::endl;
 
     std::cout << "Territories to Attack: ";
-    for (auto &t : player1.toAttack())
+    for (auto &t : player1.getToAttackTerritories())
     {
         std::cout << t->name << " ";
     }

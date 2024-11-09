@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
         testCards();
         testPlayers();
         testOrdersLists();
+        testMainGameLoop();
     } else {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
@@ -47,6 +48,10 @@ int main(int argc, char* argv[]) {
             if (arg == "testOrdersLists") {
                 std::cout << "Running test: testOrdersLists...\n";
                 testOrdersLists();
+            }
+            if (arg == "testMainGameLoop") {
+                std::cout << "Running test: testMainGameLoop...\n";
+                testMainGameLoop();
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";

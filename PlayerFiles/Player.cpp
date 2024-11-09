@@ -109,9 +109,9 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
 
 // Getter definitions: retrieve player details
 std::string Player::getPlayerName() const { return playerName; }
-std::vector<Territory *> Player::getOwnedTerritories() const { return OwnedTerritories; }
-std::vector<Territory *> Player::getToDefendTerritories() const { return toDefendTerritories; }
-std::vector<Territory *> Player::getToAttackTerritories() const { return toAttackTerritories; }
+std::vector<Territory *>& Player::getOwnedTerritories() { return OwnedTerritories; }
+std::vector<Territory *>& Player::getToDefendTerritories() { return toDefendTerritories; }
+std::vector<Territory *>& Player::getToAttackTerritories() { return toAttackTerritories; }
 Hand *Player::getPlayerHand() const { return playerHand; }
 OrdersList *Player::getOrdersList() const { return ordersList; }
 int Player::getNumArmies() const { return numArmies; }
@@ -119,7 +119,7 @@ int Player::getNumArmies() const { return numArmies; }
 // Setter definitions: modify player details
 void Player::setPlayerName(const std::string &name) { playerName = name; }
 void Player::setOwnedTerritories(const std::vector<Territory *> &territories) { OwnedTerritories = territories; }
-void Player::setToDefendTerritories(std::vector<Territory *> &territories) { toDefendTerritories = territories; }
+void Player::setToDefendTerritories(const std::vector<Territory *> &territories) { toDefendTerritories = territories; }
 void Player::setToAttackTerritories(const std::vector<Territory *> &territories) { toAttackTerritories = territories; }
 void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
 void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
@@ -149,7 +149,7 @@ std::vector<Territory *> Player::toAttack()
                     break;
                 }
             }
-            
+
             if(isEnemyT)
             {
                 enemyTerritories.insert(pair.second);
@@ -159,7 +159,7 @@ std::vector<Territory *> Player::toAttack()
 
     std::vector<Territory*> enemyTerritoriesVector(enemyTerritories.begin(), enemyTerritories.end());
     setToAttackTerritories(enemyTerritoriesVector);
-    
+
     return toAttackTerritories;
 }
 
@@ -196,13 +196,13 @@ void Player::issueOrder(std::string orderType)
     else if(orderType == "advance")
     {
         std::cout << "Current list of territories to attack:\n";
-        for(Territory* t : toAttack())
+        for(Territory* t : getToAttackTerritories())
         {
             std::cout << t->name << std::endl;
         }
 
         std::cout << "\nCurrent list of territories to defend:\n";
-        for(Territory* t : toDefend())
+        for(Territory* t : getToDefendTerritories())
         {
             std::cout << t->name << std::endl;
         }
@@ -215,6 +215,7 @@ void Player::issueOrder(std::string orderType)
 
         std::cout << "\nEnter the number of army units to execute an advance order: ";
         std::cin >> armies;
+
 
         ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies)); 
     }

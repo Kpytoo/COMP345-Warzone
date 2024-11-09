@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <ctime>
 #include <random>
 
@@ -76,9 +75,14 @@ DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) :
     validOrder = false;
 }
 
-void DeployOrder::print(size_t index) const
-{
-    std::cout << "Order " <<  index + 1 << " - Deploy Order: Deploy " << army << " army units to territory " << territoryDeployName << ".\n";
+//void DeployOrder::print(size_t index) const
+//{
+//    std::cout << "Order " <<  index + 1 << " - Deploy Order: Deploy " << army << " army units to territory " << territoryDeployName << ".\n";
+//}
+
+std::ostream& operator<<(std::ostream &COUT, const DeployOrder &ORDER) {
+    COUT << ORDER.orderType << ": " << "Deploy " << ORDER.army << " army units to territory " << ORDER.territoryDeployName << ".\n";
+    return COUT;
 }
 
 /**
@@ -91,7 +95,7 @@ void DeployOrder::validate()
     
     bool tFound = false;
     bool enoughArmy = false;
-    for(Territory* t : player->toDefend())
+    for(Territory* t : player->getToDefendTerritories())
     {
         if(t->name == territoryDeployName)
         {
@@ -135,7 +139,7 @@ void DeployOrder::execute()
     {
         Order::execute();
 
-        for(Territory* t : player->toDefend())
+        for(Territory* t : player->getToDefendTerritories())
         {
             if(t->name == territoryDeployName)
             {
@@ -168,9 +172,9 @@ player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(army
     validOrder = false;
 }
 
-void AdvanceOrder::print(size_t index) const
-{
-    std::cout << "Order " <<  index + 1 << " - Advance Order: Move " << army << " army units from territory" << territoryAdvanceSName << " to territory " << territoryAdvanceTName << ".\n";
+std::ostream& operator<<(std::ostream &COUT, const AdvanceOrder &ORDER) {
+    COUT << ORDER.orderType << ": " << "Move " << ORDER.army << " army units from territory " << ORDER.territoryAdvanceSName << " to territory " << ORDER.territoryAdvanceTName << ".\n";
+    return COUT;
 }
 
 /**
@@ -185,7 +189,7 @@ void AdvanceOrder::validate()
     Territory* sourceT = nullptr;
     Territory* targetT = nullptr;
 
-    for(Territory* t : player->toDefend())
+    for(Territory* t : player->getToDefendTerritories())
     {
         if(t->name == territoryAdvanceSName)
         {
@@ -243,7 +247,7 @@ void AdvanceOrder::execute()
         Order::execute();
 
         bool ownT = false;
-        for(Territory* t : player->toDefend())
+        for(Territory* t : player->getToDefendTerritories())
         {
             if(t->name == territoryAdvanceSName)
             {
@@ -260,7 +264,7 @@ void AdvanceOrder::execute()
 
         if(!ownT)
         {
-            for(Territory* t : player->toAttack())
+            for(Territory* t : player->getToAttackTerritories()) // TODO: Maybe change these vectors to maps to make easier to access
             {
                 if(t->name == territoryAdvanceTName)
                 {
@@ -308,6 +312,11 @@ void AdvanceOrder::execute()
  */
 BombOrder::BombOrder() { orderType = "bomb"; }
 
+std::ostream& operator<<(std::ostream &COUT, const BombOrder &ORDER) {
+    COUT << ORDER.orderType << std::endl;
+    return COUT;
+}
+
 /**
  * @brief Validates the BombOrder.
  * Displays a validation message.
@@ -338,6 +347,11 @@ void BombOrder::execute() {
  */
 BlockadeOrder::BlockadeOrder() {
     orderType = "blockade";
+}
+
+std::ostream& operator<<(std::ostream &COUT, const BlockadeOrder &ORDER) {
+    COUT << ORDER.orderType << std::endl;
+    return COUT;
 }
 
 /**
@@ -372,6 +386,11 @@ AirliftOrder::AirliftOrder() {
     orderType = "airlift";
 }
 
+std::ostream& operator<<(std::ostream &COUT, const AirliftOrder &ORDER) {
+    COUT << ORDER.orderType << std::endl;
+    return COUT;
+}
+
 /**
  * @brief Validates the AirliftOrder.
  * Displays a validation message.
@@ -402,6 +421,11 @@ void AirliftOrder::execute() {
  */
 NegotiateOrder::NegotiateOrder() {
     orderType = "negotiate";
+}
+
+std::ostream& operator<<(std::ostream &COUT, const NegotiateOrder &ORDER) {
+    COUT << ORDER.orderType << std::endl;
+    return COUT;
 }
 
 /**

@@ -31,9 +31,9 @@ public:
 
     // Getters for accessing private member variables
     std::string getPlayerName() const;
-    std::vector<Territory *> getOwnedTerritories() const;
-    std::vector<Territory *> getToDefendTerritories() const;
-    std::vector<Territory *> getToAttackTerritories() const;
+    std::vector<Territory *>& getOwnedTerritories();
+    std::vector<Territory *>& getToDefendTerritories();
+    std::vector<Territory *>& getToAttackTerritories();
     Hand *getPlayerHand() const;
     OrdersList *getOrdersList() const;
     int getNumArmies() const;
@@ -42,7 +42,7 @@ public:
     void setPlayerName(const std::string &name);
     void setOwnedTerritories(const std::vector<Territory *> &territories);
     void setToAttackTerritories(const std::vector<Territory *> &territories);
-    void setToDefendTerritories(std::vector<Territory *> &territories);
+    void setToDefendTerritories(const std::vector<Territory *> &territories);
     void setPlayerHand(Hand *hand);
     void setOrdersList(OrdersList *ordersList);
     void setNumArmies(int numArmies);
