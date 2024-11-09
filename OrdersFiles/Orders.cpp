@@ -1,6 +1,7 @@
 #include <ctime>
 #include <random>
 
+#include <sstream>
 #include "Orders.h"
 #include "PlayerFiles/Player.h"
 
@@ -56,9 +57,16 @@ std::ostream& operator<<(std::ostream &COUT, const Order &ORDER) {
  * @brief Executes the Order.
  * Displays a message if executed.
  */
-void Order::execute() 
+void Order::execute()
 {
     std::cout << "Executing " << orderType << " order." << std::endl;
+    notify(this);
+}
+
+std::string Order::stringToLog() const {
+    std::stringstream SS;
+    SS << "Order Executed: " << *this;
+    return SS.str();
 }
 
 // ---------------------- Deploy Order ----------------------
@@ -71,11 +79,11 @@ DeployOrder::DeployOrder() { orderType = "deploy"; validOrder = false;}
 
 /**
  * Constructor for the DeployOrder class.
- * 
+ *
  * This constructor initializes a deploy order, which is used to deploy a specified number of army units to a given territory.
  * It sets the associated player, the name of the territory where the army is being deployed, and the number of armies being deployed.
  * Additionally, it sets the `orderType` to "deploy" and initializes the `validOrder` flag to `false`, indicating that the order is not yet validated.
- * 
+ *
  * @param p The player who issued the order.
  * @param tName The name of the territory where the army units are being deployed.
  * @param armyDeployed The number of army units being deployed to the territory.
@@ -97,11 +105,11 @@ std::ostream& operator<<(std::ostream &COUT, const DeployOrder &ORDER) {
  * @brief Validates the DeployOrder.
  * Displays a validation message.
  */
-void DeployOrder::validate() 
+void DeployOrder::validate()
 {
     // Notify that the deploy order is being validated.
     std::cout << "Validating deploy order..." << std::endl;
-    
+
     // Flag indicating if the target territory was found in the player's owned territories.
     bool tFound = false;
     // Flag indicating if the player has enough army units to deploy.
@@ -153,13 +161,13 @@ void DeployOrder::validate()
  * @brief Executes the DeployOrder.
  * Validates and then performs the deployment if valid.
  */
-void DeployOrder::execute() 
+void DeployOrder::execute()
 {
     // Validate the deploy order before execution.
     DeployOrder::validate();
 
     // If the order is valid, proceed with the execution.
-    if (validOrder) 
+    if (validOrder)
     {
         // Call the base class execute method (Displaying the order type executing).
         Order::execute();
@@ -179,10 +187,10 @@ void DeployOrder::execute()
                 break;
             }
         }
-        
-    } 
+
+    }
     // If the order is invalid, notify the player that the order will not be executed.
-    else 
+    else
     {
         std::cout << "Deploy order is invalid and will not be executed.\n";
     }
@@ -199,13 +207,13 @@ AdvanceOrder::AdvanceOrder() { orderType = "advance"; }
 /**
  * Parameterized constructor for the AdvanceOrder class.
  * Initializes the order with player, source territory name, target territory name, and the number of army units.
- * 
+ *
  * @param p A pointer to the player who is making the order.
  * @param sName The name of the source territory from which the army is advancing.
  * @param tName The name of the target territory to which the army is advancing.
  * @param armyUnits The number of army units involved in the advance order.
  */
-AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) : 
+AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) :
 player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
 {
     // Sets the order type to "advance"
@@ -223,7 +231,7 @@ std::ostream& operator<<(std::ostream &COUT, const AdvanceOrder &ORDER) {
  * @brief Validates the AdvanceOrder.
  * Displays a validation message.
  */
-void AdvanceOrder::validate() 
+void AdvanceOrder::validate()
 {
     // Notify that the advance order is being validated.
     std::cout << "Validating advance order..." << std::endl;
@@ -276,7 +284,7 @@ void AdvanceOrder::validate()
             break;
         }
     }
-    
+
     // If no adjacent territory matches the target, mark the order as invalid and exit
     if(!adjacent)
     {
@@ -308,11 +316,11 @@ void AdvanceOrder::validate()
  * @brief Executes the AdvanceOrder.
  * Validates and then performs the advancement if valid.
  */
-void AdvanceOrder::execute() 
+void AdvanceOrder::execute()
 {
     AdvanceOrder::validate();
 
-    if (validOrder) 
+    if (validOrder)
     {
         Order::execute();
 
@@ -343,8 +351,8 @@ void AdvanceOrder::execute()
                     int attackingUnits = army;
                     int defendingUnits = t->numberOfArmies;
 
-                    std::mt19937 rng(static_cast<unsigned>(std::time(0))); 
-                    std::uniform_int_distribution<int> dist(1, 100);    
+                    std::mt19937 rng(static_cast<unsigned>(std::time(0)));
+                    std::uniform_int_distribution<int> dist(1, 100);
 
                     while(attackingUnits > 0 && defendingUnits > 0)
                     {
@@ -362,13 +370,13 @@ void AdvanceOrder::execute()
                     if(defendingUnits == 0)
                     {
                         t->numberOfArmies = attackingUnits;
-                        // continue here    
+                        // continue here
                     }
                 }
             }
         }
-    } 
-    else 
+    }
+    else
     {
         std::cout << "Advance order is invalid and will not be executed.\n";
     }
@@ -384,9 +392,9 @@ BombOrder::BombOrder() { orderType = "bomb"; }
 
 /**
  * Parameterized constructor for the BombOrder class.
- * 
+ *
  * This constructor initializes the BombOrder with the target territory for the bomb.
- * 
+ *
  * @param tBombName The name of the territory to bomb.
  */
 BombOrder::BombOrder(std::string tBombName) : territoryBombName(tBombName)
@@ -436,9 +444,9 @@ BlockadeOrder::BlockadeOrder() {
 
 /**
  * Parameterized constructor for the BlockadeOrder class.
- * 
+ *
  * This constructor initializes the BlockadeOrder with the target territory for the blockade.
- * 
+ *
  * @param tBlockadeName The name of the territory to blockade.
  */
 BlockadeOrder::BlockadeOrder(std::string tBlockadeName) : terriitoryBlockadeName(tBlockadeName)
@@ -488,10 +496,10 @@ AirliftOrder::AirliftOrder() {
 
 /**
  * Parameterized constructor for the AirliftOrder class.
- * 
- * This constructor initializes the AirliftOrder with the source and target territories 
+ *
+ * This constructor initializes the AirliftOrder with the source and target territories
  * and the number of army units to airlift.
- * 
+ *
  * @param airSName The name of the source territory from which the army units will be airlifted.
  * @param airTName The name of the target territory to which the army units will be airlifted.
  * @param units The number of army units to airlift.
@@ -543,9 +551,9 @@ NegotiateOrder::NegotiateOrder() {
 
 /**
  * Parameterized constructor for the NegotiateOrder class.
- * 
+ *
  * This constructor initializes the NegotiateOrder with the target player for the negotiation.
- * 
+ *
  * @param pTargetName The name of the player to negotiate with.
  */
 NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme)
@@ -620,6 +628,7 @@ void OrdersList::operator=(const OrdersList &ordersList) {
  */
 void OrdersList::add(Order* order) {
     ordersVector.push_back(order);
+    notify(this);
 }
 
 /**
@@ -636,7 +645,7 @@ void OrdersList::move(int orderPos, int newOrderPos) {
 
     // Check if the current and new positions are valid (within the bounds of the ordersVector).
     if (currentIndex >= 0 && currentIndex < ordersVector.size() &&
-        newIndex >= 0 && newIndex < ordersVector.size()) 
+        newIndex >= 0 && newIndex < ordersVector.size())
     {
         // Get the order to move by accessing it using the currentIndex.
         Order* orderToMove = ordersVector.at(currentIndex);
@@ -655,9 +664,9 @@ void OrdersList::move(int orderPos, int newOrderPos) {
             // Insert the order at the new position (newIndex).
             ordersVector.insert(ordersVector.begin() + newIndex, orderToMove);
         }
-    } 
+    }
     // If the indices are out of range, print an error.
-    else 
+    else
     {
         std::cerr << "Invalid positions for move operation." << std::endl;
     }
@@ -674,7 +683,7 @@ void OrdersList::remove(int orderPos) {
     int index = orderPos - 1;
 
     // Check if the index is within the valid range of ordersVector.
-    if (index >= 0 && index < ordersVector.size()) 
+    if (index >= 0 && index < ordersVector.size())
     {
         // Check if the order at the given index is of type "deploy".
         if(ordersVector.at(index)->orderType == "deploy")
@@ -690,9 +699,9 @@ void OrdersList::remove(int orderPos) {
             // Erase the order from the vector at the specified index.
             ordersVector.erase(ordersVector.begin() + index);
         }
-    } 
+    }
     // Print an error message if the index is out of bounds.
-    else 
+    else
     {
         std::cerr << "Invalid position for remove operation." << std::endl;
     }
@@ -722,6 +731,12 @@ OrdersList::~OrdersList() {
     for (Order* order : ordersVector) { // Free up dynamically allocated Order instances in list.
         delete order;
     }
+}
+
+std::string OrdersList::stringToLog() const {
+    std::stringstream SS;
+    SS << "Order Issued: " << *ordersVector.back();
+    return SS.str();
 }
 
 // <<<< OrdersList Class Definitions >>>>

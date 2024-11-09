@@ -5,6 +5,7 @@
 #include "PlayerFiles/PlayerDriver.h"
 #include "GameEngineFiles/GameEngineDriver.h"
 #include "OrdersFiles/OrdersDriver.h"
+#include "LogFiles/LoggingObserverDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
         testCards();
         testPlayers();
         testOrdersLists();
+        testLoggingObserver();
         testMainGameLoop();
     } else {
         for (int i = 1; i < argc; ++i) {
@@ -33,23 +35,27 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running test: testLoadMaps...\n";
                 testLoadMaps();
             }
-            if (arg == "testCards") {
+            else if (arg == "testCards") {
                 std::cout << "Running test: testCards...\n";
                 testCards();
             }
-            if (arg == "testPlayers") {
+            else if (arg == "testPlayers") {
                 std::cout << "Running test: testPlayers...\n";
                 testPlayers();
             }
-            if (arg == "testGameStates") {
+            else if (arg == "testGameStates") {
                 std::cout << "Running test: testGameStates...\n";
                 testGameStates();
             }
-            if (arg == "testOrdersLists") {
+            else if (arg == "testOrdersLists") {
                 std::cout << "Running test: testOrdersLists...\n";
                 testOrdersLists();
             }
-            if (arg == "testMainGameLoop") {
+            else if (arg == "testLoggingObserver") {
+                std::cout << "Running test: testLoggingObserver...\n";
+                testLoggingObserver();
+            }
+            else if (arg == "testMainGameLoop") {
                 std::cout << "Running test: testMainGameLoop...\n";
                 testMainGameLoop();
             }

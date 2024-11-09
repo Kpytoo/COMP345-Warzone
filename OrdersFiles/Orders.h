@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "LogFiles/LoggingObserver.h"
 
 class Player;
 
@@ -11,7 +12,7 @@ class Player;
  * @brief The base class representing an Order in the game.
  * Defines a generic order with type and validation/execution mechanisms.
  */
-class Order
+class Order : public Subject, public ILoggable
 {
 public:
     /**
@@ -65,13 +66,15 @@ public:
      * @return std::ostream& The modified output stream.
      */
     friend std::ostream& operator<<(std::ostream &COUT, const Order &ORDER);
+
+    std::string stringToLog() const override;
 };
 
 /**
  * @brief Represents a list of orders in the game.
  * Manages a collection of orders and provides methods to add, move, and remove orders.
  */
-class OrdersList
+class OrdersList : public Subject, public ILoggable
 {
 public:
     /**
@@ -140,6 +143,8 @@ public:
      * Frees the memory allocated for each Order in the list.
      */
     virtual ~OrdersList();
+
+    std::string stringToLog() const override;
 };
 
 /**

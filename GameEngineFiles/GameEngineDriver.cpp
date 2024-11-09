@@ -17,7 +17,7 @@
 void testGameStates()
 {
     // Create a new GameEngine object using dynamic memory allocation
-    GameEngine* game = new GameEngine();
+    GameEngine *game = new GameEngine();
 
     // String to hold user command input
     std::string command;
@@ -25,7 +25,7 @@ void testGameStates()
     // Output a header for the test of game states to the console
     std::cout << "--- Test Game States ---\n\n";
 
-    while(true)
+    while (true)
     {
         // Display the current game state and available commands
         // Dereference the GameEngine pointer and use the overloaded operator<< to display the current game state and valid commands
@@ -38,7 +38,7 @@ void testGameStates()
         std::getline(std::cin, command);
 
         // Check if the user wants to quit the game
-        if(command == "quit")
+        if (command == "quit")
         {
             // Inform the user that the game is exiting
             std::cout << "Exiting the game...\n\n";
@@ -132,4 +132,42 @@ void testMainGameLoop()
     delete player2;
     delete gameMap;
     delete gameEngine;
+}
+void testStartupPhase()
+{
+    // Initialize objects for testing
+    GameEngine gameEngine;
+    Map gameMap;
+    Deck gameDeck;
+
+    std::string commandFilePath = "commands.txt";
+    FileCommandProcessorAdapter commandProcessor(commandFilePath);
+
+    // Call the startupPhase method
+    gameEngine.startupPhase(commandProcessor, gameMap, gameDeck);
+
+    // Display the final game state to verify setup success
+    std::cout << "Final Game State: " << gameEngine.getCurrentState() << "\n";
+    std::cout << "Players and Territories:\n";
+    for (Player *player : gameEngine.getPlayers())
+    {
+        std::cout << "Player: " << player->getPlayerName() << "\nOwned Territories:\n";
+        for (Territory *territory : player->getOwnedTerritories())
+        {
+            std::cout << " - " << territory->name << "\n";
+        }
+        std::cout << "Hand:\n";
+        for (Card *card : player->getPlayerHand()->handVector)
+        {
+            std::cout << " - Card: " << card->getCardType() << "\n";
+        }
+        std::cout << "\n";
+    }
+}
+
+int main()
+{
+    // Run the startup phase test
+    testStartupPhase();
+    return 0;
 }
