@@ -5,6 +5,7 @@
 
 #include "MapFiles/Map.h"
 #include "PlayerFiles/Player.h"
+#include "CommandProcessing.h"
 #include <vector>
 #include <set>
 
@@ -82,8 +83,8 @@ void testMainGameLoop()
     player2->getOwnedTerritories().push_back(gameMap->territories.at("Mont Royal"));
     player2->getOwnedTerritories().push_back(gameMap->territories.at("NDG CDN"));
 
-    gameEngine->getPlayersList().push_back(player1);
-    gameEngine->getPlayersList().push_back(player2);
+    gameEngine->getPlayers().push_back(player1);
+    gameEngine->getPlayers().push_back(player2);
 
     // Test toDefend() and toAttack() for Player 1
     std::cout << "\nTesting Player 1's toDefend() and toAttack() methods:\n";
@@ -163,11 +164,4 @@ void testStartupPhase()
         }
         std::cout << "\n";
     }
-}
-
-int main()
-{
-    // Run the startup phase test
-    testStartupPhase();
-    return 0;
 }

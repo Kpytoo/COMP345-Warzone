@@ -3,16 +3,7 @@
 #include "GameEngine.h"
 #include <ctime>
 #include <cstdlib>
-/**
- * Once a command gets executed, we can save its effect by using
- * saveEffect() and entering a string that reflects its effect.
- *
- * @param effect The effect of the command as a string.
- */
-void Command::saveEffect(std::string effect)
-{
-    this->effect = effect;
-}
+#include "CommandProcessing.h"
 
 /**
  * Default constructor for the GameEngine class.
@@ -23,72 +14,7 @@ GameEngine::GameEngine()
     // Allocating memory for the game engine and initializing it to the game state Start
     currentGameState = new GameState(GameState::Start);
 
-    // Allocating memory for the command map
-    mapCommand = new std::map<std::string, Command>();
-
-    // Allocating memory for the valid commands map
-    mapValidCommands = new std::map<GameState, std::vector<std::string>>();
-
-    // Pairing string commands to their respective game states with descriptions
-    // Maps "loadmap" to Map_Loaded state
-    (*mapCommand)["loadmap"] = {GameState::Map_Loaded, "Loading a Map"};
-
-    // Maps "validatemap" to Map_Validated state
-    (*mapCommand)["validatemap"] = {GameState::Map_Validated, "Validate the Loaded Map"};
-
-    // Maps "addplayer" to Players_Added state
-    (*mapCommand)["addplayer"] = {GameState::Players_Added, "Add Players To The Game"};
-
-    // Maps "assigncountries" to Assign_Reinforcement state
-    (*mapCommand)["assigncountries"] = {GameState::Assign_Reinforcement, "Assign Countries To Players"};
-
-    // Maps "issueorder" to Issue_Orders state
-    (*mapCommand)["issueorder"] = {GameState::Issue_Orders, "Issue Orders"};
-
-    // Maps "endissueorders" to Execute_Orders state
-    (*mapCommand)["endissueorders"] = {GameState::Execute_Orders, "Execute Orders"};
-
-    // Maps "execorder" to Execute_Orders state
-    (*mapCommand)["execorder"] = {GameState::Execute_Orders, "Execute Orders"};
-
-    // Maps "endexecorders" to Assign_Reinforcement state
-    (*mapCommand)["endexecorders"] = {GameState::Assign_Reinforcement, "Assign Countries To Players"};
-
-    // Maps "win" to Win state
-    (*mapCommand)["win"] = {GameState::Win, "You Won!"};
-
-    // Maps "end" to End state
-    (*mapCommand)["end"] = {GameState::End, "Game Finished"};
-
-    // Maps "play" to Start state
-    (*mapCommand)["play"] = {GameState::Start, "Restart The Game"};
-
-    // Define valid commands for each game state
-    (*mapValidCommands)[GameState::Start] = {"loadmap"};
-
-    // Valid commands for Map_Loaded state
-    (*mapValidCommands)[GameState::Map_Loaded] = {"loadmap", "validatemap"};
-
-    // Valid command for Map_Validated state
-    (*mapValidCommands)[GameState::Map_Validated] = {"addplayer"};
-
-    // Valid commands for Players_Added state
-    (*mapValidCommands)[GameState::Players_Added] = {"addplayer", "assigncountries"};
-
-    // Valid command for Assign_Reinforcement state
-    (*mapValidCommands)[GameState::Assign_Reinforcement] = {"issueorder"};
-
-    // Valid commands for Issue_Orders state
-    (*mapValidCommands)[GameState::Issue_Orders] = {"issueorder", "endissueorders"};
-
-    // Valid commands for Execute_Orders state
-    (*mapValidCommands)[GameState::Execute_Orders] = {"execorder", "endexecorders", "win"};
-
-    // Valid commands for Win state
-    (*mapValidCommands)[GameState::Win] = {"play", "end"};
-
     // Might need to modify these values for other parts
-    playersList = {};
     currentMap = nullptr;
     mainDeck = nullptr;
 }
@@ -102,12 +28,6 @@ GameEngine::GameEngine(const GameEngine &copy)
 {
     // Allocating new memory for the current game state and copying its value
     currentGameState = new GameState(*copy.currentGameState);
-
-    // Allocating new memory for the command map and copying it
-    mapCommand = new std::map<std::string, Command>(*(copy.mapCommand));
-
-    // Allocating new memory for the valid commands map and copying it
-    mapValidCommands = new std::map<GameState, std::vector<std::string>>(*(copy.mapValidCommands));
 }
 
 /**
@@ -119,18 +39,15 @@ GameEngine::~GameEngine()
     // Delete the pointer and free memory allocated for the current game state
     delete currentGameState;
 
-    // Delete the pointer and free memory allocated for the command map
-    delete mapCommand;
-
-    // Delete the pointer and free memory allocated for the valid commands map
-    delete mapValidCommands;
-
     delete currentMap;
-    for(auto player : playersList)
+    for(auto player : players)
     {
         delete player;
     }
-    player.clear();
+    players.clear();
+
+    // delete map (map deconstructor will also remove all the allocated memory for the territories and continents)
+    delete currentMap;
 }
 
 /**
@@ -171,21 +88,9 @@ GameEngine &GameEngine::operator=(const GameEngine &copy)
         // Free existing memory allocated for current game state
         delete currentGameState;
 
-        // Free existing memory allocated for command map
-        delete mapCommand;
-
-        // Free existing memory allocated for valid commands map
-        delete mapValidCommands;
-
         // Perform a deep copy of the GameEngine
         // Copy the current game state
         currentGameState = new GameState(*copy.currentGameState);
-
-        // Copy the command map
-        mapCommand = new std::map<std::string, Command>(*(copy.mapCommand));
-
-        // Copy the valid commands map
-        mapValidCommands = new std::map<GameState, std::vector<std::string>>(*(copy.mapValidCommands));
     }
 
     // Return a reference to the current object
@@ -212,16 +117,16 @@ std::ostream &operator<<(std::ostream &os, const GameEngine &gameEngine)
     GameState currentGameState = *(gameEngine.currentGameState);
 
     // Check if there are any valid commands for the current game state
-    if (gameEngine.mapValidCommands->count(currentGameState) > 0)
+    if (MapValidCommands.count(currentGameState) > 0)
     {
         // List of valid commands for the current game state
-        const std::vector<std::string> &commands = (*gameEngine.mapValidCommands)[currentGameState];
+        const std::vector<std::string> &commands = MapValidCommands.at(currentGameState);
 
         // Iterate through each valid command
         for (const std::string &command : commands)
         {
             // Get the command's description from the command map
-            const Command &commandDesc = (*gameEngine.mapCommand).at(command);
+            const Command &commandDesc = MapCommand.at(command);
 
             // Print the command and its description to the output stream
             os << " - " << command << ": " << commandDesc.description << "\n";
@@ -246,13 +151,13 @@ void GameEngine::manageCommand(const std::string &command)
     std::string lowerStringCommand = toLowerCase(command);
 
     // Check if the command is valid for the current game state
-    if (isCommandValid(lowerStringCommand))
+    if (CommandProcessor::isCommandValidForGameState(lowerStringCommand, *currentGameState))
     {
         // Find the command in the command map
-        auto c = mapCommand->find(lowerStringCommand);
+        auto c = MapCommand.find(lowerStringCommand);
 
         // Check if the command was found in the command map
-        if (c != mapCommand->end())
+        if (c != MapCommand.end())
         {
             // If it's a valid command, then transition to the next game state
             *currentGameState = c->second.nextState;
@@ -347,7 +252,7 @@ void GameEngine::setCurrentState(GameState newState)
     std::cout << "Game state updated to: " << getCurrentState() << std::endl;
 }
 
-const std::vector<Player *> &GameEngine::getPlayers() const
+std::vector<Player *> &GameEngine::getPlayers()
 {
     return players;
 }
@@ -377,39 +282,11 @@ void GameEngine::displayCommands() const
     std::cout << "Valid commands: \n";
 
     // Iterate over each command in the command map
-    for (const auto &cmd : *mapCommand)
+    for (const auto &cmd : MapCommand)
     {
         // Output the command name and its description
         std::cout << " - " << cmd.first << ": " << cmd.second.description << "\n";
     }
-}
-
-/**
- * Check if the command input is valid for the current game state.
- *
- * This function verifies whether a given command is valid
- * based on the current state of the game.
- *
- * @param command The command string to validate.
- * @return True if the command is valid for the current game state; otherwise, false.
- */
-bool GameEngine::isCommandValid(const std::string &command) const
-{
-    // Get the valid commands for the current game state
-    auto validC = mapValidCommands->find(*currentGameState);
-
-    // Check if the current game state has any valid commands
-    if (validC != mapValidCommands->end())
-    {
-        // Retrieve the list of valid commands for the current game state
-        const std::vector<std::string> &validCmd = validC->second;
-
-        // Check if the given command exists in the list of valid commands
-        return std::find(validCmd.begin(), validCmd.end(), command) != validCmd.end();
-    }
-
-    // The command wasn't found in the list of valid commands for the current game state
-    return false;
 }
 
 void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, Deck &gameDeck)
@@ -422,7 +299,7 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
     do
     {
         command = commandProcessor.getCommand().description;
-        if (!commandProcessor.validate(command, *this) || command.substr(0, 7) != "loadmap")
+        if (!commandProcessor.validate(command, *currentGameState) || command.substr(0, 7) != "loadmap")
         {
             std::cout << "Invalid command for loading map. Please try again.\n";
         }
@@ -447,7 +324,7 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
     do
     {
         command = commandProcessor.getCommand().description;
-        if (!commandProcessor.validate(command, *this) || command != "validatemap")
+        if (!commandProcessor.validate(command, *currentGameState) || command != "validatemap")
         {
             std::cout << "Invalid command for validating map. Please try again.\n";
         }
@@ -462,7 +339,7 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
     while (playerCount < 2 || playerCount > 6)
     {
         command = commandProcessor.getCommand().description;
-        if (command.substr(0, 9) == "addplayer" && commandProcessor.validate(command, *this))
+        if (command.substr(0, 9) == "addplayer" && commandProcessor.validate(command, *currentGameState))
         {
             manageCommand(command);
             std::string playerName = command.substr(10);
@@ -534,12 +411,6 @@ std::string GameEngine::stringToLog() const {
     return SS.str();
 }
 
-// get players list, was just created for GameEngineDriver - can delete method if not needed
- std::vector<Player*>& GameEngine::getPlayersList()
- {
-    return playersList;
- }
-
 // set a game map, was just created for GameEngineDriver - can delete method if not needed
  void GameEngine::setCurrentMap(Map* map)
  {
@@ -566,21 +437,21 @@ std::string GameEngine::stringToLog() const {
 void GameEngine::mainGameLoop()
 {
     // Loop continues as long as there is more than one player
-    while(playersList.size() > 1)
+    while(players.size() > 1)
     {
         // Switch to the game state Assign_Reinforcement
         *currentGameState = GameState::Assign_Reinforcement;
 
          // Iterate through each player to perform the reinforcement phase
-        for(int i = 0; i < playersList.size(); i++)
+        for(int i = 0; i < players.size(); i++)
         {
              // Check if the player has no territories left
-            if(playersList[i]->getOwnedTerritories().empty())
+            if(players[i]->getOwnedTerritories().empty())
             {
                 // Delete the player object to free memory
-                delete playersList[i];
+                delete players[i];
                 // Remove the player from the list of active players
-                playersList.erase(playersList.begin() + i);
+                players.erase(players.begin() + i);
                 // Decrement the index to recheck the current position after removal
                 i--;
                 // Skip the eliminated player for the current iteration, move to the next
@@ -588,16 +459,16 @@ void GameEngine::mainGameLoop()
             }
 
             // Call the reinforcement phase for the player
-            reinforcementPhase(playersList[i]);
+            reinforcementPhase(players[i]);
         }
 
         //Switch to game state Issue_Orders
         *currentGameState = GameState::Issue_Orders;
         // Iterate through each player to perform the issue orders phase
-        for(int i = 0; i < playersList.size(); i++)
+        for(int i = 0; i < players.size(); i++)
         {
             // Issue orders phase for the player (player decides actions)
-            issueOrdersPhase(playersList[i]);
+            issueOrdersPhase(players[i]);
         }
 
         //Switch to game state Execute_Orders
@@ -607,7 +478,7 @@ void GameEngine::mainGameLoop()
     }
 
     // When one player remains, announce them as the winner
-    std::cout << "\nGame Over! Player " << playersList[0]->getPlayerName() << "has won! \n\n";
+    std::cout << "\nGame Over! Player " << players[0]->getPlayerName() << "has won! \n\n";
     // Switch to the game state Win
     *currentGameState = GameState::Win;
 }
@@ -891,33 +762,33 @@ void GameEngine::executeOrdersPhase()
         if(!deployOver)
         {
             // Iterate through each player in the players list
-            for(int i = 0; i < playersList.size(); i++)
+            for(int i = 0; i < players.size(); i++)
             {
                 // Display whose turn it is for the deploy orders execution phase
-                std::cout << "Deploy Orders Execution Phase for " << playersList[i]->getPlayerName() << std::endl;
+                std::cout << "Deploy Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
 
                 // If the current player has no orders left in their orders list
-                if(playersList[i]->getOrdersList()->ordersVector.empty())
+                if(players[i]->getOrdersList()->ordersVector.empty())
                 {
                     // Inform the player that they have no deploy orders to execute
-                    std::cout << "No deploy orders to execute for " << playersList[i]->getPlayerName() << ".\n";
+                    std::cout << "No deploy orders to execute for " << players[i]->getPlayerName() << ".\n";
 
                     // Skip the current player and move on to the next player
                     continue;
                 }
 
                 // Iterate through the orders list of the current player
-                for(int j = 0; j < playersList[i]->getOrdersList()->ordersVector.size(); j++)
+                for(int j = 0; j < players[i]->getOrdersList()->ordersVector.size(); j++)
                 {
                     // If the order is of type "deploy", the order will be executed.
-                    if(playersList[i]->getOrdersList()->ordersVector[j]->orderType == "deploy")
+                    if(players[i]->getOrdersList()->ordersVector[j]->orderType == "deploy")
                     {
                         // If the player still has orders to execute, set ordersLeft to true to continue executing orders
                         ordersLeft = true;
                         // Executes the first deploy order in the player's orders list.
-                        playersList[i]->getOrdersList()->ordersVector.front()->execute();
+                        players[i]->getOrdersList()->ordersVector.front()->execute();
                         // After executing the order, remove it from the player's orders list
-                        playersList[i]->getOrdersList()->ordersVector.erase(playersList[i]->getOrdersList()->ordersVector.begin());
+                        players[i]->getOrdersList()->ordersVector.erase(players[i]->getOrdersList()->ordersVector.begin());
                     }
                     // Stop checking further orders if the current order is not "deploy"
                     else
@@ -932,16 +803,16 @@ void GameEngine::executeOrdersPhase()
         }
 
         // Iterate through each player in the game
-        for(int i = 0; i < playersList.size(); i++)
+        for(int i = 0; i < players.size(); i++)
         {
             // Display whose turn it is for the orders execution phase
-            std::cout << "Orders Execution Phase for " << playersList[i]->getPlayerName() << std::endl;
+            std::cout << "Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
 
             // If the current player has no orders left in their orders list
-            if(playersList[i]->getOrdersList()->ordersVector.empty())
+            if(players[i]->getOrdersList()->ordersVector.empty())
             {
                 // Inform the player that they have no more orders to execute
-                std::cout << "No more orders to execute for " << playersList[i]->getPlayerName() << ".\n";
+                std::cout << "No more orders to execute for " << players[i]->getPlayerName() << ".\n";
 
                 // Skip the current player and move on to the next player
                 continue;
@@ -951,9 +822,13 @@ void GameEngine::executeOrdersPhase()
             ordersLeft = true;
 
             // Execute the first order in the player's orders list
-            playersList[i]->getOrdersList()->ordersVector.front()->execute();
+            players[i]->getOrdersList()->ordersVector.front()->execute();
             // After executing the order, remove it from the player's orders list
-            playersList[i]->getOrdersList()->ordersVector.erase(playersList[i]->getOrdersList()->ordersVector.begin());
+            players[i]->getOrdersList()->ordersVector.erase(players[i]->getOrdersList()->ordersVector.begin());
         }
     }
+}
+
+GameState GameEngine::getCurrentGameState() const {
+    return *currentGameState;
 }

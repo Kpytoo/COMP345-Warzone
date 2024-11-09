@@ -1,4 +1,6 @@
+#include "CommandProcessingDriver.h"
 #include "CommandProcessing.h"
+#include "GameEngine.h"
 #include <cstring>
 
 /**
@@ -59,42 +61,42 @@ void testCommandProcessor(int argc, char *argv[])
 
     std::cout << std::endl;
     std::cout << "<<< validating \"loadmap\" command >>>" << std::endl;
-    if (comProc->validate("loadmap Map.txt", *engine) == true) ///> if loadmap is valid
+    if (comProc->validate("loadmap Map.txt", engine->getCurrentGameState()) == true) ///> if loadmap is valid
     {
         engine->manageCommand("loadmap");
     }
     std::cout << std::endl;
 
     std::cout << "<<< validating \"validatemap\" command >>>" << std::endl; ///> if validatemap is valid
-    if (comProc->validate("validatemap", *engine) == true)
+    if (comProc->validate("validatemap", engine->getCurrentGameState()) == true)
     {
         engine->manageCommand("validatemap");
     }
     std::cout << std::endl;
 
     std::cout << "<<< validating \"addplayer\" command >>>" << std::endl; ///> if addplayer is valid
-    if (comProc->validate("addplayer Matt", *engine) == true)
+    if (comProc->validate("addplayer Matt", engine->getCurrentGameState()) == true)
     {
         engine->manageCommand("addplayer");
     }
     std::cout << std::endl;
 
     std::cout << "<<< validating \"gamestart\" command >>>" << std::endl; ///> if gamestart is valid
-    if (comProc->validate("gamestart", *engine) == true)
+    if (comProc->validate("gamestart", engine->getCurrentGameState()) == true)
     {
         engine->manageCommand("assigncountries");
     }
     std::cout << std::endl;
 
     std::cout << "<<< validating \"replay\" command >>>" << std::endl; ///> if replay is valid
-    if (comProc->validate("replay", *engine) == true)
+    if (comProc->validate("replay", engine->getCurrentGameState()) == true)
     {
         engine->manageCommand("loadmap");
     }
     std::cout << std::endl;
 
     std::cout << "<<< validating \"quit\" command >>>" << std::endl; ///> if quit is valid
-    if (comProc->validate("quit", *engine) == true)
+    if (comProc->validate("quit", engine->getCurrentGameState()) == true)
     {
         engine->manageCommand("end");
     }
@@ -105,12 +107,4 @@ void testCommandProcessor(int argc, char *argv[])
 
     // Free the memory held by engine
     delete engine;
-}
-
-int main(int argc, char *argv[])
-{
-
-    testCommandProcessor(argc, argv); ///> calling the testCommandProcessor() free function
-
-    return 0;
 }

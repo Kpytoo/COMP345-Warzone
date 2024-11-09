@@ -285,107 +285,30 @@ void Player::issueOrder(std::string orderType, Deck* deck)
 
         // Create a new AdvanceOrder object and add it to the orders list.
         ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies)); 
-    }
-    // Handle the "airlift" order type.
-    else if(orderType == "airlift")
-    {
+    } else if (std::find(cardTypes.begin(), cardTypes.end(), orderType) != cardTypes.end()) { // order type is valid
+        // Handle the orders that requires a card to be used from the player's deck
+
         // Loop through each card in the player's hand to check for an "airlift" card
         for(Card* c : this->getPlayerHand()->handVector)
         {
-            // If an airlift card is found
-            if(c->cardType == "airlift")
+            // If the card of type is found
+            if(c->cardType == orderType)
             {
                 // Set the flag to true when an "airlift" card is found
                 hasCard = true;
                 // Issue the order by playing the card
-                c->play(*this->ordersList, *deck, *this->getPlayerHand(), "airlift");
+                c->play(*this->ordersList, *deck, *this->getPlayerHand());
                 // Exit the loop early since we've found the card
                 break;
             }
         }
 
-        // If no "airlift" card is found 
+        // If no "airlift" card is found
         if(!hasCard)
         {
             // Print an error message and exit the function
-            std::cout << "You do not have an Airlift card in your hand!\n";
+            std::cout << "You do not have an " << orderType << " card in your hand!\n";
             return;
-        }
-        
-    }
-    // Handle the "bomb" order type.
-    else if(orderType == "bomb")
-    {
-        // Loop through each card in the player's hand to check for a "bomb" card
-        for(Card* c : this->getPlayerHand()->handVector)
-        {
-            // If a bomb card is found
-            if(c->cardType == "bomb")
-            {
-                // Set the flag to true when a "bomb" card is found
-                hasCard = true;
-                // Issue the order by playing the card
-                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "bomb");
-                // Exit the loop early since we've found the card
-                break;
-            }
-        }
-
-        // If no "bomb" card is found 
-        if(!hasCard)
-        {
-            // Print an error message and exit the function
-            std::cout << "You do not have a Bomb card in your hand!\n";
-        }
-    }
-    // Handle the "blockade" order type.
-    else if(orderType == "blockade")
-    {
-        // Loop through each card in the player's hand to check for a "blockade" card
-        for(Card* c : this->getPlayerHand()->handVector)
-        {
-            // If a blockade card is found
-            if(c->cardType == "blockade")
-            {
-                // Set the flag to true when a "blockade" card is found
-                hasCard = true;
-                // Issue the order by playing the card
-                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "blockade");
-                // Exit the loop early since we've found the card
-                break;
-            }
-        }
-
-        // If no "blockade" card is found 
-        if(!hasCard)
-        {
-            // Print an error message and exit the function
-            std::cout << "You do not have a Blockade card in your hand!\n";
-        }
-    }
-    // Handle the "negotiate" order type.
-    else if(orderType == "negotiate")
-    {
-        // Loop through each card in the player's hand to check for a "diplomacy" card
-        for(Card* c : this->getPlayerHand()->handVector)
-        {
-            // If a diplomacy card is found
-            if(c->cardType == "diplomacy")
-            {
-                // Set the flag to true when a "diplomacy" card is found
-                hasCard = true;
-                // Issue the order by playing the card
-                c->play(*this->getOrdersList(), *deck, *this->getPlayerHand(), "negotiate");
-                // Exit the loop early since we've found the card
-                break;
-            }
-        }
-
-        // If no "blockade" card is found 
-        if(!hasCard)
-        {
-            // Print an error message and exit the function
-            std::cout << "You do not have a Diplomacy card in your hand!\n";
         }
     }
     else

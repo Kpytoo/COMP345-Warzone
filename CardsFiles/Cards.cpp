@@ -5,9 +5,6 @@
 
 // <<<< Card Class Definitions >>>>
 
-const std::vector<std::string> cardTypes = {"Bomb", "Reinforcement", "Blockade", "Airlift", "Diplomacy"};
-
-
 /**
  * Method that plays the card, which creates an order and adds it 
  * to the player's list of orders and then returns the card to the deck.
@@ -17,7 +14,7 @@ const std::vector<std::string> cardTypes = {"Bomb", "Reinforcement", "Blockade",
  * @param playingHand The hand from which the card is played.
  * @param cardOrder A string representing the type of order to be created from the card.
  */
-void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, std::string cardOrder)
+void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
 {
     if(playingHand.handVector.size() == 0) ///< If hand is empty.
     {
@@ -33,7 +30,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, st
         int armies = 0;
 
         // Check if the order to be issued is an "airlift" type.
-        if(cardOrder == "airlift")
+        if(cardType == "airlift")
         {
             // Prompt the player to choose a source territory for the airlift.
             std::cout << "\nChoose a source territory (army units should be on standby there): ";
@@ -54,7 +51,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, st
             ordersList.ordersVector.push_back(new AirliftOrder(sourceTName, targetTName, armies)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "bomb" type.
-        else if(cardOrder == "bomb")
+        else if(cardType == "bomb")
         {
             // Prompt the player to choose a target territory to execute a bomb order.
             std::cout << "\nChoose a target territory to execute a bomb order: ";
@@ -65,7 +62,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, st
             ordersList.ordersVector.push_back(new BombOrder(targetTName)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "blockade" type.
-        else if(cardOrder == "blockade")
+        else if(cardType == "blockade")
         {
             // Prompt the player to choose a target territory for the blockade.
             std::cout << "\nChoose a target territory to execute a blockade order: ";
@@ -76,7 +73,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand, st
             ordersList.ordersVector.push_back(new BlockadeOrder(targetTName)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "negotiate" type.
-        else if(cardOrder == "negotiate")
+        else if(cardType == "negotiate")
         {
             // Declare a variable to store the name of the target player for negotiation.
             std::string targetPName;
@@ -121,9 +118,13 @@ std::ostream &operator<<(std::ostream &COUT, const Card &CARD)
     return COUT;
 }
 
-// Getters and setters for card type
-std::string Card::getCardType() { return cardType; }
-void Card::setCardType(std::string newCardType) { cardType = std::move(newCardType); }
+const std::string &Card::getCardType() const {
+    return cardType;
+}
+
+void Card::setCardType(const std::string &cardType) {
+    Card::cardType = cardType;
+}
 
 // <<<< Deck Class Definitions >>>>
 

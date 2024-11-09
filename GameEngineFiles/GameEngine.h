@@ -9,65 +9,8 @@
 #include "PlayerFiles/Player.h"
 #include "MapFiles/Map.h"
 #include "CardsFiles/Cards.h"
-#include "CommandProcessing.h"
 #include "LogFiles/LoggingObserver.h"
-
-/**
- * Enum representing various game states/phases.
- */
-enum class GameState
-{
-    // Initial state of the game
-    Start,
-
-    // State when the map has been loaded
-    Map_Loaded,
-
-    // State when the map has been validated
-    Map_Validated,
-
-    // State when players have been added to the game
-    Players_Added,
-
-    // State when players are assigning reinforcements to their territories
-    Assign_Reinforcement,
-
-    // State for players to issue their orders
-    Issue_Orders,
-
-    // State for executing the issued orders
-    Execute_Orders,
-
-    // State when a player wins the game
-    Win,
-
-    // State indicating the end of the game
-    End
-};
-
-/**
- * Command class that holds a game state along with its description and methods.
- */
-class Command
-{
-public:
-    // The game state triggered from the command input by the player
-    GameState nextState;
-
-    // A description of what the command does
-    std::string description;
-
-    // The effect of the command
-    std::string effect;
-
-    /**
-     * Once a command gets executed, we can save its effect by using
-     * saveEffect() and entering a string that relfects its effect.
-     *
-     * @param effect The effect of the command as a string.
-     */
-    void saveEffect(std::string effect);
-};
+#include "CommandProcessing.h"
 
 /**
  * GameEngine class responsible for managing the game states and commands.
@@ -77,12 +20,6 @@ class GameEngine : public Subject, public ILoggable
 private:
     // Pointer to the current game state
     GameState *currentGameState;
-
-    // Map of commands with their descriptions
-    std::map<std::string, Command> *mapCommand;
-
-    // Valid commands for each game state
-    std::map<GameState, std::vector<std::string>> *mapValidCommands;
 
     // The map used for the game
     Map* currentMap;
@@ -148,8 +85,10 @@ public:
 
     void setCurrentState(GameState newState);
 
+    GameState getCurrentGameState() const;
+
     // Returns a const reference to the vector of players in the game
-    const std::vector<Player *> &getPlayers() const;
+    std::vector<Player *> &getPlayers();
     // Sets the list of players in the game
     void setPlayers(const std::vector<Player *> &newPlayers);
 
@@ -158,16 +97,7 @@ public:
      */
     void displayCommands() const;
 
-    /**
-     * Function to check if a command is valid in the current game state.
-     *
-     * @param command The command to check.
-     * @return True if the command is valid, false otherwise.
-     */
-    bool isCommandValid(const std::string& command) const;
-
     // can delete these methods if not needed, created for GameEngineDriver
-    std::vector<Player*>& getPlayersList();
     void setCurrentMap(Map* map);
     void setGameDeck(Deck* deck);
 
@@ -194,7 +124,6 @@ public:
      * Executes all orders in each player's orders list during the Orders Execution Phase of the game.
      */
     void executeOrdersPhase();
-    bool isCommandValid(const std::string &command) const;
 
     /**
      * Initializes the game setup phase, including map loading, validation, player addition,
