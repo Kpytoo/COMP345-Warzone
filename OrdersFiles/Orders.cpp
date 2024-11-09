@@ -69,16 +69,24 @@ void Order::execute()
  */
 DeployOrder::DeployOrder() { orderType = "deploy"; validOrder = false;}
 
+/**
+ * Constructor for the DeployOrder class.
+ * 
+ * This constructor initializes a deploy order, which is used to deploy a specified number of army units to a given territory.
+ * It sets the associated player, the name of the territory where the army is being deployed, and the number of armies being deployed.
+ * Additionally, it sets the `orderType` to "deploy" and initializes the `validOrder` flag to `false`, indicating that the order is not yet validated.
+ * 
+ * @param p The player who issued the order.
+ * @param tName The name of the territory where the army units are being deployed.
+ * @param armyDeployed The number of army units being deployed to the territory.
+ */
 DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
 {
+    // Set the order type to "deploy", indicating this is a deployment order
     orderType = "deploy";
+    // Initialize the validOrder flag to false, meaning the order is not validated at creation
     validOrder = false;
 }
-
-//void DeployOrder::print(size_t index) const
-//{
-//    std::cout << "Order " <<  index + 1 << " - Deploy Order: Deploy " << army << " army units to territory " << territoryDeployName << ".\n";
-//}
 
 std::ostream& operator<<(std::ostream &COUT, const DeployOrder &ORDER) {
     COUT << ORDER.orderType << ": " << "Deploy " << ORDER.army << " army units to territory " << ORDER.territoryDeployName << ".\n";
@@ -91,37 +99,51 @@ std::ostream& operator<<(std::ostream &COUT, const DeployOrder &ORDER) {
  */
 void DeployOrder::validate() 
 {
+    // Notify that the deploy order is being validated.
     std::cout << "Validating deploy order..." << std::endl;
     
+    // Flag indicating if the target territory was found in the player's owned territories.
     bool tFound = false;
+    // Flag indicating if the player has enough army units to deploy.
     bool enoughArmy = false;
-    for(Territory* t : player->getToDefendTerritories())
+    for(Territory* t : player->toDefend())
     {
+        // If the player's owned territory matches the target territory name
         if(t->name == territoryDeployName)
         {
+            // The target territory was found.
             tFound = true;
 
+            // Check if the player has enough army units to deploy to the target territory.
             if(player->getNumArmies() >= army)
             {
+                // Player has enough army units.
                 enoughArmy = true;
             }
 
+            // Exit the loop once the target territory is found.
             break;
         }
     }
 
+    // If the target territory was not found in the player's owned territories, the order is invalid.
     if(!tFound)
     {
+        // Mark the order as invalid.
         std::cout << "Order Invalid: Target territory not found in " << player->getPlayerName() << "'s owned territories.\n";
         validOrder = false;
     }
+    // If the player does not have enough army units, the order is invalid.
     else if(!enoughArmy)
     {
+        // Mark the order as invalid.
         std::cout << "Order Invalid: Not enough army units in " << player->getPlayerName() << "'s reinforcement pool to deploy.\n";
         validOrder = false;
     }
+    // If the target territory is found and the player has enough army units, the order is valid.
     else
     {
+        // Mark the order as valid.
         validOrder = true;
     }
 
@@ -133,24 +155,33 @@ void DeployOrder::validate()
  */
 void DeployOrder::execute() 
 {
+    // Validate the deploy order before execution.
     DeployOrder::validate();
 
+    // If the order is valid, proceed with the execution.
     if (validOrder) 
     {
+        // Call the base class execute method (Displaying the order type executing).
         Order::execute();
 
-        for(Territory* t : player->getToDefendTerritories())
+        for(Territory* t : player->toDefend())
         {
+            // If the target territory is found in the player's owned territories
             if(t->name == territoryDeployName)
             {
+                // Deploy the army units to the territory by adding the army units to the target territory.
                 t->numberOfArmies += army;
+                // Update the player's reinforcement pool to reflect the deployment.
                 player->setNumArmies(player->getNumArmies() - army);
+                // Notify that the deployment was successful.
                 std::cout << "Successfully deployed " << army << " units to " << t->name << ".\n";
+                // Exit the loop once the deployment is completed.
                 break;
             }
         }
         
     } 
+    // If the order is invalid, notify the player that the order will not be executed.
     else 
     {
         std::cout << "Deploy order is invalid and will not be executed.\n";
@@ -165,10 +196,21 @@ void DeployOrder::execute()
  */
 AdvanceOrder::AdvanceOrder() { orderType = "advance"; }
 
+/**
+ * Parameterized constructor for the AdvanceOrder class.
+ * Initializes the order with player, source territory name, target territory name, and the number of army units.
+ * 
+ * @param p A pointer to the player who is making the order.
+ * @param sName The name of the source territory from which the army is advancing.
+ * @param tName The name of the target territory to which the army is advancing.
+ * @param armyUnits The number of army units involved in the advance order.
+ */
 AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) : 
 player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
 {
+    // Sets the order type to "advance"
     orderType = "advance";
+    // Initially invalid until validated
     validOrder = false;
 }
 
@@ -183,53 +225,81 @@ std::ostream& operator<<(std::ostream &COUT, const AdvanceOrder &ORDER) {
  */
 void AdvanceOrder::validate() 
 {
+    // Notify that the advance order is being validated.
     std::cout << "Validating advance order..." << std::endl;
+
+    // Flag to track if source territory is found in player's owned territories
     bool sFound = false;
+    // Flag to track if the target territory is adjacent to the source territory
     bool adjacent = false;
+    // Pointer to source territory
     Territory* sourceT = nullptr;
+    // Pointer to target territory
     Territory* targetT = nullptr;
 
-    for(Territory* t : player->getToDefendTerritories())
+    for(Territory* t : player->toDefend())
     {
+        // Check if current territory matches the source territory name
         if(t->name == territoryAdvanceSName)
         {
+            // Mark source territory as found
             sFound = true;
+            // Set the source territory pointer to the found territory
             sourceT = t;
+            // Exit the loop once the source territory is found
             break;
         }
     }
 
+    // If the source territory is not found, mark the order as invalid and exit
     if(!sFound)
     {
+        // Print an error message
         std::cout << "Order Invalid: Source territory not found in " << player->getPlayerName() << "'s owned territories.\n";
+        // Set the order as invalid
         validOrder = false;
+        // Exit the function early as the order cannot be validated further
         return;
     }
 
+    // // Loop over adjacent territories of the source territory to check if the target territory is adjacent to the source territory
     for(const auto& pair : sourceT->adjacentTerritories)
     {
+        // Check if current adjacent territory matches the target territory name
         if(pair.second->name == territoryAdvanceTName)
         {
+            // Mark the target as adjacent if found
             adjacent = true;
+            // Set the target territory pointer to the found territory
             targetT = pair.second;
+            // Exit the loop once the target is found
             break;
         }
     }
-
+    
+    // If no adjacent territory matches the target, mark the order as invalid and exit
     if(!adjacent)
     {
+        // Print an error message
         std::cout << "Order Invalid: Target territory is not found to source territory " << targetT->name << ".\n";
+        // Set the order as invalid
         validOrder = false;
+        // Exit the function early as the order cannot be validated further
         return;
     }
 
+    // Check if the player has enough army units in the source territory to execute the order
     if(sourceT->numberOfArmies >= army)
     {
+        // Mark the order as valid
         validOrder = true;
     }
+    // If there are not enough armies in the source territory
     else
     {
+        // Print an error message indicating insufficient armies
         std::cout << "Order Invalid: Number of army units to advance surpass the number of army units available in source territoty" << sourceT->name << ".\n";
+        // Set the order as invalid
         validOrder = false;
     }
 }
@@ -501,20 +571,29 @@ void OrdersList::move(int orderPos, int newOrderPos) {
     int currentIndex = orderPos - 1;
     int newIndex = newOrderPos - 1;
 
+    // Check if the current and new positions are valid (within the bounds of the ordersVector).
     if (currentIndex >= 0 && currentIndex < ordersVector.size() &&
         newIndex >= 0 && newIndex < ordersVector.size()) 
     {
+        // Get the order to move by accessing it using the currentIndex.
         Order* orderToMove = ordersVector.at(currentIndex);
+
+        // Prevent moving orders of type "deploy".
         if(orderToMove->orderType == "deploy" || ordersVector.at(newIndex)->orderType == "deploy")
         {
+            // If the order or the order at the target position is of type "deploy", print an error.
             std::cerr << "Cannot move a Deploy order.\n";
         }
+        // Erase the order from its current position and insert it at the new position.
         else
         {
+            // Remove the order at the current position (currentIndex).
             ordersVector.erase(ordersVector.begin() + currentIndex);
+            // Insert the order at the new position (newIndex).
             ordersVector.insert(ordersVector.begin() + newIndex, orderToMove);
         }
     } 
+    // If the indices are out of range, print an error.
     else 
     {
         std::cerr << "Invalid positions for move operation." << std::endl;
@@ -531,18 +610,25 @@ void OrdersList::remove(int orderPos) {
     // Convert from 1-based to 0-based indexing
     int index = orderPos - 1;
 
+    // Check if the index is within the valid range of ordersVector.
     if (index >= 0 && index < ordersVector.size()) 
     {
+        // Check if the order at the given index is of type "deploy".
         if(ordersVector.at(index)->orderType == "deploy")
         {
+            // Print an error message if the order type is "deploy".
             std::cerr << "Cannot remove a Deploy order.\n";
         }
+        // If the order is not of type "deploy", proceed to remove the order.
         else
         {
-            delete ordersVector.at(index); // Free the memory
+            // Free the memory allocated for the order at the specified index.
+            delete ordersVector.at(index);
+            // Erase the order from the vector at the specified index.
             ordersVector.erase(ordersVector.begin() + index);
         }
     } 
+    // Print an error message if the index is out of bounds.
     else 
     {
         std::cerr << "Invalid position for remove operation." << std::endl;

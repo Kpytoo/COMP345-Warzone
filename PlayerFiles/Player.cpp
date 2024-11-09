@@ -25,7 +25,6 @@ Player::~Player()
 {
     delete playerHand;
     delete ordersList;
-    
 }
 
 // Copy constructor: creates a deep copy of another Player object
@@ -125,41 +124,74 @@ void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
 void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
 void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 
-// toDefend: returns a list of territories to defend
+/**
+ * Returns a list of territories that the player should defend.
+ * 
+ * This method generates a list of territories owned by the player and 
+ * marks them as territories to defend. The list is stored in the 
+ * `toDefendTerritories` member variable, which is updated by 
+ * the `setToDefendTerritories()` method.
+ * 
+ * @return A vector of pointers to the territories that the player needs to defend.
+ */
 std::vector<Territory *> Player::toDefend()
 {
+    // Set the player's owned territories as the territories to defend
     setToDefendTerritories(getOwnedTerritories());
+    // Return the list of territories to defend
     return toDefendTerritories;
 }
 
-// toAttack: returns a list of territories to attack
+/**
+ * Returns a list of territories that the player should attack.
+ * 
+ * This method generates a list of enemy territories that the player can attack.
+ * It does this by checking the player's own "to defend" territories and finding
+ * adjacent territories that are not owned by the player which means enemy territories.
+ * 
+ * @return A vector of pointers to the territories that the player should attack.
+ */
 std::vector<Territory *> Player::toAttack()
 {
+    // Create a set to store the enemy territories that the player can attack
     std::set<Territory*> enemyTerritories;
+
+    // Loop through each territory the player needs to defend
     for(Territory* t : toDefend())
     {
+        // Loop through the adjacent territories of the current defending territory
         for(const auto& pair : t->adjacentTerritories)
         {
+            // Flag to check if the adjacent territory is an enemy territory
             bool isEnemyT = true;
+
+            // Loop through the player's own defended territories to check if this is one of them
             for(Territory* ownedT : toDefend())
             {
+                // If the adjacent territory is one of the player's own, mark it as not an enemy
                 if(pair.second == ownedT)
                 {
+                    // Break out of the loop as we know this is not an enemy territory
                     isEnemyT = false;
                     break;
                 }
             }
 
+            // If the adjacent territory is not owned by the player, it's an enemy territory
             if(isEnemyT)
             {
+                // Add the enemy territory to the set
                 enemyTerritories.insert(pair.second);
             }
         }
     }
 
+    // Convert the set of enemy territories to a vector
     std::vector<Territory*> enemyTerritoriesVector(enemyTerritories.begin(), enemyTerritories.end());
+    // Set the list of enemy territories as the territories to attack
     setToAttackTerritories(enemyTerritoriesVector);
-
+    
+    // Return the list of territories the player should attack
     return toAttackTerritories;
 }
 

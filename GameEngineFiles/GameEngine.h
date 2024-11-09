@@ -142,12 +142,32 @@ public:
      */
     bool isCommandValid(const std::string& command) const;
 
+    // can delete these methods if not needed, created for GameEngineDriver
     std::vector<Player*>& getPlayersList();
     void setCurrentMap(Map* map);
 
+    /**
+     * Main game loop that runs the core gameplay sequence.
+     */
     void mainGameLoop();
+
+    /**
+     * Executes the Reinforcement Phase for a given player.
+     * 
+     * @param player The player who is undergoing the reinforcement phase. 
+     */
     void reinforcementPhase(Player* player);
+
+    /**
+     * Executes the Issuing Orders Phase for a given player.
+     * 
+     * @param player The player who is issuing orders. 
+     */
     void issueOrdersPhase(Player* player);
+
+    /**
+     * Executes all orders in each player's orders list during the Orders Execution Phase of the game.
+     */    
     void executeOrdersPhase();
 };
 

@@ -18,6 +18,8 @@ public:
      * @brief The type of the order (e.g., deploy, advance, bomb, etc.).
      */
     std::string orderType;
+
+    // A flag indicating whether the order has been validated and is ready for execution.
     bool validOrder;
 
     /**
@@ -31,6 +33,13 @@ public:
      * This method is purely virtual and must be implemented by derived classes.
      */
     virtual void execute() = 0;
+
+     /**
+     * Prints the details of the order.
+     * 
+     * @param index The index of the order in the list (used to display the order number).
+     */
+    virtual void print(size_t index) const = 0;
 
     /**
      * @brief Default constructor for the Order class.
@@ -146,8 +155,11 @@ public:
  */
 class DeployOrder : public Order {
 public:
+    // The name of the territory where army units are to be deployed.
     std::string territoryDeployName;
+    // The number of army units to be deployed to the specified territory.
     int army;
+    // A pointer to the player who issued the deploy order.
     Player* player;
 
     /**
@@ -156,7 +168,16 @@ public:
      */
     DeployOrder();
 
+    /**
+     * Parameterized constructor for the DeployOrder class.
+     * 
+     * @param p The player who issued the order.
+     * @param tName The name of the territory where the army units are being deployed.
+     * @param armyDeployed The number of army units being deployed to the territory.
+     */
     DeployOrder(Player* p, const std::string tName, int armyUnits);
+
+    void print(size_t index) const override;
 
     /**
      * @brief Validates the DeployOrder.
@@ -188,7 +209,17 @@ public:
      */
     AdvanceOrder();
 
+    /**
+     * Parameterized constructor for the AdvanceOrder class.
+     * 
+     * @param p A pointer to the player who is making the advance order.
+     * @param sName The name of the source territory from which the army units will advance.
+     * @param tName The name of the target territory to which the army units will advance.
+     * @param armyUnits The number of army units that are being advanced.
+     */
     AdvanceOrder(Player* p, const std::string sName, const std::string tName, int armyUnits);
+
+    void print(size_t index) const override;
 
     /**
      * @brief Validates the AdvanceOrder.
