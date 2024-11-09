@@ -1,6 +1,6 @@
 #include <ctime>
 #include <random>
-
+#include <algorithm>
 #include <sstream>
 #include "Orders.h"
 #include "PlayerFiles/Player.h"
@@ -34,8 +34,10 @@ Order::Order(const Order &orderCopy) : orderType(orderCopy.orderType) {}
  *
  * @param order The Order object to assign from.
  */
-void Order::operator=(const Order &order) {
-    if (this != &order) {
+void Order::operator=(const Order &order)
+{
+    if (this != &order)
+    {
         orderType = order.orderType;
     }
 }
@@ -48,7 +50,8 @@ void Order::operator=(const Order &order) {
  * @param ORDER The Order object to display.
  * @return std::ostream& The modified output stream.
  */
-std::ostream& operator<<(std::ostream &COUT, const Order &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const Order &ORDER)
+{
     COUT << "Order: " << ORDER.orderType;
     return COUT;
 }
@@ -63,7 +66,8 @@ void Order::execute()
     notify(this);
 }
 
-std::string Order::stringToLog() const {
+std::string Order::stringToLog() const
+{
     std::stringstream SS;
     SS << "Order Executed: " << *this;
     return SS.str();
@@ -75,7 +79,11 @@ std::string Order::stringToLog() const {
  * @brief Constructor for the DeployOrder class.
  * Initializes the orderType as "deploy".
  */
-DeployOrder::DeployOrder() { orderType = "deploy"; validOrder = false;}
+DeployOrder::DeployOrder()
+{
+    orderType = "deploy";
+    validOrder = false;
+}
 
 /**
  * Constructor for the DeployOrder class.
@@ -88,7 +96,7 @@ DeployOrder::DeployOrder() { orderType = "deploy"; validOrder = false;}
  * @param tName The name of the territory where the army units are being deployed.
  * @param armyDeployed The number of army units being deployed to the territory.
  */
-DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
+DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
 {
     // Set the order type to "deploy", indicating this is a deployment order
     orderType = "deploy";
@@ -96,7 +104,8 @@ DeployOrder::DeployOrder(Player* p, const std::string tName, int armyDeployed) :
     validOrder = false;
 }
 
-std::ostream& operator<<(std::ostream &COUT, const DeployOrder &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const DeployOrder &ORDER)
+{
     COUT << ORDER.orderType << ": " << "Deploy " << ORDER.army << " army units to territory " << ORDER.territoryDeployName << ".\n";
     return COUT;
 }
@@ -114,16 +123,16 @@ void DeployOrder::validate()
     bool tFound = false;
     // Flag indicating if the player has enough army units to deploy.
     bool enoughArmy = false;
-    for(Territory* t : player->toDefend())
+    for (Territory *t : player->toDefend())
     {
         // If the player's owned territory matches the target territory name
-        if(t->name == territoryDeployName)
+        if (t->name == territoryDeployName)
         {
             // The target territory was found.
             tFound = true;
 
             // Check if the player has enough army units to deploy to the target territory.
-            if(player->getNumArmies() >= army)
+            if (player->getNumArmies() >= army)
             {
                 // Player has enough army units.
                 enoughArmy = true;
@@ -135,14 +144,14 @@ void DeployOrder::validate()
     }
 
     // If the target territory was not found in the player's owned territories, the order is invalid.
-    if(!tFound)
+    if (!tFound)
     {
         // Mark the order as invalid.
         std::cout << "Order Invalid: Target territory not found in " << player->getPlayerName() << "'s owned territories.\n";
         validOrder = false;
     }
     // If the player does not have enough army units, the order is invalid.
-    else if(!enoughArmy)
+    else if (!enoughArmy)
     {
         // Mark the order as invalid.
         std::cout << "Order Invalid: Not enough army units in " << player->getPlayerName() << "'s reinforcement pool to deploy.\n";
@@ -154,7 +163,6 @@ void DeployOrder::validate()
         // Mark the order as valid.
         validOrder = true;
     }
-
 }
 
 /**
@@ -172,10 +180,10 @@ void DeployOrder::execute()
         // Call the base class execute method (Displaying the order type executing).
         Order::execute();
 
-        for(Territory* t : player->toDefend())
+        for (Territory *t : player->toDefend())
         {
             // If the target territory is found in the player's owned territories
-            if(t->name == territoryDeployName)
+            if (t->name == territoryDeployName)
             {
                 // Deploy the army units to the territory by adding the army units to the target territory.
                 t->numberOfArmies += army;
@@ -187,7 +195,6 @@ void DeployOrder::execute()
                 break;
             }
         }
-
     }
     // If the order is invalid, notify the player that the order will not be executed.
     else
@@ -213,8 +220,7 @@ AdvanceOrder::AdvanceOrder() { orderType = "advance"; }
  * @param tName The name of the target territory to which the army is advancing.
  * @param armyUnits The number of army units involved in the advance order.
  */
-AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) :
-player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
+AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) : player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
 {
     // Sets the order type to "advance"
     orderType = "advance";
@@ -222,7 +228,8 @@ player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(army
     validOrder = false;
 }
 
-std::ostream& operator<<(std::ostream &COUT, const AdvanceOrder &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const AdvanceOrder &ORDER)
+{
     COUT << ORDER.orderType << ": " << "Move " << ORDER.army << " army units from territory " << ORDER.territoryAdvanceSName << " to territory " << ORDER.territoryAdvanceTName << ".\n";
     return COUT;
 }
@@ -233,146 +240,148 @@ std::ostream& operator<<(std::ostream &COUT, const AdvanceOrder &ORDER) {
  */
 void AdvanceOrder::validate()
 {
-    // Notify that the advance order is being validated.
     std::cout << "Validating advance order..." << std::endl;
 
-    // Flag to track if source territory is found in player's owned territories
-    bool sFound = false;
-    // Flag to track if the target territory is adjacent to the source territory
-    bool adjacent = false;
-    // Pointer to source territory
-    Territory* sourceT = nullptr;
-    // Pointer to target territory
-    Territory* targetT = nullptr;
+    bool sFound = false;          // Source territory owned by the player
+    bool adjacent = false;        // Target territory is adjacent to the source
+    Territory *sourceT = nullptr; // Pointer to source territory
+    Territory *targetT = nullptr; // Pointer to target territory
 
-    for(Territory* t : player->toDefend())
+    // Check if player owns the source territory
+    for (Territory *t : player->getOwnedTerritories())
     {
-        // Check if current territory matches the source territory name
-        if(t->name == territoryAdvanceSName)
+        if (t->name == territoryAdvanceSName)
         {
-            // Mark source territory as found
             sFound = true;
-            // Set the source territory pointer to the found territory
             sourceT = t;
-            // Exit the loop once the source territory is found
             break;
         }
     }
 
-    // If the source territory is not found, mark the order as invalid and exit
-    if(!sFound)
+    if (!sFound)
     {
-        // Print an error message
-        std::cout << "Order Invalid: Source territory not found in " << player->getPlayerName() << "'s owned territories.\n";
-        // Set the order as invalid
+        std::cout << "Order Invalid: Source territory " << territoryAdvanceSName
+                  << " not found in " << player->getPlayerName() << "'s owned territories.\n";
         validOrder = false;
-        // Exit the function early as the order cannot be validated further
         return;
     }
 
-    // // Loop over adjacent territories of the source territory to check if the target territory is adjacent to the source territory
-    for(const auto& pair : sourceT->adjacentTerritories)
+    // Check if the target territory is adjacent to the source
+    for (const auto &pair : sourceT->adjacentTerritories)
     {
-        // Check if current adjacent territory matches the target territory name
-        if(pair.second->name == territoryAdvanceTName)
+        if (pair.second->name == territoryAdvanceTName)
         {
-            // Mark the target as adjacent if found
             adjacent = true;
-            // Set the target territory pointer to the found territory
             targetT = pair.second;
-            // Exit the loop once the target is found
             break;
         }
     }
 
-    // If no adjacent territory matches the target, mark the order as invalid and exit
-    if(!adjacent)
+    if (!adjacent)
     {
-        // Print an error message
-        std::cout << "Order Invalid: Target territory is not found to source territory " << targetT->name << ".\n";
-        // Set the order as invalid
+        std::cout << "Order Invalid: Target territory " << territoryAdvanceTName
+                  << " is not adjacent to source territory " << territoryAdvanceSName << ".\n";
         validOrder = false;
-        // Exit the function early as the order cannot be validated further
         return;
     }
 
     // Check if the player has enough army units in the source territory to execute the order
-    if(sourceT->numberOfArmies >= army)
+    if (sourceT->numberOfArmies >= army)
     {
-        // Mark the order as valid
         validOrder = true;
     }
-    // If there are not enough armies in the source territory
     else
     {
-        // Print an error message indicating insufficient armies
-        std::cout << "Order Invalid: Number of army units to advance surpass the number of army units available in source territoty " << sourceT->name << ".\n";
-        // Set the order as invalid
+        std::cout << "Order Invalid: Insufficient armies in source territory " << territoryAdvanceSName << ".\n";
         validOrder = false;
     }
 }
 
 /**
  * @brief Executes the AdvanceOrder.
- * Validates and then performs the advancement if valid.
+ * Moves or attacks armies based on the target's ownership if the order is valid.
  */
 void AdvanceOrder::execute()
 {
-    AdvanceOrder::validate();
+    validate();
 
     if (validOrder)
     {
+        // Check if negotiation prevents the attack
+        if (NegotiateOrder::negotiatedPlayers.count(player->getPlayerName()) > 0 &&
+            NegotiateOrder::negotiatedPlayers.at(player->getPlayerName()) == territoryAdvanceTName)
+        {
+            std::cout << "Advance order prevented due to active negotiation between "
+                      << player->getPlayerName() << " and " << territoryAdvanceTName << ".\n";
+            return; // Exit without executing the attack
+        }
+
         Order::execute();
 
-        bool ownT = false;
-        for(Territory* t : player->getToDefendTerritories())
+        // Proceed with the usual advance order logic
+        Territory *sourceT = nullptr;
+        for (Territory *t : player->getOwnedTerritories())
         {
-            if(t->name == territoryAdvanceSName)
+            if (t->name == territoryAdvanceSName)
             {
+                sourceT = t;
                 t->numberOfArmies -= army;
-            }
-
-            if(t->name == territoryAdvanceTName)
-            {
-                ownT = true;
-                t->numberOfArmies += army;
-                std::cout << "Advancing troops from " << territoryAdvanceSName << " to defend " << territoryAdvanceTName << ".\n";
+                break;
             }
         }
 
-        if(!ownT)
+        bool targetOwned = false;
+        for (Territory *t : player->getOwnedTerritories())
         {
-            for(Territory* t : player->getToAttackTerritories()) // TODO: Maybe change these vectors to maps to make easier to access
+            if (t->name == territoryAdvanceTName)
             {
-                if(t->name == territoryAdvanceTName)
+                targetOwned = true;
+                t->numberOfArmies += army;
+                std::cout << "Advanced " << army << " units from " << territoryAdvanceSName
+                          << " to defend " << territoryAdvanceTName << ".\n";
+                break;
+            }
+        }
+
+        // Attack logic if target is not owned
+        if (!targetOwned)
+        {
+            Territory *targetT = nullptr;
+            for (const auto &pair : sourceT->adjacentTerritories)
+            {
+                if (pair.second->name == territoryAdvanceTName)
                 {
-                    std::cout << "Advancing troops from " << territoryAdvanceSName << " to attack " << territoryAdvanceTName << ".\n";
-
-                    int attackingUnits = army;
-                    int defendingUnits = t->numberOfArmies;
-
-                    std::mt19937 rng(static_cast<unsigned>(std::time(0)));
-                    std::uniform_int_distribution<int> dist(1, 100);
-
-                    while(attackingUnits > 0 && defendingUnits > 0)
-                    {
-                        if(dist(rng) < 60)
-                        {
-                            defendingUnits--;
-                        }
-
-                        if(dist(rng) < 70)
-                        {
-                            attackingUnits--;
-                        }
-                    }
-
-                    if(defendingUnits == 0)
-                    {
-                        t->numberOfArmies = attackingUnits;
-                        // continue here
-                    }
+                    targetT = pair.second;
+                    break;
                 }
+            }
+
+            int attackingUnits = army;
+            int defendingUnits = targetT->numberOfArmies;
+
+            std::mt19937 rng(static_cast<unsigned>(std::time(0)));
+            std::uniform_int_distribution<int> dist(1, 100);
+
+            while (attackingUnits > 0 && defendingUnits > 0)
+            {
+                if (dist(rng) < 60)
+                    defendingUnits--;
+                if (dist(rng) < 70)
+                    attackingUnits--;
+            }
+
+            if (defendingUnits == 0)
+            {
+                targetT->numberOfArmies = attackingUnits;
+                std::cout << "Attack successful: " << territoryAdvanceTName
+                          << " conquered with " << attackingUnits << " remaining units.\n";
+                player->getOwnedTerritories().push_back(targetT);
+            }
+            else
+            {
+                targetT->numberOfArmies = defendingUnits;
+                std::cout << "Attack failed: " << territoryAdvanceTName
+                          << " defended with " << defendingUnits << " units remaining.\n";
             }
         }
     }
@@ -405,7 +414,8 @@ BombOrder::BombOrder(std::string tBombName) : territoryBombName(tBombName)
     validOrder = false;
 }
 
-std::ostream& operator<<(std::ostream &COUT, const BombOrder &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const BombOrder &ORDER)
+{
     COUT << ORDER.orderType << std::endl;
     return COUT;
 }
@@ -414,21 +424,70 @@ std::ostream& operator<<(std::ostream &COUT, const BombOrder &ORDER) {
  * @brief Validates the BombOrder.
  * Displays a validation message.
  */
-void BombOrder::validate() {
-    std::cout << "Validating bomb order..." << std::endl;
-    // Assume validation logic here
+void BombOrder::validate()
+{
+    std::cout << "Validating bomb order...\n";
+
+    if (!player)
+    {
+        std::cout << "Order Invalid: Issuing player not specified.\n";
+        validOrder = false;
+        return;
+    }
+
+    bool targetIsEnemy = false;
+
+    // Check if the target territory is not owned by the player
+    for (Territory *t : player->getOwnedTerritories())
+    {
+        if (t->name == territoryBombName)
+        {
+            std::cout << "Order Invalid: Cannot bomb own territory " << territoryBombName << ".\n";
+            validOrder = false;
+            return;
+        }
+    }
+
+    // If the loop completes without finding the territory, it's valid to bomb as long as it's an enemy
+    targetIsEnemy = true;
+
+    if (!targetIsEnemy)
+    {
+        std::cout << "Order Invalid: Target territory not found among enemy territories.\n";
+        validOrder = false;
+    }
+    else
+    {
+        validOrder = true;
+    }
 }
 
 /**
  * @brief Executes the BombOrder.
- * Validates and then performs the bombing if valid.
+ * Halves the army units in the target territory if the order is valid.
  */
-void BombOrder::execute() {
-    if (true /* assume valid */) {
+void BombOrder::execute()
+{
+    validate();
+
+    if (validOrder)
+    {
         Order::execute();
-        std::cout << "Bombing target." << std::endl;
-    } else {
-        std::cout << "Bomb order is invalid." << std::endl;
+
+        // Assuming the bomb simply halves the army in the target territory
+        for (Territory *t : player->getToAttackTerritories())
+        {
+            if (t->name == territoryBombName)
+            {
+                t->numberOfArmies /= 2; // Halve the armies
+                std::cout << "Bombing " << territoryBombName << ": Armies reduced to " << t->numberOfArmies << ".\n";
+                break;
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Bomb order is invalid and will not be executed.\n";
     }
 }
 
@@ -438,7 +497,8 @@ void BombOrder::execute() {
  * @brief Constructor for the BlockadeOrder class.
  * Initializes the orderType as "blockade".
  */
-BlockadeOrder::BlockadeOrder() {
+BlockadeOrder::BlockadeOrder()
+{
     orderType = "blockade";
 }
 
@@ -449,7 +509,7 @@ BlockadeOrder::BlockadeOrder() {
  *
  * @param tBlockadeName The name of the territory to blockade.
  */
-BlockadeOrder::BlockadeOrder(std::string tBlockadeName) : terriitoryBlockadeName(tBlockadeName)
+BlockadeOrder::BlockadeOrder(std::string tBlockadeName) : territoryBlockadeName(tBlockadeName)
 {
     // Sets the order type to "blockade"
     orderType = "blockade";
@@ -457,7 +517,8 @@ BlockadeOrder::BlockadeOrder(std::string tBlockadeName) : terriitoryBlockadeName
     validOrder = false;
 }
 
-std::ostream& operator<<(std::ostream &COUT, const BlockadeOrder &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const BlockadeOrder &ORDER)
+{
     COUT << ORDER.orderType << std::endl;
     return COUT;
 }
@@ -466,21 +527,81 @@ std::ostream& operator<<(std::ostream &COUT, const BlockadeOrder &ORDER) {
  * @brief Validates the BlockadeOrder.
  * Displays a validation message.
  */
-void BlockadeOrder::validate() {
-    std::cout << "Validating blockade order..." << std::endl;
-    // Assume validation logic here
+void BlockadeOrder::validate()
+{
+    std::cout << "Validating blockade order...\n";
+
+    if (!player)
+    {
+        std::cout << "Order Invalid: Issuing player not specified.\n";
+        validOrder = false;
+        return;
+    }
+
+    bool targetIsOwned = false;
+
+    // Check if the target territory is owned by the player
+    for (Territory *t : player->getOwnedTerritories())
+    {
+        if (t->name == territoryBlockadeName)
+        {
+            targetIsOwned = true;
+            break;
+        }
+    }
+
+    if (!targetIsOwned)
+    {
+        std::cout << "Order Invalid: Target territory " << territoryBlockadeName << " is not owned by "
+                  << player->getPlayerName() << ".\n";
+        validOrder = false;
+    }
+    else
+    {
+        validOrder = true;
+    }
 }
 
 /**
  * @brief Executes the BlockadeOrder.
- * Validates and then initiates the blockade if valid.
+ * Triples the army units in the target territory if the order is valid,
+ * and removes the territory from the player's list of owned territories.
  */
-void BlockadeOrder::execute() {
-    if (true /* assume valid */) {
+void BlockadeOrder::execute()
+{
+    validate();
+
+    if (validOrder)
+    {
         Order::execute();
-        std::cout << "Initiating blockade." << std::endl;
-    } else {
-        std::cout << "Blockade order is invalid." << std::endl;
+
+        auto &ownedTerritories = player->getOwnedTerritories();
+
+        // Find the target territory in the player's owned territories
+        auto it = std::find_if(ownedTerritories.begin(), ownedTerritories.end(),
+                               [this](Territory *t)
+                               { return t->name == territoryBlockadeName; });
+
+        if (it != ownedTerritories.end())
+        {
+            Territory *targetTerritory = *it;
+            targetTerritory->numberOfArmies *= 3; // Triple the armies in the territory
+
+            // Remove the territory from the current player's list
+            ownedTerritories.erase(it);
+
+            // Transfer ownership to the Neutral player
+            // Assuming `neutralPlayer` is a global or accessible instance of the Neutral player
+            neutralPlayer->getOwnedTerritories().push_back(targetTerritory);
+
+            std::cout << "Blockading " << territoryBlockadeName << ": Armies increased to "
+                      << targetTerritory->numberOfArmies
+                      << " and territory is now owned by the Neutral player.\n";
+        }
+    }
+    else
+    {
+        std::cout << "Blockade order is invalid and will not be executed.\n";
     }
 }
 
@@ -490,7 +611,8 @@ void BlockadeOrder::execute() {
  * @brief Constructor for the AirliftOrder class.
  * Initializes the orderType as "airlift".
  */
-AirliftOrder::AirliftOrder() {
+AirliftOrder::AirliftOrder()
+{
     orderType = "airlift";
 }
 
@@ -512,7 +634,8 @@ AirliftOrder::AirliftOrder(std::string airSName, std::string airTName, int units
     validOrder = false;
 }
 
-std::ostream& operator<<(std::ostream &COUT, const AirliftOrder &ORDER) {
+std::ostream &operator<<(std::ostream &COUT, const AirliftOrder &ORDER)
+{
     COUT << ORDER.orderType << std::endl;
     return COUT;
 }
@@ -521,21 +644,91 @@ std::ostream& operator<<(std::ostream &COUT, const AirliftOrder &ORDER) {
  * @brief Validates the AirliftOrder.
  * Displays a validation message.
  */
-void AirliftOrder::validate() {
-    std::cout << "Validating airlift order..." << std::endl;
-    // Assume validation logic here
+void AirliftOrder::validate()
+{
+    std::cout << "Validating airlift order...\n";
+
+    if (!player)
+    {
+        std::cout << "Order Invalid: Issuing player not specified.\n";
+        validOrder = false;
+        return;
+    }
+
+    Territory *sourceT = nullptr;
+    Territory *targetT = nullptr;
+
+    // Find source and target territories in the player's owned territories
+    for (Territory *t : player->getOwnedTerritories())
+    {
+        if (t->name == territoryAirliftSName)
+        {
+            sourceT = t;
+        }
+        else if (t->name == territoryAirliftTName)
+        {
+            targetT = t;
+        }
+
+        // Exit loop early if both territories are found
+        if (sourceT && targetT)
+        {
+            break;
+        }
+    }
+
+    if (!sourceT)
+    {
+        std::cout << "Order Invalid: Source territory not found in " << player->getPlayerName() << "'s owned territories.\n";
+        validOrder = false;
+    }
+    else if (!targetT)
+    {
+        std::cout << "Order Invalid: Target territory not found in " << player->getPlayerName() << "'s owned territories.\n";
+        validOrder = false;
+    }
+    else if (sourceT->numberOfArmies < army)
+    {
+        std::cout << "Order Invalid: Not enough army units in source territory " << sourceT->name << " for airlift.\n";
+        validOrder = false;
+    }
+    else
+    {
+        validOrder = true;
+    }
 }
 
 /**
  * @brief Executes the AirliftOrder.
- * Validates and then airlifts units if valid.
+ * Transfers army units from source to target territory if the order is valid.
  */
-void AirliftOrder::execute() {
-    if (true /* assume valid */) {
+void AirliftOrder::execute()
+{
+    validate();
+
+    if (validOrder)
+    {
         Order::execute();
-        std::cout << "Airlifting units." << std::endl;
-    } else {
-        std::cout << "Airlift order is invalid." << std::endl;
+
+        // Transfer the specified army units
+        for (Territory *t : player->getOwnedTerritories())
+        {
+            if (t->name == territoryAirliftSName)
+            {
+                t->numberOfArmies -= army; // Deduct armies from source
+            }
+            else if (t->name == territoryAirliftTName)
+            {
+                t->numberOfArmies += army; // Add armies to target
+                std::cout << "Airlifting " << army << " units from " << territoryAirliftSName
+                          << " to " << territoryAirliftTName << ".\n";
+                break;
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Airlift order is invalid and will not be executed.\n";
     }
 }
 
@@ -545,49 +738,69 @@ void AirliftOrder::execute() {
  * @brief Constructor for the NegotiateOrder class.
  * Initializes the orderType as "negotiate".
  */
-NegotiateOrder::NegotiateOrder() {
+NegotiateOrder::NegotiateOrder()
+{
     orderType = "negotiate";
 }
 
 /**
  * Parameterized constructor for the NegotiateOrder class.
  *
- * This constructor initializes the NegotiateOrder with the target player for the negotiation.
+ * This constructor initializes the NegotiateOrder with the issuing player and the target player for negotiation.
  *
+ * @param p The player issuing the negotiate order.
  * @param pTargetName The name of the player to negotiate with.
  */
-NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme)
+NegotiateOrder::NegotiateOrder(Player *p, std::string pTargetName)
+    : player(p), playerTargetName(std::move(pTargetName))
 {
-    // Sets the order type to "negotiate"
     orderType = "negotiate";
-    // Initially invalid until validated
-    validOrder = false;
-}
-
-std::ostream& operator<<(std::ostream &COUT, const NegotiateOrder &ORDER) {
-    COUT << ORDER.orderType << std::endl;
-    return COUT;
+    validOrder = false; // Not validated until `validate()` is called.
 }
 
 /**
  * @brief Validates the NegotiateOrder.
- * Displays a validation message.
+ * Ensures both players are specified and are not the same.
  */
-void NegotiateOrder::validate() {
-    std::cout << "Validating negotiate order..." << std::endl;
-    // Assume validation logic here
+void NegotiateOrder::validate()
+{
+    std::cout << "Validating negotiate order...\n";
+
+    if (!player || player->getPlayerName() == playerTargetName)
+    {
+        std::cout << "Order Invalid: Negotiation requires two distinct players.\n";
+        validOrder = false;
+        return;
+    }
+
+    validOrder = true;
 }
 
 /**
  * @brief Executes the NegotiateOrder.
- * Validates and then negotiates peace if valid.
+ * Marks the negotiation as successful, preventing attacks between the two players.
  */
-void NegotiateOrder::execute() {
-    if (true /* assume valid */) {
+void NegotiateOrder::execute()
+{
+    validate();
+
+    if (validOrder)
+    {
         Order::execute();
-        std::cout << "Negotiating peace." << std::endl;
-    } else {
-        std::cout << "Negotiate order is invalid." << std::endl;
+
+        // Placeholder for negotiation logic enforcement
+        // This would ideally be checked in the main game loop to prevent attacks between negotiated players
+
+        std::cout << "Negotiation order executed between " << player->getPlayerName()
+                  << " and " << playerTargetName << ". Attacks between these players are now prevented.\n";
+
+        // Notify the game engine or a higher-level mechanism that the players are negotiating
+        negotiatedPlayers[player->getPlayerName()] = playerTargetName;
+        negotiatedPlayers[playerTargetName] = player->getPlayerName();
+    }
+    else
+    {
+        std::cout << "Negotiate order is invalid and will not be executed.\n";
     }
 }
 
@@ -604,7 +817,8 @@ OrdersList::OrdersList() {}
  *
  * @param ordersListCopy The OrdersList object to copy from.
  */
-OrdersList::OrdersList(const OrdersList &ordersListCopy) {
+OrdersList::OrdersList(const OrdersList &ordersListCopy)
+{
     ordersVector = ordersListCopy.ordersVector;
 }
 
@@ -614,8 +828,10 @@ OrdersList::OrdersList(const OrdersList &ordersListCopy) {
  *
  * @param ordersList The OrdersList object to assign from.
  */
-void OrdersList::operator=(const OrdersList &ordersList) {
-    if (this != &ordersList) {
+void OrdersList::operator=(const OrdersList &ordersList)
+{
+    if (this != &ordersList)
+    {
         ordersVector = ordersList.ordersVector;
     }
 }
@@ -626,7 +842,8 @@ void OrdersList::operator=(const OrdersList &ordersList) {
  *
  * @param order A pointer to the Order object to add.
  */
-void OrdersList::add(Order* order) {
+void OrdersList::add(Order *order)
+{
     ordersVector.push_back(order);
     notify(this);
 }
@@ -638,7 +855,8 @@ void OrdersList::add(Order* order) {
  * @param orderPos The current position of the order to move (1-based index).
  * @param newOrderPos The new position for the order (1-based index).
  */
-void OrdersList::move(int orderPos, int newOrderPos) {
+void OrdersList::move(int orderPos, int newOrderPos)
+{
     // Convert from 1-based to 0-based indexing
     int currentIndex = orderPos - 1;
     int newIndex = newOrderPos - 1;
@@ -648,10 +866,10 @@ void OrdersList::move(int orderPos, int newOrderPos) {
         newIndex >= 0 && newIndex < ordersVector.size())
     {
         // Get the order to move by accessing it using the currentIndex.
-        Order* orderToMove = ordersVector.at(currentIndex);
+        Order *orderToMove = ordersVector.at(currentIndex);
 
         // Prevent moving orders of type "deploy".
-        if(orderToMove->orderType == "deploy" || ordersVector.at(newIndex)->orderType == "deploy")
+        if (orderToMove->orderType == "deploy" || ordersVector.at(newIndex)->orderType == "deploy")
         {
             // If the order or the order at the target position is of type "deploy", print an error.
             std::cerr << "Cannot move a Deploy order.\n";
@@ -678,7 +896,8 @@ void OrdersList::move(int orderPos, int newOrderPos) {
  *
  * @param orderPos The position of the order to remove (1-based index).
  */
-void OrdersList::remove(int orderPos) {
+void OrdersList::remove(int orderPos)
+{
     // Convert from 1-based to 0-based indexing
     int index = orderPos - 1;
 
@@ -686,7 +905,7 @@ void OrdersList::remove(int orderPos) {
     if (index >= 0 && index < ordersVector.size())
     {
         // Check if the order at the given index is of type "deploy".
-        if(ordersVector.at(index)->orderType == "deploy")
+        if (ordersVector.at(index)->orderType == "deploy")
         {
             // Print an error message if the order type is "deploy".
             std::cerr << "Cannot remove a Deploy order.\n";
@@ -715,10 +934,12 @@ void OrdersList::remove(int orderPos) {
  * @param ORDERSLIST The OrdersList object to display.
  * @return std::ostream& The modified output stream.
  */
-std::ostream& operator<<(std::ostream &COUT, const OrdersList &ORDERSLIST) {
+std::ostream &operator<<(std::ostream &COUT, const OrdersList &ORDERSLIST)
+{
     COUT << "Orders List:" << std::endl;
-    for (int i = 0; i<ORDERSLIST.ordersVector.size(); i++) {
-        COUT << i+1 << ". " << *ORDERSLIST.ordersVector[i] << std::endl;
+    for (int i = 0; i < ORDERSLIST.ordersVector.size(); i++)
+    {
+        COUT << i + 1 << ". " << *ORDERSLIST.ordersVector[i] << std::endl;
     }
     return COUT;
 }
@@ -727,13 +948,16 @@ std::ostream& operator<<(std::ostream &COUT, const OrdersList &ORDERSLIST) {
  * @brief Destructor for the OrdersList class.
  * Frees the memory allocated for each Order in the list.
  */
-OrdersList::~OrdersList() {
-    for (Order* order : ordersVector) { // Free up dynamically allocated Order instances in list.
+OrdersList::~OrdersList()
+{
+    for (Order *order : ordersVector)
+    { // Free up dynamically allocated Order instances in list.
         delete order;
     }
 }
 
-std::string OrdersList::stringToLog() const {
+std::string OrdersList::stringToLog() const
+{
     std::stringstream SS;
     SS << "Order Issued: " << *ordersVector.back();
     return SS.str();
