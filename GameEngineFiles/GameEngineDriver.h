@@ -6,6 +6,7 @@
 #define COMP345_WARZONE_GAMEENGINEDRIVER_H
 
 void testGameStates();
+void testStartupPhase();
 void testMainGameLoop();
 
 #endif //COMP345_WARZONE_GAMEENGINEDRIVER_H

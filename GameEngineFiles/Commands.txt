@@ -1,1 +1,7 @@
 loadmap Map.txt
+validatemap
+addplayer player1
+addplayer player2
+assigncountries
+loadmap
+quit

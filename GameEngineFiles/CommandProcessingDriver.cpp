@@ -28,7 +28,12 @@ void testCommandProcessor(int argc, char *argv[])
         else
         {
             std::cout << "Please specify \"-console\" or \"-file <filename>\"" << std::endl;
-            exit(1);
+            // Free the memory held by comProc
+            delete comProc;
+
+            // Free the memory held by engine
+            delete engine;
+            return;
         }
     }
     else if (argc == 3)
@@ -40,18 +45,32 @@ void testCommandProcessor(int argc, char *argv[])
             comProc = new FileCommandProcessorAdapter(fileName); ///> create a new file command processor adapter on the heap
             std::cout << "Reading commands from " << fileName << " file\n"
                       << std::endl;
-            comProc->getCommand(); ///> get 1 command from the file
+
+            Command* cmd;
+            do {
+                cmd = &comProc->getCommand();
+            } while(cmd->name != "Nothing");
         }
         else
         {
             std::cout << "Please specify \"-console\" or \"-file <filename>\"" << std::endl;
-            exit(1);
+            // Free the memory held by comProc
+            delete comProc;
+
+            // Free the memory held by engine
+            delete engine;
+            return;
         }
     }
-    else
+    else // if arg count is not 0, continue to rest of function and just show some examples
     {
         std::cout << "Please specify \"-console\" or \"-file <filename>\"" << std::endl;
-        exit(1);
+        // Free the memory held by comProc
+        delete comProc;
+
+        // Free the memory held by engine
+        delete engine;
+        return;
     }
 
     // Display the commands saved in the collection
@@ -60,47 +79,15 @@ void testCommandProcessor(int argc, char *argv[])
     // Validate all possible commands
 
     std::cout << std::endl;
-    std::cout << "<<< validating \"loadmap\" command >>>" << std::endl;
-    if (comProc->validate("loadmap Map.txt", engine->getCurrentGameState()) == true) ///> if loadmap is valid
-    {
-        engine->manageCommand("loadmap");
-    }
-    std::cout << std::endl;
 
-    std::cout << "<<< validating \"validatemap\" command >>>" << std::endl; ///> if validatemap is valid
-    if (comProc->validate("validatemap", engine->getCurrentGameState()) == true)
-    {
-        engine->manageCommand("validatemap");
+    for (Command *cmd : comProc->commandCollection) {
+        std::cout << "<<< validating \"" << cmd->name << "\" command >>>" << std::endl;
+        if (comProc->validate(*cmd, engine->getCurrentGameState())) ///> if loadmap is valid
+        {
+            engine->manageCommand(*cmd);
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
-
-    std::cout << "<<< validating \"addplayer\" command >>>" << std::endl; ///> if addplayer is valid
-    if (comProc->validate("addplayer Matt", engine->getCurrentGameState()) == true)
-    {
-        engine->manageCommand("addplayer");
-    }
-    std::cout << std::endl;
-
-    std::cout << "<<< validating \"gamestart\" command >>>" << std::endl; ///> if gamestart is valid
-    if (comProc->validate("gamestart", engine->getCurrentGameState()) == true)
-    {
-        engine->manageCommand("assigncountries");
-    }
-    std::cout << std::endl;
-
-    std::cout << "<<< validating \"replay\" command >>>" << std::endl; ///> if replay is valid
-    if (comProc->validate("replay", engine->getCurrentGameState()) == true)
-    {
-        engine->manageCommand("loadmap");
-    }
-    std::cout << std::endl;
-
-    std::cout << "<<< validating \"quit\" command >>>" << std::endl; ///> if quit is valid
-    if (comProc->validate("quit", engine->getCurrentGameState()) == true)
-    {
-        engine->manageCommand("end");
-    }
-    std::cout << std::endl;
 
     // Free the memory held by comProc
     delete comProc;

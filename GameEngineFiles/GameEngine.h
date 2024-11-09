@@ -74,7 +74,7 @@ public:
      *
      * @param command The user input command to manage.
      */
-    void manageCommand(const std::string &command);
+    void manageCommand(Command& command);
 
     /**
      * Function to get the current game state as a string.

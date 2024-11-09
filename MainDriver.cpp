@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
 
+            // Assignment #1 Drivers
             if (arg == "testLoadMaps") {
                 std::cout << "Running test: testLoadMaps...\n";
                 testLoadMaps();
@@ -46,16 +47,23 @@ int main(int argc, char* argv[]) {
 //                std::cout << "Running test: testOrdersLists...\n";
 //                testOrdersLists();
 //            }
-            else if (arg == "testLoggingObserver") {
-                std::cout << "Running test: testLoggingObserver...\n";
-                testLoggingObserver();
+
+            // Assignment #2 drivers
+            else if (arg == "testCommandProcessor") {
+                testCommandProcessor(argc-1, argv+1); // Provide args after first argument to driver
+                break; // Exit parent loop
+            }
+            else if (arg == "testStartupPhase") {
+                std::cout << "Running test: testMainGameLoop...\n";
+                testStartupPhase();
             }
             else if (arg == "testMainGameLoop") {
                 std::cout << "Running test: testMainGameLoop...\n";
                 testMainGameLoop();
             }
-            else if (arg == "testCommandProcessor") {
-                testCommandProcessor(argc-1, argv+1); // Provide args after first argument to driver
+            else if (arg == "testLoggingObserver") {
+                std::cout << "Running test: testLoggingObserver...\n";
+                testLoggingObserver();
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";
