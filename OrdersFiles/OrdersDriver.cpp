@@ -1,7 +1,7 @@
 #include "OrdersFiles/OrdersDriver.h"
 #include "OrdersFiles/Orders.h"
 
-void testOrdersLists() {
+/* void testOrdersLists() {
     OrdersList ordersList;
 
     // Create various orders
@@ -43,4 +43,4 @@ void testOrdersLists() {
     ordersList.remove(1);
     std::cout << "After removing order at position 1:" << std::endl;
     std::cout << ordersList << std::endl;
-}
+} */

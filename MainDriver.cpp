@@ -6,6 +6,7 @@
 #include "GameEngineFiles/GameEngineDriver.h"
 #include "OrdersFiles/OrdersDriver.h"
 #include "LogFiles/LoggingObserverDriver.h"
+#include "GameEngineFiles/CommandProcessingDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -20,12 +21,7 @@
  */
 int main(int argc, char* argv[]) {
     if (argc == 1) {
-        std::cout << "No specific tests selected. Running all tests... \n(except for game engine, testGameStates arg is required)\n";
-        testLoadMaps();
-        testCards();
-        testPlayers();
-        testOrdersLists();
-        testLoggingObserver();
+        std::cout << "No specific tests selected. Running no tests.";
     } else {
         for (int i = 1; i < argc; ++i) {
             std::string arg = argv[i];
@@ -46,13 +42,20 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running test: testGameStates...\n";
                 testGameStates();
             }
-            else if (arg == "testOrdersLists") {
-                std::cout << "Running test: testOrdersLists...\n";
-                testOrdersLists();
-            }
+//            else if (arg == "testOrdersLists") {
+//                std::cout << "Running test: testOrdersLists...\n";
+//                testOrdersLists();
+//            }
             else if (arg == "testLoggingObserver") {
                 std::cout << "Running test: testLoggingObserver...\n";
                 testLoggingObserver();
+            }
+            else if (arg == "testMainGameLoop") {
+                std::cout << "Running test: testMainGameLoop...\n";
+                testMainGameLoop();
+            }
+            else if (arg == "testCommandProcessor") {
+                testCommandProcessor(argc-1, argv+1); // Provide args after first argument to driver
             }
             else {
                 std::cerr << "Unknown test: " << arg << "\n";

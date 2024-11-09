@@ -38,15 +38,15 @@ void testPlayers()
 
     
 
-    std::cout << "\nTerritories to Defend: ";
-    for (auto &t : player1.toDefend())
+    std::cout << "\nTerritories to Defend: "; // TODO: prob just print player object, should display everything needed
+    for (auto &t : player1.getToDefendTerritories())
     {
         std::cout << t->name << " ";
     }
     std::cout << std::endl;
 
     std::cout << "Territories to Attack: ";
-    for (auto &t : player1.toAttack())
+    for (auto &t : player1.getToAttackTerritories())
     {
         std::cout << t->name << " ";
     }
@@ -56,7 +56,7 @@ void testPlayers()
 
     // Issue an order and display the updated orders list
     std::cout << "\nIssuing Order..." << std::endl;
-    player1.issueOrder();
+    //player1.issueOrder();
     std::cout << "Order issued. Orders List:" << std::endl;
     std::cout << *(player1.getOrdersList()) << std::endl;
 

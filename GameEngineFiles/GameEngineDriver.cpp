@@ -3,6 +3,12 @@
 #include "GameEngine.h"
 #include <string>
 
+#include "MapFiles/Map.h"
+#include "PlayerFiles/Player.h"
+#include "CommandProcessing.h"
+#include <vector>
+#include <set>
+
 /**
  * Function to test game states by simulating user input.
  *
@@ -53,6 +59,81 @@ void testGameStates()
     delete game;
 }
 
+void testMainGameLoop()
+{
+    GameEngine* gameEngine = new GameEngine();
+    Map* gameMap = new Map();
+    MapLoader::LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", gameMap);
+
+    gameEngine->setCurrentMap(gameMap);
+
+    // Create players
+    Player* player1 = new Player();
+    Player* player2 = new Player();
+
+    player1->setPlayerName("Player1");
+    player2->setPlayerName("Player2");
+
+    player1->getOwnedTerritories().push_back(gameMap->territories.at("Ahuntsic"));
+    player1->getOwnedTerritories().push_back(gameMap->territories.at("Cote St-Luc"));
+    player1->getOwnedTerritories().push_back(gameMap->territories.at("NDG CDN"));
+    player1->getOwnedTerritories().push_back(gameMap->territories.at("Outremont"));
+
+    player2->getOwnedTerritories().push_back(gameMap->territories.at("Lachine"));
+    player2->getOwnedTerritories().push_back(gameMap->territories.at("Mont Royal"));
+    player2->getOwnedTerritories().push_back(gameMap->territories.at("NDG CDN"));
+
+    gameEngine->getPlayers().push_back(player1);
+    gameEngine->getPlayers().push_back(player2);
+
+    // Test toDefend() and toAttack() for Player 1
+    std::cout << "\nTesting Player 1's toDefend() and toAttack() methods:\n";
+    std::vector<Territory*> toDefend1 = player1->toDefend();
+    std::vector<Territory*> toAttack1 = player1->toAttack();
+
+    std::cout << "Player 1 should defend:\n";
+    for (Territory* t : toDefend1)
+    {
+        std::cout << t->name << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Player 1 should attack:\n";
+    for (Territory* t : toAttack1)
+    {
+        std::cout << t->name << std::endl;
+    }
+    std::cout << std::endl;
+
+    // Test toDefend() and toAttack() for Player 2
+    std::cout << "\nTesting Player 2's toDefend() and toAttack() methods:\n";
+    std::vector<Territory*> toDefend2 = player2->toDefend();
+    std::vector<Territory*> toAttack2 = player2->toAttack();
+
+    std::cout << "Player 2 should defend:\n";
+    for (Territory* t : toDefend2)
+    {
+        std::cout << t->name << std::endl;
+    }
+    std::cout << std::endl;
+
+    std::cout << "Player 2 should attack:\n";
+    for (Territory* t : toAttack2)
+    {
+        std::cout << t->name << std::endl;
+    }
+    std::cout << std::endl;
+
+    // Start the game loop
+    std::cout << "\nGame Starting...\n\n";
+
+    gameEngine->mainGameLoop();
+
+    delete player1;
+    delete player2;
+    delete gameMap;
+    delete gameEngine;
+}
 void testStartupPhase()
 {
     // Initialize objects for testing
@@ -83,11 +164,4 @@ void testStartupPhase()
         }
         std::cout << "\n";
     }
-}
-
-int main()
-{
-    // Run the startup phase test
-    testStartupPhase();
-    return 0;
 }

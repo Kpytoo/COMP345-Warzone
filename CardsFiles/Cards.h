@@ -16,6 +16,8 @@ class Deck;
  */
 class Hand;
 
+const std::vector<std::string> cardTypes = {"Bomb", "Reinforcement", "Blockade", "Airlift", "Diplomacy"};
+
 /**
  * The Card class represents a card in the game. A card can have only one type.
  * Possible types of cards {Bomb, Reinforcement, Blockade, Airlift, Diplomacy}.
@@ -37,6 +39,7 @@ class Card
          * @param ordersList The orders list to which the created order will be added to.
          * @param playingDeck The deck to which the card will be returned to.
          * @param playingHand The hand from which the card is played.
+         * @param cardOrder A string representing the type of order to be created from the card.
          */
         void play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand);
 
@@ -78,6 +81,10 @@ class Card
          * @param CARD The card instance that is being outputted.
          */
         friend std::ostream& operator<<(std::ostream& COUT, const Card& CARD);
+
+        const std::string &getCardType() const;
+
+        void setCardType(const std::string &cardType);
 
 };
 
@@ -178,6 +185,8 @@ class Hand
          * @param HAND The card instance that is being outputted.
          */
         friend std::ostream& operator<<(std::ostream& COUT, Hand& HAND);
+
+
 
     /**
      * Destructor for the Hand class. Frees all dynamically allocated memory used for Cards.

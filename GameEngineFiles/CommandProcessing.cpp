@@ -1,4 +1,17 @@
 #include "CommandProcessing.h"
+#include <algorithm>
+
+/**
+ * Once a command gets executed, we can save its effect by using
+ * saveEffect() and entering a string that reflects its effect.
+ *
+ * @param effect The effect of the command as a string.
+ */
+void Command::saveEffect(std::string effect)
+{
+    this->effect = effect;
+}
+
 
 // <<<< CommandProcessor Class Definitions >>>>
 
@@ -14,24 +27,26 @@ Command &CommandProcessor::getCommand()
 }
 
 /**
- * This function takes in a string that stores a command and a GameEngine object
- * and firstly checks whether the given Command is available
- * inside the Command Collection list, if it is, we check whether
- * the command is valid in the current game state, if it is not,
+ * This function checks whether the given Command is available
+ * inside the Command Collection list, if it is not,
  * we output and error message stating that the Command is not in
  * the Command Collection.
  * Whenever checking for validity, if it is not
  * valid, we save an error message in the "effect" of the Command.
  *
  * @param command String that holds a command.
- * @param currentGame GameEngine instance passed by reference.
- */
-bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
+     */
+bool CommandProcessor::validate(std::string command, GameState currentGameState)
 {
     // check if the Command Collection is empty
-    if (this->commandCollection.empty() == true)
+    if (this->commandCollection.empty())
     {
         std::cout << "Can't find " << command << " inside an empty Command Collection" << std::endl;
+        return false;
+    }
+
+    if (!isCommandValidForGameState(command, currentGameState)) {
+        std::cout << "Command: " << command << " invalid for current game state" << std::endl;
         return false;
     }
 
@@ -46,19 +61,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
                 if ((*(*i)).description == fileName) ///> if the command description fits the file name
                 {
                     std::cout << command << " was found in the Command Collection " << std::endl;
-                    if (currentGame.getCurrentState() == "Start" || currentGame.getCurrentState() == "Load Map") ///> Check game state if valid
-                    {
-                        std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        return true;
-                    }
-                    else ///< if command is not valid in current game state
-                    {
-                        std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).saveEffect("Error: loadmap is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                        std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                                  << std::endl;
-                        return false;
-                    }
+                    return true;
                 }
             }
             std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -77,19 +80,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
             if ((*(*i)).description == command) ///> if the command description fits the command
             {
                 std::cout << command << " was found in the Command Collection " << std::endl;
-                if (currentGame.getCurrentState() == "Load Map") ///> Check game state if valid
-                {
-                    std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return true;
-                }
-                else ///< if command is not valid in current game state
-                {
-                    std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: validatemap is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                    std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                              << std::endl;
-                    return false;
-                }
+                return true;
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -105,19 +96,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
                 if ((*(*i)).description == playerName) ///> if the command description fits the player name
                 {
                     std::cout << command << " was found in the Command Collection " << std::endl;
-                    if (currentGame.getCurrentState() == "Validate Map" || currentGame.getCurrentState() == "Add Player") ///> Check game state if valid
-                    {
-                        std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        return true;
-                    }
-                    else ///< if command is not valid in current game state
-                    {
-                        std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                        (*(*i)).saveEffect("Error: addplayer is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                        std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                                  << std::endl;
-                        return false;
-                    }
+                    return true;
                 }
             }
             std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -136,19 +115,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
             if ((*(*i)).description == command) ///> if the command description fits the command
             {
                 std::cout << command << " was found in the Command Collection " << std::endl;
-                if (currentGame.getCurrentState() == "Add Player") ///> Check game state if valid
-                {
-                    std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return true;
-                }
-                else ///< if command is not valid in current game state
-                {
-                    std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: gamestart is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                    std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                              << std::endl;
-                    return false;
-                }
+                return true;
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -161,19 +128,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
             if ((*(*i)).description == command) ///> if the command description fits the command
             {
                 std::cout << command << " was found in the Command Collection " << std::endl;
-                if (currentGame.getCurrentState() == "Win") ///> Check game state if valid
-                {
-                    std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return true;
-                }
-                else ///< if command is not valid in current game state
-                {
-                    std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: replay is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                    std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                              << std::endl;
-                    return false;
-                }
+                return true;
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -186,19 +141,7 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
             if ((*(*i)).description == command) ///> if the command description fits the command
             {
                 std::cout << command << " was found in the Command Collection " << std::endl;
-                if (currentGame.getCurrentState() == "Win") ///> Check game state if valid
-                {
-                    std::cout << command << " is currently valid! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    return true;
-                }
-                else ///< if command is not valid in current game state
-                {
-                    std::cout << command << " is not currently valide! | Gamestate: " << currentGame.getCurrentState() << std::endl;
-                    (*(*i)).saveEffect("Error: quit is not valid in current game state: " + currentGame.getCurrentState()); ///> save the effect
-                    std::cout << "Effect saved: " << (*(*i)).effect << "\n"
-                              << std::endl;
-                    return false;
-                }
+                return true;
             }
         }
         std::cout << command << " was not found in the Command Collection" << std::endl;
@@ -210,6 +153,34 @@ bool CommandProcessor::validate(std::string command, GameEngine &currentGame)
                   << std::endl;
         return false;
     }
+}
+
+/**
+ * Check if the command input is valid for the current game state.
+ *
+ * This function verifies whether a given command is valid
+ * based on the current state of the game.
+ *
+ * @param command The command string to validate.
+ * @return True if the command is valid for the current game state; otherwise, false.
+ */
+bool CommandProcessor::isCommandValidForGameState(const std::string &command, GameState currentGameState)
+{
+    // Get the valid commands for the current game state
+    auto validC = MapValidCommands.find(currentGameState);
+
+    // Check if the current game state has any valid commands
+    if (validC != MapValidCommands.end())
+    {
+        // Retrieve the list of valid commands for the current game state
+        const std::vector<std::string> &validCmd = validC->second;
+
+        // Check if the given command exists in the list of valid commands
+        return std::find(validCmd.begin(), validCmd.end(), command) != validCmd.end();
+    }
+
+    // The command wasn't found in the list of valid commands for the current game state
+    return false;
 }
 
 /**

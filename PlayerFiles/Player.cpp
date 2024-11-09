@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <algorithm>
+#include <set>
+
 #include "PlayerFiles/Player.h"
 #include "CardsFiles/Cards.h"
 #include "OrdersFiles/Orders.h"
@@ -23,7 +25,6 @@ Player::~Player()
 {
     delete playerHand;
     delete ordersList;
-    
 }
 
 // Copy constructor: creates a deep copy of another Player object
@@ -107,9 +108,9 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
 
 // Getter definitions: retrieve player details
 std::string Player::getPlayerName() const { return playerName; }
-std::vector<Territory *> Player::getOwnedTerritories() const { return OwnedTerritories; }
-std::vector<Territory *> Player::getToDefendTerritories() const { return toDefendTerritories; }
-std::vector<Territory *> Player::getToAttackTerritories() const { return toAttackTerritories; }
+std::vector<Territory *>& Player::getOwnedTerritories() { return OwnedTerritories; }
+std::vector<Territory *>& Player::getToDefendTerritories() { return toDefendTerritories; }
+std::vector<Territory *>& Player::getToAttackTerritories() { return toAttackTerritories; }
 Hand *Player::getPlayerHand() const { return playerHand; }
 OrdersList *Player::getOrdersList() const { return ordersList; }
 int Player::getNumArmies() const { return numArmies; }
@@ -117,26 +118,201 @@ int Player::getNumArmies() const { return numArmies; }
 // Setter definitions: modify player details
 void Player::setPlayerName(const std::string &name) { playerName = name; }
 void Player::setOwnedTerritories(const std::vector<Territory *> &territories) { OwnedTerritories = territories; }
-void Player::setToDefendTerritories(std::vector<Territory *> &territories) { toDefendTerritories = territories; }
+void Player::setToDefendTerritories(const std::vector<Territory *> &territories) { toDefendTerritories = territories; }
 void Player::setToAttackTerritories(const std::vector<Territory *> &territories) { toAttackTerritories = territories; }
 void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
 void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
 void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 
-// toDefend: returns a list of territories to defend
+/**
+ * Returns a list of territories that the player should defend.
+ * 
+ * This method generates a list of territories owned by the player and 
+ * marks them as territories to defend. The list is stored in the 
+ * `toDefendTerritories` member variable, which is updated by 
+ * the `setToDefendTerritories()` method.
+ * 
+ * @return A vector of pointers to the territories that the player needs to defend.
+ */
 std::vector<Territory *> Player::toDefend()
 {
+    // Set the player's owned territories as the territories to defend
+    setToDefendTerritories(getOwnedTerritories());
+    // Return the list of territories to defend
     return toDefendTerritories;
 }
 
-// toAttack: returns a list of territories to attack
+/**
+ * Returns a list of territories that the player should attack.
+ * 
+ * This method generates a list of enemy territories that the player can attack.
+ * It does this by checking the player's own "to defend" territories and finding
+ * adjacent territories that are not owned by the player which means enemy territories.
+ * 
+ * @return A vector of pointers to the territories that the player should attack.
+ */
 std::vector<Territory *> Player::toAttack()
 {
+    // Create a set to store the enemy territories that the player can attack
+    std::set<Territory*> enemyTerritories;
+
+    // Loop through each territory the player needs to defend
+    for(Territory* t : toDefend())
+    {
+        // Loop through the adjacent territories of the current defending territory
+        for(const auto& pair : t->adjacentTerritories)
+        {
+            // Flag to check if the adjacent territory is an enemy territory
+            bool isEnemyT = true;
+
+            // Loop through the player's own defended territories to check if this is one of them
+            for(Territory* ownedT : toDefend())
+            {
+                // If the adjacent territory is one of the player's own, mark it as not an enemy
+                if(pair.second == ownedT)
+                {
+                    // Break out of the loop as we know this is not an enemy territory
+                    isEnemyT = false;
+                    break;
+                }
+            }
+
+            // If the adjacent territory is not owned by the player, it's an enemy territory
+            if(isEnemyT)
+            {
+                // Add the enemy territory to the set
+                enemyTerritories.insert(pair.second);
+            }
+        }
+    }
+
+    // Convert the set of enemy territories to a vector
+    std::vector<Territory*> enemyTerritoriesVector(enemyTerritories.begin(), enemyTerritories.end());
+    // Set the list of enemy territories as the territories to attack
+    setToAttackTerritories(enemyTerritoriesVector);
+    
+    // Return the list of territories the player should attack
     return toAttackTerritories;
 }
 
-// issueOrder: creates a new order and adds it to the player's orders list
-void Player::issueOrder()
+/**
+ * Issues a new order based on the provided order type and adds it to the player's orders list.
+ * 
+ * The function handles different types of orders, including "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
+ * The method will check if the player has army units left in the reinforcement pool before issuing an order other than "deploy".
+ * Depending on the order type, it will prompt the player for additional details.
+ * 
+ * @param orderType The type of the order to be issued. Possible values include "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
+ */
+void Player::issueOrder(std::string orderType, Deck* deck)
 {
-    ordersList->ordersVector.push_back(new AdvanceOrder()); // Use advanced order for now
+    // Check if the player has no army units left in the reinforcement pool and tries to issue another order than deploy.
+    if(orderType != "deploy" && getNumArmies() != 0)
+    {
+        // Print a message informing the player they still have army units in the reinforcement pool and should deploy them.
+        std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
+        // Exit the function without issuing the order if the player needs to deploy.
+        return;
+    }
+
+    // Stores the name of the source territory for the order.
+    std::string sourceTName = "";
+    // Stores the name of the target territory for the order.
+    std::string targetTName = "";
+    // Stores the number of army units involved in the order.
+    int armies = 0;
+    // Flag to track if the player has the required card in their hand
+    bool hasCard = false;
+
+    // Handle the "deploy" order type.
+    if(orderType == "deploy")
+    {
+        std::cout << "- Owned Territories -\n";
+        // Display a list of the player's owned territories to choose from.
+        for(Territory* t : getOwnedTerritories())
+        {
+            // Print each owned territory's name.
+            std::cout << t->name << std::endl;
+        }
+
+        // Prompt the player to enter the name of the target territory to deploy army units.
+        std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
+        // Get the name of the target territory.
+        std::cin >> targetTName;
+
+        // Display how many army units the player has left in their reinforcement pool.
+        std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
+        // Prompt the player to enter the number of army units they wish to deploy to the selected territory.
+        std::cout << "Please enter the number of army units you want to deploy in " << targetTName << ": ";
+        // Get the number of army units to deploy.
+        std::cin >> armies;
+        // Create a new DeployOrder object and add it to the orders list.
+        ordersList->ordersVector.push_back(new DeployOrder(this, targetTName, armies));
+    }
+    // Handle the "advance" order type.
+    else if(orderType == "advance")
+    {
+        // Display a list of territories the player can attack.
+        std::cout << "Current list of territories to attack:\n";
+        for(Territory* t : getToAttackTerritories())
+        {
+            // Print each territory available for attack.
+            std::cout << t->name << std::endl;
+        }
+
+        // Display a list of territories the player needs to defend.
+        std::cout << "\nCurrent list of territories to defend:\n";
+        for(Territory* t : getToDefendTerritories())
+        {
+            // Print each territory that needs defending.
+            std::cout << t->name << std::endl;
+        }
+    
+        // Prompt the player to choose a source territory (where they have army units stationed).
+        std::cout << "\n\nChoose a source territory (army units should be on standby there): ";
+        // Get the name of the source territory.
+        std::cin >> sourceTName;
+
+        // Prompt the player to choose a target territory to advance to.
+        std::cout << "\nChoose a target territory to advance to: ";
+        // Get the name of the target territory.
+        std::cin >> targetTName;
+
+        // Prompt the player to enter the number of army units they want to advance.
+        std::cout << "\nEnter the number of army units to execute an advance order: ";
+        // Get the number of army units to advance.
+        std::cin >> armies;
+
+        // Create a new AdvanceOrder object and add it to the orders list.
+        ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies)); 
+    } else if (std::find(cardTypes.begin(), cardTypes.end(), orderType) != cardTypes.end()) { // order type is valid
+        // Handle the orders that requires a card to be used from the player's deck
+
+        // Loop through each card in the player's hand to check for an "airlift" card
+        for(Card* c : this->getPlayerHand()->handVector)
+        {
+            // If the card of type is found
+            if(c->cardType == orderType)
+            {
+                // Set the flag to true when an "airlift" card is found
+                hasCard = true;
+                // Issue the order by playing the card
+                c->play(*this->ordersList, *deck, *this->getPlayerHand());
+                // Exit the loop early since we've found the card
+                break;
+            }
+        }
+
+        // If no "airlift" card is found
+        if(!hasCard)
+        {
+            // Print an error message and exit the function
+            std::cout << "You do not have an " << orderType << " card in your hand!\n";
+            return;
+        }
+    }
+    else
+    {
+        std::cout << "Invalid Order Type! Please try again! \n\n";
+    }
 }

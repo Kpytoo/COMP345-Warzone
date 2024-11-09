@@ -18,7 +18,7 @@ private:
     std::vector<Territory *> toAttackTerritories; // List of territories the player wants to attack
     Hand *playerHand;                     // Pointer to the player's hand of cards
     OrdersList *ordersList;               // Pointer to the player's orders list
-    int numArmies;                        // Number of armies player controls
+    int numArmies;                        // Number of armies player controls              
 
 public:
     // Constructors, assignment operator, and destructor
@@ -31,9 +31,9 @@ public:
 
     // Getters for accessing private member variables
     std::string getPlayerName() const;
-    std::vector<Territory *> getOwnedTerritories() const;
-    std::vector<Territory *> getToDefendTerritories() const;
-    std::vector<Territory *> getToAttackTerritories() const;
+    std::vector<Territory *>& getOwnedTerritories();
+    std::vector<Territory *>& getToDefendTerritories();
+    std::vector<Territory *>& getToAttackTerritories();
     Hand *getPlayerHand() const;
     OrdersList *getOrdersList() const;
     int getNumArmies() const;
@@ -42,7 +42,7 @@ public:
     void setPlayerName(const std::string &name);
     void setOwnedTerritories(const std::vector<Territory *> &territories);
     void setToAttackTerritories(const std::vector<Territory *> &territories);
-    void setToDefendTerritories(std::vector<Territory *> &territories);
+    void setToDefendTerritories(const std::vector<Territory *> &territories);
     void setPlayerHand(Hand *hand);
     void setOrdersList(OrdersList *ordersList);
     void setNumArmies(int numArmies);
@@ -50,7 +50,7 @@ public:
     // Core gameplay methods
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
-    void issueOrder();                   // Issues an order for the player
+    void issueOrder(std::string orderType, Deck* deck); // Issues an order for the player
 };
 
 #endif
