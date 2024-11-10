@@ -1,5 +1,7 @@
 #include "CommandProcessing.h"
 #include <algorithm>
+#include <cstring>
+#include <sstream>
 
 /**
  * Once a command gets executed, we can save its effect by using
@@ -10,6 +12,18 @@
 void Command::saveEffect(std::string effect)
 {
     this->effect = effect;
+}
+
+Command::Command(const Command& copy) : name(copy.name), arg(copy.arg), nextState(copy.nextState), description(copy.description) {}
+
+Command::Command(std::string name, GameState nextState, const std::string &description) : name(name), nextState(nextState),
+                                                                        description(description) {}
+
+Command::Command() : name("Nothing"), description("Nothing") {
+}
+
+std::string Command::ToString() {
+    return name + " " + arg;
 }
 
 
@@ -36,123 +50,14 @@ Command &CommandProcessor::getCommand()
  *
  * @param command String that holds a command.
      */
-bool CommandProcessor::validate(std::string command, GameState currentGameState)
+bool CommandProcessor::validate(Command& command, GameState currentGameState)
 {
-    // check if the Command Collection is empty
-    if (this->commandCollection.empty())
-    {
-        std::cout << "Can't find " << command << " inside an empty Command Collection" << std::endl;
+    if (!isCommandValidForGameState(command.name, currentGameState)) {
+        std::cout << "Command: " << command.name << " invalid for current game state" << std::endl;
         return false;
     }
 
-    if (!isCommandValidForGameState(command, currentGameState)) {
-        std::cout << "Command: " << command << " invalid for current game state" << std::endl;
-        return false;
-    }
-
-    if (command.substr(0, 7) == "loadmap") ///> loadmap command
-    {
-
-        if (command.size() > 7) ///> loadmap xxxxx...
-        {
-            std::string fileName = command.substr(8);
-            for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-            {
-                if ((*(*i)).description == fileName) ///> if the command description fits the file name
-                {
-                    std::cout << command << " was found in the Command Collection " << std::endl;
-                    return true;
-                }
-            }
-            std::cout << command << " was not found in the Command Collection" << std::endl;
-            return false;
-        }
-        else
-        {
-            std::cout << "No file name was given" << std::endl;
-            return false;
-        }
-    }
-    else if (command == "validatemap") ///> validatemap command
-    {
-        for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-        {
-            if ((*(*i)).description == command) ///> if the command description fits the command
-            {
-                std::cout << command << " was found in the Command Collection " << std::endl;
-                return true;
-            }
-        }
-        std::cout << command << " was not found in the Command Collection" << std::endl;
-        return false;
-    }
-    else if (command.substr(0, 9) == "addplayer") ///> addplayer command
-    {
-        if (command.size() > 9)
-        {
-            std::string playerName = command.substr(10);
-            for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-            {
-                if ((*(*i)).description == playerName) ///> if the command description fits the player name
-                {
-                    std::cout << command << " was found in the Command Collection " << std::endl;
-                    return true;
-                }
-            }
-            std::cout << command << " was not found in the Command Collection" << std::endl;
-            return false;
-        }
-        else
-        {
-            std::cout << "No player name was given" << std::endl;
-            return false;
-        }
-    }
-    else if (command == "gamestart") ///> gamestart command
-    {
-        for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-        {
-            if ((*(*i)).description == command) ///> if the command description fits the command
-            {
-                std::cout << command << " was found in the Command Collection " << std::endl;
-                return true;
-            }
-        }
-        std::cout << command << " was not found in the Command Collection" << std::endl;
-        return false;
-    }
-    else if (command == "replay") ///> replay command
-    {
-        for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-        {
-            if ((*(*i)).description == command) ///> if the command description fits the command
-            {
-                std::cout << command << " was found in the Command Collection " << std::endl;
-                return true;
-            }
-        }
-        std::cout << command << " was not found in the Command Collection" << std::endl;
-        return false;
-    }
-    else if (command == "quit") ///> quit command
-    {
-        for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++) ///> iterate through the command collection
-        {
-            if ((*(*i)).description == command) ///> if the command description fits the command
-            {
-                std::cout << command << " was found in the Command Collection " << std::endl;
-                return true;
-            }
-        }
-        std::cout << command << " was not found in the Command Collection" << std::endl;
-        return false;
-    }
-    else ///> Invalid command has been entered
-    {
-        std::cout << "Can't validate an invalid command!\n"
-                  << std::endl;
-        return false;
-    }
+    return true;
 }
 
 /**
@@ -214,9 +119,9 @@ CommandProcessor::CommandProcessor(CommandProcessor &cmdprc)
  */
 CommandProcessor::~CommandProcessor()
 {
-    for (std::list<Command *>::iterator i = this->commandCollection.begin(); i != this->commandCollection.end(); i++)
+    for (Command *cmd : commandCollection)
     {
-        delete *i; ///> free the memory held by each command pointer
+        delete cmd; ///> free the memory held by each command pointer
     }
 }
 
@@ -282,6 +187,18 @@ std::string CommandProcessor::readCommand()
     return stringCommand; ///> return the input line
 }
 
+std::vector<std::string> split(const std::string &input, char delimiter) {
+    std::istringstream stream(input);
+    std::vector<std::string> result;
+    std::string segment;
+
+    while (std::getline(stream, segment, delimiter)) {
+        result.push_back(segment);
+    }
+
+    return result;
+}
+
 /**
  * This function takes in a constant string, and parses it
  * to determine the specific command. If the command entered
@@ -295,100 +212,29 @@ std::string CommandProcessor::readCommand()
  */
 Command &CommandProcessor::saveCommand(const std::string stringCommand)
 {
-    Command *command = new Command;
+    std::vector<std::string> split_command = split(stringCommand, ' ');
+    std::string cmd = split_command[0];
 
-    if (stringCommand.substr(0, 7) == "loadmap") ///> loadmap command
-    {
+    std::string arg = "";
+    if (split_command.size() >= 2) {
+        arg = split_command[1];
+    }
 
-        if (stringCommand.size() > 7)
-        {
-            if (stringCommand.at(7) != ' ') ///> checks so there is a space between "loadmap" and the file name
-            {
-                std::cout << "Please leave one space between \"loadmap\" and the file name." << std::endl;
-            }
-            else
-            {
-                std::string fileName = stringCommand.substr(8);
-                command->nextState = GameState::Map_Loaded; ///> state transitions to maploaded
-                command->description = fileName;            ///> File name is added to the description of the command
-                command->effect = "To load a map";          ///> update the effect
-                this->commandCollection.push_back(command); ///> add the command to the collection
-                std::cout << "*** loadmap command added to command collection (file name: " << fileName << ") ***" << std::endl;
-                return *command;
-            }
-        }
-        else
-        {
-            std::cout << "Please enter a file name after using the \"loadmap\" command." << std::endl; ///> if no file name was provided
-            return *command;
-        }
+    if ((cmd == "addplayer" || cmd == "loadmap") && arg.length() == 0) {
+        std::cout<<"No argument was provided for the " << cmd << " command." << std::endl;
+        Command* c = new Command();
+        return *c;
     }
-    else if (stringCommand == "validatemap") ///> validatemap command
-    {
-        command->nextState = GameState::Map_Validated; ///> state transitions to mapvalidated
-        command->description = "validatemap";          ///> description holds "validatemap"
-        command->effect = "To validate a map";         ///> update the effect
-        this->commandCollection.push_back(command);    ///> add the command to the collection
-        std::cout << "*** validatemap command added to command collection ***" << std::endl;
+
+    if (MapCommand.find(cmd) != MapCommand.end()) {
+        Command* command = new Command(MapCommand.at(cmd));
+        command->arg = arg;
+        commandCollection.push_back(command); ///> add the command to the collection
+        std::cout << "*** " << cmd << " command added to command collection (argument: " << arg << ") ***" << std::endl;
         return *command;
-    }
-    else if (stringCommand.substr(0, 9) == "addplayer") ///> addplayer command
-    {
-        if (stringCommand.size() > 9) ///> addplayer xxxxx....
-        {
-            if (stringCommand.at(9) != ' ') ///> checks so there is a space between "addplayer" and the player name
-            {
-                std::cout << "Please leave one space between \"addplayer\" and the player name." << std::endl;
-            }
-            else
-            {
-                std::string playerName = stringCommand.substr(10);
-                command->nextState = GameState::Players_Added; ///> state transitions to maploaded
-                command->description = playerName;             ///> Player name is added to the description of the command
-                command->effect = "To add a player";           ///> update the effect
-                this->commandCollection.push_back(command);    ///> add the command to the collection
-                std::cout << "*** playerName command added to command collection (player name: " << playerName << ") ***" << std::endl;
-                return *command;
-            }
-        }
-        else
-        {
-            std::cout << "Please enter a player name after using the \"addplayer\" command." << std::endl; ///> if no name was provided
-            return *command;
-        }
-    }
-    else if (stringCommand == "gamestart") ///> gamestart command
-    {
-        command->nextState = GameState::Assign_Reinforcement; ///> state transitions to assignreinforcement
-        command->description = "gamestart";                   ///> description holds "gamestart"
-        command->effect = "To start a game";                  ///> update the effect
-        this->commandCollection.push_back(command);           ///> add the command to the collection
-        std::cout << "*** gamestart command added to command collection ***" << std::endl;
-        return *command;
-    }
-    else if (stringCommand == "replay") ///> replay command
-    {
-        command->nextState = GameState::Start;      ///> state transitions to start
-        command->description = "replay";            ///> description holds "replay"
-        command->effect = "To replay a game";       ///> update the effect
-        this->commandCollection.push_back(command); ///> add the command to the collection
-        std::cout << "*** replay command added to command collection ***" << std::endl;
-        return *command;
-    }
-    else if (stringCommand == "quit") ///> quit command
-    {
-        command->nextState = GameState::End;        ///> state transitions to exit program
-        command->description = "quit";              ///> description holds "quit"
-        command->effect = "To quit a game";         ///> update the effect
-        this->commandCollection.push_back(command); ///> add the command to the collection
-        std::cout << "*** quit command added to command collection ***" << std::endl;
-        return *command;
-    }
-    else ///> Invalid command has been entered
-    {
-        std::cout << "Invalid command has been entered.\n"
-                  << std::endl;
-        return *command;
+    } else {
+        Command* c = new Command();
+        return *c;
     }
 }
 
@@ -437,29 +283,23 @@ std::string FileCommandProcessorAdapter::readCommand()
 FileLineReader::FileLineReader(std::string fileName)
 {
     this->fileName = fileName;
+    file.open(fileName, std::ios::in);
 }
 
 /**
- * readLineFromFile() method that reads a line from a
+ * readLineFromFile() method that reads the next line from the opened
  * file and returns the command.
- *
- * Notice: Given the restrictions in Assignment 2, part 1,
- * especially the graph "Sum-up of the proposed design for Part 1",
- * it is impossible to read more than one command from a file since
- * the saveCommand() method has to be inside the getCommand().
  */
 std::string FileLineReader::readLineFromFile()
 {
-    std::fstream file;
     std::string command;
 
-    file.open(this->fileName, std::ios::in); ///> read mode
-
-    if (file.is_open()) ///> if the file can be opened
+    if (file.is_open()) ///> if the file is opened
     {
         if (getline(file, command)) ///> get the line
         {
-            file.close();
+            command.erase(std::remove(command.begin(), command.end(), '\n'),
+                   command.end());
             return command;
         }
         else
@@ -472,7 +312,11 @@ std::string FileLineReader::readLineFromFile()
     else
     {
         std::cout << this->fileName << " was not found!" << std::endl; ///> if the file wasn't found
+        file.close();
     }
-    file.close();
     return "Nothing"; ///> if the file couldn't be opened
+}
+
+FileLineReader::~FileLineReader() {
+    file.close();
 }

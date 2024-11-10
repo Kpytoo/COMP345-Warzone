@@ -145,10 +145,10 @@ std::ostream &operator<<(std::ostream &os, const GameEngine &gameEngine)
  *
  * @param command The user input command to process.
  */
-void GameEngine::manageCommand(const std::string &command)
+void GameEngine::manageCommand(Command& command)
 {
     // Convert the user input string to lowercase to ignore case sensitivity
-    std::string lowerStringCommand = toLowerCase(command);
+    std::string lowerStringCommand = toLowerCase(command.name);
 
     // Check if the command is valid for the current game state
     if (CommandProcessor::isCommandValidForGameState(lowerStringCommand, *currentGameState))
@@ -291,22 +291,21 @@ void GameEngine::displayCommands() const
 
 void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, Deck &gameDeck)
 {
-    std::string command;
     int playerCount = 0;
 
     // 1. Load Map
     std::cout << "Starting game setup...\n";
     do
     {
-        command = commandProcessor.getCommand().description;
-        if (!commandProcessor.validate(command, *currentGameState) || command.substr(0, 7) != "loadmap")
+        Command& command = commandProcessor.getCommand();
+        if (!commandProcessor.validate(command, *currentGameState))
         {
             std::cout << "Invalid command for loading map. Please try again.\n";
         }
         else
         {
             manageCommand(command);
-            std::string mapFile = command.substr(8);
+            std::string mapFile = command.arg;
             MapLoader::LoadMap(mapFile, &gameMap);
             if (gameMap.territories.empty() || !gameMap.Validate())
             {
@@ -323,8 +322,8 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
     // 2. Validate Map
     do
     {
-        command = commandProcessor.getCommand().description;
-        if (!commandProcessor.validate(command, *currentGameState) || command != "validatemap")
+        Command& command = commandProcessor.getCommand();
+        if (!commandProcessor.validate(command, *currentGameState))
         {
             std::cout << "Invalid command for validating map. Please try again.\n";
         }
@@ -338,25 +337,32 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
     // 3. Add Players
     while (playerCount < 2 || playerCount > 6)
     {
-        command = commandProcessor.getCommand().description;
-        if (command.substr(0, 9) == "addplayer" && commandProcessor.validate(command, *currentGameState))
+        Command& command = commandProcessor.getCommand();
+        if (commandProcessor.validate(command, *currentGameState))
         {
-            manageCommand(command);
-            std::string playerName = command.substr(10);
-            players.push_back(new Player(playerName, {}));
-            playerCount++;
-            std::cout << "Player " << playerName << " added. Total players: " << playerCount << "\n";
-        }
-        else if (command == "gamestart")
-        {
-            if (playerCount >= 2)
+            if (command.name == "addplayer")
             {
                 manageCommand(command);
-                break;
+                std::string playerName = command.arg;
+                players.push_back(new Player(playerName, {}));
+                playerCount++;
+                std::cout << "Player " << playerName << " added. Total players: " << playerCount << "\n";
+            }
+            else if (command.name == "gamestart")
+            {
+                if (playerCount >= 2)
+                {
+                    manageCommand(command);
+                    break;
+                }
+                else
+                {
+                    std::cout << "At least 2 players are required to start the game.\n";
+                }
             }
             else
             {
-                std::cout << "At least 2 players are required to start the game.\n";
+                std::cout << "Invalid command. Please add players or start the game.\n";
             }
         }
         else

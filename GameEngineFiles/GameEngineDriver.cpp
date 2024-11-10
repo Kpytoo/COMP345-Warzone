@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 
+// Assignment #1 drivers
 /**
  * Function to test game states by simulating user input.
  *
@@ -49,7 +50,9 @@ void testGameStates()
         }
 
         // Manage the commands which will handle the transition to the next game state
-        game->manageCommand(command);
+        Command cmd = Command();
+        cmd.name = command;
+        game->manageCommand(cmd);
 
         // Print a newline for better readability
         std::cout << "\n\n";
@@ -57,6 +60,39 @@ void testGameStates()
 
     // Free memory allocated for the GameEngine object
     delete game;
+}
+
+// Assignment #2 drivers
+void testStartupPhase()
+{
+    // Initialize objects for testing
+    GameEngine gameEngine;
+    Map gameMap;
+    Deck gameDeck;
+
+    std::string commandFilePath = "commands.txt";
+    FileCommandProcessorAdapter commandProcessor(commandFilePath);
+
+    // Call the startupPhase method
+    gameEngine.startupPhase(commandProcessor, gameMap, gameDeck);
+
+    // Display the final game state to verify setup success
+    std::cout << "Final Game State: " << gameEngine.getCurrentState() << "\n";
+    std::cout << "Players and Territories:\n";
+    for (Player *player : gameEngine.getPlayers())
+    {
+        std::cout << "Player: " << player->getPlayerName() << "\nOwned Territories:\n";
+        for (Territory *territory : player->getOwnedTerritories())
+        {
+            std::cout << " - " << territory->name << "\n";
+        }
+        std::cout << "Hand:\n";
+        for (Card *card : player->getPlayerHand()->handVector)
+        {
+            std::cout << " - Card: " << card->getCardType() << "\n";
+        }
+        std::cout << "\n";
+    }
 }
 
 void testMainGameLoop()
@@ -133,35 +169,4 @@ void testMainGameLoop()
     delete player2;
     delete gameMap;
     delete gameEngine;
-}
-void testStartupPhase()
-{
-    // Initialize objects for testing
-    GameEngine gameEngine;
-    Map gameMap;
-    Deck gameDeck;
-
-    std::string commandFilePath = "commands.txt";
-    FileCommandProcessorAdapter commandProcessor(commandFilePath);
-
-    // Call the startupPhase method
-    gameEngine.startupPhase(commandProcessor, gameMap, gameDeck);
-
-    // Display the final game state to verify setup success
-    std::cout << "Final Game State: " << gameEngine.getCurrentState() << "\n";
-    std::cout << "Players and Territories:\n";
-    for (Player *player : gameEngine.getPlayers())
-    {
-        std::cout << "Player: " << player->getPlayerName() << "\nOwned Territories:\n";
-        for (Territory *territory : player->getOwnedTerritories())
-        {
-            std::cout << " - " << territory->name << "\n";
-        }
-        std::cout << "Hand:\n";
-        for (Card *card : player->getPlayerHand()->handVector)
-        {
-            std::cout << " - Card: " << card->getCardType() << "\n";
-        }
-        std::cout << "\n";
-    }
 }

@@ -41,8 +41,6 @@ enum class GameState
     End
 };
 
-class FileLineReader;
-
 /**
  * Command class that holds a game state along with its description and methods.
  */
@@ -52,11 +50,25 @@ public:
     // The game state triggered from the command input by the player
     GameState nextState;
 
+    // Name of command
+    std::string name;
+
+    // Argument of command
+    std::string arg;
+
     // A description of what the command does
     std::string description;
 
     // The effect of the command
     std::string effect;
+
+    Command();
+
+    Command(const Command& copy);
+
+    Command(std::string name, GameState nextState, const std::string &description);
+
+    std::string ToString();
 
     /**
      * Once a command gets executed, we can save its effect by using
@@ -72,17 +84,17 @@ public:
  */
 // Map of commands with their descriptions
 const std::map<std::string, Command> MapCommand = {
-        {"loadmap", {GameState::Map_Loaded, "Loading a Map"}},
-        {"validatemap", {GameState::Map_Validated, "Validate the Loaded Map"}},
-        {"addplayer", {GameState::Players_Added, "Add Players To The Game"}},
-        {"assigncountries", {GameState::Assign_Reinforcement, "Assign Countries To Players"}},
-        {"issueorder", {GameState::Issue_Orders, "Issue Orders"}},
-        {"endissueorders", {GameState::Execute_Orders, "Execute Orders"}},
-        {"execorder", {GameState::Execute_Orders, "Execute Orders"}},
-        {"endexecorders", {GameState::Assign_Reinforcement, "Assign Countries To Players"}},
-        {"win", {GameState::Win, "You Won!"}},
-        {"end", {GameState::End, "Game Finished"}},
-        {"play", {GameState::Start, "Restart The Game"}}
+        {"loadmap", {"loadmap", GameState::Map_Loaded, "Loading a Map"}},
+        {"validatemap", {"validatemap", GameState::Map_Validated, "Validate the Loaded Map"}},
+        {"addplayer", {"addplayer", GameState::Players_Added, "Add Players To The Game"}},
+        {"assigncountries", {"assigncountries", GameState::Assign_Reinforcement, "Assign Countries To Players"}},
+        {"issueorder", {"issueorder", GameState::Issue_Orders, "Issue Orders"}},
+        {"endissueorders", {"endissueorders", GameState::Execute_Orders, "Execute Orders"}},
+        {"execorder", {"execorder", GameState::Execute_Orders, "Execute Orders"}},
+        {"endexecorders", {"endexecorders", GameState::Assign_Reinforcement, "Assign Countries To Players"}},
+        {"win", {"win", GameState::Win, "You Won!"}},
+        {"end", {"end", GameState::End, "Game Finished"}},
+        {"play", {"play", GameState::Start, "Restart The Game"}}
 };
 
 // Valid commands for each game state
@@ -124,7 +136,7 @@ public:
      *
      * @param command String that holds a command.
      */
-    bool validate(std::string command, GameState currentGameState);
+    bool validate(Command& command, GameState currentGameState);
 
     /**
      * Function to check if a command is valid in the current game state.
@@ -166,12 +178,12 @@ public:
      */
     friend std::ostream &operator<<(std::ostream &COUT, CommandProcessor &CMDPRC);
 
-private:
     /**
-     * A list that contains a collection of Command pointers.
+     * A vector that contains a collection of Command pointers.
      */
     std::list<Command *> commandCollection;
 
+private:
     /**
      * This function prompts the user to enter a command
      * from the console and stores it in a string.
@@ -195,6 +207,25 @@ private:
 };
 
 /**
+ * The FileLineReader class is the
+ * "Adaptee" class that provides features to
+ * be able to read from a previously saved
+ * text file. It is used by the FileCommandProcessorAdapter class.
+ */
+class FileLineReader
+{
+private:
+    std::string fileName;
+    std::fstream file;
+
+public:
+    FileLineReader(std::string fileName);
+    std::string readLineFromFile();
+
+    virtual ~FileLineReader();
+};
+
+/**
  * The FileCommandProcessorAdapter class inherits from and provides
  * the same functionality as the CommandProcessor class,
  * except that it reads the commands sequentially from
@@ -213,22 +244,6 @@ public:
     FileCommandProcessorAdapter(std::string fileName);
     ~FileCommandProcessorAdapter();
     std::string readCommand();
-};
-
-/**
- * The FileLineReader class is the
- * "Adaptee" class that provides features to
- * be able to read from a previously saved
- * text file. It is used by the FileCommandProcessorAdapter class.
- */
-class FileLineReader
-{
-private:
-    std::string fileName;
-
-public:
-    FileLineReader(std::string fileName);
-    std::string readLineFromFile();
 };
 
 #endif
