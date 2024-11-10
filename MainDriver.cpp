@@ -54,12 +54,16 @@ int main(int argc, char* argv[]) {
                 break; // Exit parent loop
             }
             else if (arg == "testStartupPhase") {
-                std::cout << "Running test: testMainGameLoop...\n";
+                std::cout << "Running test: testStartupPhase...\n";
                 testStartupPhase();
             }
             else if (arg == "testMainGameLoop") {
                 std::cout << "Running test: testMainGameLoop...\n";
                 testMainGameLoop();
+            }
+            else if (arg == "testOrderExecution") {
+                std::cout << "Running test: testOrderExecution...\n";
+                testOrderExecution();
             }
             else if (arg == "testLoggingObserver") {
                 std::cout << "Running test: testLoggingObserver...\n";

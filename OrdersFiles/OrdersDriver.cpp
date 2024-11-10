@@ -1,57 +1,5 @@
 #include "OrdersFiles/OrdersDriver.h"
 #include "OrdersFiles/Orders.h"
-#include "PlayerFiles/Player.h"
-#include "GameEngineFiles/GameEngine.h"
-#include <iostream>
-#include <vector>
-#include <string>
-
-/* void testOrdersLists() {
-    OrdersList ordersList;
-
-    // Create various orders
-    Order* deployOrder = new DeployOrder();
-    Order* advanceOrder = new AdvanceOrder();
-    Order* bombOrder = new BombOrder();
-    Order* blockadeOrder = new BlockadeOrder();
-    Order* airliftOrder = new AirliftOrder();
-    Order* negotiateOrder = new NegotiateOrder();
-
-    // Add orders to the list
-    ordersList.add(deployOrder);
-    ordersList.add(advanceOrder);
-    ordersList.add(bombOrder);
-    ordersList.add(blockadeOrder);
-    ordersList.add(airliftOrder);
-    ordersList.add(negotiateOrder);
-
-    // Display the list
-    std::cout << "Initial Orders List:" << std::endl;
-    std::cout << ordersList << std::endl;
-
-    // Move the last order (position 6) to the first position
-    ordersList.move(6, 1);
-    std::cout << "After moving order 6 to position 1:" << std::endl;
-    std::cout << ordersList << std::endl;
-
-    // Move the second order to the last position
-    ordersList.move(2, 6);
-    std::cout << "After moving order 2 to position 6:" << std::endl;
-    std::cout << ordersList << std::endl;
-
-    // Remove the order at position 3
-    ordersList.remove(3);
-    std::cout << "After removing order at position 3:" << std::endl;
-    std::cout << ordersList << std::endl;
-
-    // Remove the first order
-    ordersList.remove(1);
-    std::cout << "After removing order at position 1:" << std::endl;
-    std::cout << ordersList << std::endl;
-} */
-
-#include "OrdersFiles/OrdersDriver.h"
-#include "OrdersFiles/Orders.h"
 #include <iostream>
 #include "PlayerFiles/Player.h"
 #include "GameEngineFiles/GameEngine.h"
@@ -115,33 +63,29 @@ void testOrderExecution()
     MapLoader mapLoader;
 
     // Load the map from file
-    mapLoader.LoadMap("sample_map.txt", gameMap); // Replace "sample_map.txt" with your actual map file name
+    mapLoader.LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", gameMap);
     gameEngine.setCurrentMap(gameMap);
-
-    // Create players
-    Player player1("Player1");
-    Player player2("Player2");
 
     // Assign territories to players based on map data
     std::vector<Territory *> player1Territories;
     std::vector<Territory *> player2Territories;
 
-    if (gameMap->territories.count("TerritoryA"))
+    if (gameMap->territories.count("Lachine"))
     {
-        player1Territories.push_back(gameMap->territories["TerritoryA"]);
+        player1Territories.push_back(gameMap->territories["Lachine"]);
     }
-    if (gameMap->territories.count("TerritoryB"))
+    if (gameMap->territories.count("Cote St-Luc"))
     {
-        player1Territories.push_back(gameMap->territories["TerritoryB"]);
+        player1Territories.push_back(gameMap->territories["Cote St-Luc"]);
     }
-    if (gameMap->territories.count("TerritoryC"))
+    if (gameMap->territories.count("NDG CDN"))
     {
-        player2Territories.push_back(gameMap->territories["TerritoryC"]);
+        player2Territories.push_back(gameMap->territories["NDG CDN"]);
     }
 
-    // Set each player's owned territories
-    player1.setOwnedTerritories(player1Territories);
-    player2.setOwnedTerritories(player2Territories);
+    // Create players
+    Player player1("Player1", player1Territories);
+    Player player2("Player2", player2Territories);
 
     // Set players' reinforcement pools
     player1.setNumArmies(10);
@@ -161,7 +105,7 @@ void testOrderExecution()
     std::cout << "\n--- Test: AdvanceOrder Without Negotiation ---\n";
 
     // Add an AdvanceOrder from player1 to attack player2's territory
-    ordersListNoNegotiate.add(new AdvanceOrder(&player1, "TerritoryA", "TerritoryC", 3));
+    ordersListNoNegotiate.add(new AdvanceOrder(&player1, "Lachine", "NDG CDN", 3));
 
     for (auto order : ordersListNoNegotiate.ordersVector)
     {
@@ -176,7 +120,7 @@ void testOrderExecution()
 
     // NegotiateOrder is added before AdvanceOrder
     ordersListWithNegotiate.add(new NegotiateOrder(&player1, "Player2"));
-    ordersListWithNegotiate.add(new AdvanceOrder(&player1, "TerritoryA", "TerritoryC", 3));
+    ordersListWithNegotiate.add(new AdvanceOrder(&player1, "Lachine", "NDG CDN", 3));
 
     for (auto order : ordersListWithNegotiate.ordersVector)
     {
@@ -197,13 +141,4 @@ void testOrderExecution()
         delete order;
     }
     ordersListWithNegotiate.ordersVector.clear();
-
-    // Clean up dynamically allocated objects
-    delete gameMap;
-}
-
-int main()
-{
-    testOrderExecution();
-    return 0;
 }

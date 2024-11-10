@@ -376,7 +376,7 @@ public:
      */
     NegotiateOrder(std::string pTargetNAme);
 
-    NegotiateOrder::NegotiateOrder(Player *p, std::string pTargetName);
+    NegotiateOrder(Player *p, std::string pTargetName);
 
     /**
      * @brief Validates the NegotiateOrder.

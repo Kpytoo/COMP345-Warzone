@@ -23,6 +23,7 @@ private:
 public:
     // Constructors, assignment operator, and destructor
     Player();
+    Player(std::string name);
     Player(std::string playerName, const std::vector<Territory *> &ownedTerritories);
     Player(const Player &other);
     Player &operator=(const Player &other);

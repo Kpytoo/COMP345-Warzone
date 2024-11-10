@@ -12,6 +12,7 @@
 void Command::saveEffect(std::string effect)
 {
     this->effect = effect;
+    notify(this);
 }
 
 Command::Command(const Command& copy) : name(copy.name), arg(copy.arg), nextState(copy.nextState), description(copy.description) {}
@@ -24,6 +25,17 @@ Command::Command() : name("Nothing"), description("Nothing") {
 
 std::string Command::ToString() {
     return name + " " + arg;
+}
+
+std::string Command::stringToLog() const {
+    std::stringstream SS;
+    SS << "Command's effect: " << effect;
+    return SS.str();
+}
+
+std::ostream &operator<<(std::ostream &os, const Command &command) {
+    os << " name: "<< command.name << " arg: " << command.arg;
+    return os;
 }
 
 
@@ -231,11 +243,18 @@ Command &CommandProcessor::saveCommand(const std::string stringCommand)
         command->arg = arg;
         commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** " << cmd << " command added to command collection (argument: " << arg << ") ***" << std::endl;
+        notify(this);
         return *command;
     } else {
         Command* c = new Command();
         return *c;
     }
+}
+
+std::string CommandProcessor::stringToLog() const {
+    std::stringstream SS;
+    SS << "Command: " << *commandCollection.back();
+    return SS.str();
 }
 
 // <<<< FileCommandProcessorAdapter Class Definitions >>>>

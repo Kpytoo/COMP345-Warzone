@@ -5,6 +5,8 @@
 #include "Orders.h"
 #include "PlayerFiles/Player.h"
 
+std::unordered_map<std::string, std::string> NegotiateOrder::negotiatedPlayers;
+
 /*
 Note that the orders’ actions do not need to be implemented at this point. Invalid
 orders can be created and put in the list, but their execution will not result in any action.
@@ -802,6 +804,10 @@ void NegotiateOrder::execute()
     {
         std::cout << "Negotiate order is invalid and will not be executed.\n";
     }
+}
+
+NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme) {
+
 }
 
 // ---------------------- OrdersList Class Implementation ----------------------

@@ -39,7 +39,6 @@ GameEngine::~GameEngine()
     // Delete the pointer and free memory allocated for the current game state
     delete currentGameState;
 
-    delete currentMap;
     for(auto player : players)
     {
         delete player;
@@ -163,6 +162,7 @@ void GameEngine::manageCommand(Command& command)
             *currentGameState = c->second.nextState;
             // Notify the user about the transition to the new game state
             std::cout << "\nTransitioned to game state: " << getCurrentState() << "\n\n";
+            notify(this);
 
             // If we reach the game state End
             if (*currentGameState == GameState::End)
@@ -250,6 +250,7 @@ void GameEngine::setCurrentState(GameState newState)
 {
     *currentGameState = newState;
     std::cout << "Game state updated to: " << getCurrentState() << std::endl;
+    notify(this);
 }
 
 std::vector<Player *> &GameEngine::getPlayers()
@@ -447,6 +448,7 @@ void GameEngine::mainGameLoop()
     {
         // Switch to the game state Assign_Reinforcement
         *currentGameState = GameState::Assign_Reinforcement;
+        notify(this);
 
          // Iterate through each player to perform the reinforcement phase
         for(int i = 0; i < players.size(); i++)
@@ -470,6 +472,7 @@ void GameEngine::mainGameLoop()
 
         //Switch to game state Issue_Orders
         *currentGameState = GameState::Issue_Orders;
+        notify(this);
         // Iterate through each player to perform the issue orders phase
         for(int i = 0; i < players.size(); i++)
         {
@@ -479,6 +482,7 @@ void GameEngine::mainGameLoop()
 
         //Switch to game state Execute_Orders
         *currentGameState = GameState::Execute_Orders;
+        notify(this);
         // Execute the orders that have been issued by the players
         executeOrdersPhase();
     }
@@ -487,6 +491,7 @@ void GameEngine::mainGameLoop()
     std::cout << "\nGame Over! Player " << players[0]->getPlayerName() << "has won! \n\n";
     // Switch to the game state Win
     *currentGameState = GameState::Win;
+    notify(this);
 }
 
 /**
