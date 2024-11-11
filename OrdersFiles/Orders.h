@@ -204,6 +204,7 @@ public:
     int army;
     // A pointer to the player who issued the advance order.
     Player *player;
+    Player *enemyPlayer;
 
     /**
      * @brief Constructor for AdvanceOrder.
@@ -219,7 +220,7 @@ public:
      * @param tName The name of the target territory to which the army units will advance.
      * @param armyUnits The number of army units that are being advanced.
      */
-    AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits);
+    AdvanceOrder(Player *p, Player *enemyP, const std::string sName, const std::string tName, int armyUnits);
 
     /**
      * @brief Validates the AdvanceOrder.

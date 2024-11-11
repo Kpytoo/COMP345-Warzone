@@ -222,7 +222,7 @@ AdvanceOrder::AdvanceOrder() { orderType = "advance"; }
  * @param tName The name of the target territory to which the army is advancing.
  * @param armyUnits The number of army units involved in the advance order.
  */
-AdvanceOrder::AdvanceOrder(Player *p, const std::string sName, const std::string tName, int armyUnits) : player(p), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
+AdvanceOrder::AdvanceOrder(Player *p, Player *enemyP, const std::string sName, const std::string tName, int armyUnits) : player(p), enemyPlayer(enemyP), territoryAdvanceSName(sName), territoryAdvanceTName(tName), army(armyUnits)
 {
     // Sets the order type to "advance"
     orderType = "advance";
@@ -311,10 +311,10 @@ void AdvanceOrder::execute()
     {
         // Check if negotiation prevents the attack
         if (NegotiateOrder::negotiatedPlayers.count(player->getPlayerName()) > 0 &&
-            NegotiateOrder::negotiatedPlayers.at(player->getPlayerName()) == territoryAdvanceTName)
+            NegotiateOrder::negotiatedPlayers.at(player->getPlayerName()) == enemyPlayer->getPlayerName())
         {
             std::cout << "Advance order prevented due to active negotiation between "
-                      << player->getPlayerName() << " and " << territoryAdvanceTName << ".\n";
+                      << player->getPlayerName() << " and " << enemyPlayer->getPlayerName() << ".\n";
             return; // Exit without executing the attack
         }
 
@@ -378,6 +378,15 @@ void AdvanceOrder::execute()
                 std::cout << "Attack successful: " << territoryAdvanceTName
                           << " conquered with " << attackingUnits << " remaining units.\n";
                 player->getOwnedTerritories().push_back(targetT);
+                if (enemyPlayer != nullptr) { // Remove conquered territory from enemy territory
+                    enemyPlayer->getOwnedTerritories().erase(std::remove(enemyPlayer->getOwnedTerritories().begin(),
+                                                                         enemyPlayer->getOwnedTerritories().end(), targetT),
+                                                             enemyPlayer->getOwnedTerritories().end());
+                }
+
+                if (player->deck != nullptr) {
+                    player->deck->draw(*player->getPlayerHand());
+                }
             }
             else
             {
@@ -437,10 +446,11 @@ void BombOrder::validate()
         return;
     }
 
-    bool targetIsEnemy = false;
+    bool targetIsEnemy = true;  // Assume target is enemy until proven otherwise
+    bool hasAdjacentTerritory = false;
 
     // Check if the target territory is not owned by the player
-    for (Territory *t : player->getOwnedTerritories())
+    for (Territory* t : player->getOwnedTerritories())
     {
         if (t->name == territoryBombName)
         {
@@ -448,10 +458,30 @@ void BombOrder::validate()
             validOrder = false;
             return;
         }
+
+        // Check if any of the player's territories are adjacent to the target
+        for (const auto& adjPair : t->adjacentTerritories)
+        {
+            if (adjPair.second->name == territoryBombName)
+            {
+                hasAdjacentTerritory = true;
+                break;
+            }
+        }
+
+        if (hasAdjacentTerritory)
+        {
+            break;  // Exit the loop if we found an adjacent territory
+        }
     }
 
-    // If the loop completes without finding the territory, it's valid to bomb as long as it's an enemy
-    targetIsEnemy = true;
+    if (!hasAdjacentTerritory)
+    {
+        std::cout << "Order Invalid: Target territory " << territoryBombName
+                  << " is not adjacent to any territory owned by " << player->getPlayerName() << ".\n";
+        validOrder = false;
+        return;
+    }
 
     if (!targetIsEnemy)
     {
@@ -477,7 +507,7 @@ void BombOrder::execute()
         Order::execute();
 
         // Assuming the bomb simply halves the army in the target territory
-        for (Territory *t : player->getToAttackTerritories())
+        for (Territory *t : player->toAttack())
         {
             if (t->name == territoryBombName)
             {
@@ -724,7 +754,6 @@ void AirliftOrder::execute()
                 t->numberOfArmies += army; // Add armies to target
                 std::cout << "Airlifting " << army << " units from " << territoryAirliftSName
                           << " to " << territoryAirliftTName << ".\n";
-                break;
             }
         }
     }

@@ -115,7 +115,7 @@ std::string Player::getPlayerName() const { return playerName; }
 std::vector<Territory *> &Player::getOwnedTerritories() { return OwnedTerritories; }
 std::vector<Territory *> &Player::getToDefendTerritories() { return toDefendTerritories; }
 std::vector<Territory *> &Player::getToAttackTerritories() { return toAttackTerritories; }
-Hand *Player::getPlayerHand() const { return playerHand; }
+Hand *Player::getPlayerHand() { return playerHand; }
 OrdersList *Player::getOrdersList() const { return ordersList; }
 int Player::getNumArmies() const { return numArmies; }
 
@@ -197,6 +197,20 @@ std::vector<Territory *> Player::toAttack()
 
     // Return the list of territories the player should attack
     return toAttackTerritories;
+}
+
+Player* Player::FindTerritoryOwner(const std::string& territoryName, const std::vector<Player*>& players) {
+    // Search through all players
+    for (Player* player : players) {
+        // Check each territory owned by the current player
+        for (Territory* territory : player->getOwnedTerritories()) {
+            if (territory->name == territoryName) {
+                return player;
+            }
+        }
+    }
+    // Territory not found or not owned by any player
+    return nullptr;
 }
 
 /**
@@ -288,7 +302,8 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         std::cin >> armies;
 
         // Create a new AdvanceOrder object and add it to the orders list.
-        ordersList->ordersVector.push_back(new AdvanceOrder(this, sourceTName, targetTName, armies));
+        Player* enemyPlayer = FindTerritoryOwner(targetTName, *players); // Look for owner of target territory, if any
+        ordersList->ordersVector.push_back(new AdvanceOrder(this, enemyPlayer, sourceTName, targetTName, armies));
     }
     else if (std::find(cardTypes.begin(), cardTypes.end(), orderType) != cardTypes.end())
     { // order type is valid
@@ -322,3 +337,7 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         std::cout << "Invalid Order Type! Please try again! \n\n";
     }
 }
+
+Player::Player(const std::string &playerName, const std::vector<Territory *> &ownedTerritories,
+               std::vector<Player *> *players) : playerName(playerName), OwnedTerritories(ownedTerritories),
+                                                 players(players) {}

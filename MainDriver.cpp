@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running test: testGameStates...\n";
                 testGameStates();
             }
-//            else if (arg == "testOrdersLists") {
-//                std::cout << "Running test: testOrdersLists...\n";
-//                testOrdersLists();
-//            }
+            else if (arg == "testOrdersLists") {
+                std::cout << "Running test: testOrdersLists...\n";
+                testOrdersLists();
+            }
 
             // Assignment #2 drivers
             else if (arg == "testCommandProcessor") {

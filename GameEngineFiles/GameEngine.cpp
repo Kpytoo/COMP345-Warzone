@@ -345,7 +345,7 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
             {
                 manageCommand(command);
                 std::string playerName = command.arg;
-                players.push_back(new Player(playerName, {}));
+                players.push_back(new Player(playerName, {}, &players));
                 playerCount++;
                 std::cout << "Player " << playerName << " added. Total players: " << playerCount << "\n";
             }

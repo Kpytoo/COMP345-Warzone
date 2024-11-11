@@ -5,7 +5,7 @@
 #ifndef COMP345_WARZONE_ORDERSDRIVER_H
 #define COMP345_WARZONE_ORDERSDRIVER_H
 
-//void testOrdersLists();
+void testOrdersLists();
 void testOrderExecution();
 
 #endif //COMP345_WARZONE_ORDERSDRIVER_H

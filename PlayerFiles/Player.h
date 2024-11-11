@@ -18,13 +18,19 @@ private:
     std::vector<Territory *> toAttackTerritories; // List of territories the player wants to attack
     Hand *playerHand;                     // Pointer to the player's hand of cards
     OrdersList *ordersList;               // Pointer to the player's orders list
-    int numArmies;                        // Number of armies player controls              
+    int numArmies;                        // Number of armies player controls
+
+    std::vector<Player *>* players;        // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
 
 public:
     // Constructors, assignment operator, and destructor
     Player();
     Player(std::string name);
     Player(std::string playerName, const std::vector<Territory *> &ownedTerritories);
+
+    Player(const std::string &playerName, const std::vector<Territory *> &ownedTerritories,
+           std::vector<Player *> *players);
+
     Player(const Player &other);
     Player &operator=(const Player &other);
     friend std::ostream &operator<<(std::ostream &os, const Player &obj);
@@ -35,7 +41,7 @@ public:
     std::vector<Territory *>& getOwnedTerritories();
     std::vector<Territory *>& getToDefendTerritories();
     std::vector<Territory *>& getToAttackTerritories();
-    Hand *getPlayerHand() const;
+    Hand *getPlayerHand();
     OrdersList *getOrdersList() const;
     int getNumArmies() const;
 
@@ -51,7 +57,10 @@ public:
     // Core gameplay methods
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
+    Player* FindTerritoryOwner(const std::string& territoryName, const std::vector<Player*>& players);
     void issueOrder(std::string orderType, Deck* deck); // Issues an order for the player
+
+    Deck* deck = nullptr; // Pointer to the deck for player to draw from
 };
 
 #endif
