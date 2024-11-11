@@ -595,24 +595,24 @@ void GameEngine::issueOrdersPhase(Player* player)
     // Flag to determine if the player wants to finalize their orders list
     bool finalOrders = false;
 
-    // Input to issue an order or not
-    std::string inputO;
-    // Input for the type of order to issue
-    std::string inputOrderType;
-    // Input for managing the orders list (move or remove)
-    std::string inputOrderAction;
-
     // Loop to allow the player to issue orders until they decide to stop
     while(!noMoreOrders)
     {
         // Prompt the player to issue an order or not, ensuring valid input
         do
         {
+            // Input to issue an order or not
+            std::string inputO;
+            // Input for the type of order to issue
+            std::string inputOrderType;
+            // Input for managing the orders list (move or remove)
+            std::string inputOrderAction;
+
             // Reset invalid input flag
             invalidO = false;
             // Prompt user for whether they want to issue an order
             std::cout << "Issue an Order? (Y/N): ";
-            std::cin >> inputO;
+            std::getline(std::cin, inputO);
             std::cout << "\n\n";
 
             // If the player wants to issue an order, ask for the order type
@@ -627,7 +627,7 @@ void GameEngine::issueOrdersPhase(Player* player)
 
                 // Prompt player for selection
                 std::cout << "Please issue an order type: ";
-                std::cin >> inputOrderType;
+                std::getline(std::cin, inputOrderType);
 
                 // Issue the order based on user input (order type)
                 player->issueOrder(toLowerCase(inputOrderType), mainDeck);
@@ -657,6 +657,13 @@ void GameEngine::issueOrdersPhase(Player* player)
         // Prompt the player to modify the orders list or not, ensuring valid input
         do
         {
+            // Input to issue an order or not
+            std::string inputO;
+            // Input for the type of order to issue
+            std::string inputOrderType;
+            // Input for managing the orders list (move or remove)
+            std::string inputOrderAction;
+
             // Reset invalid input flag
             invalidO = false;
 
@@ -664,12 +671,12 @@ void GameEngine::issueOrdersPhase(Player* player)
             std::cout << "- Orders List -\n";
             for(size_t i = 0; i < player->getOrdersList()->ordersVector.size(); ++i)
             {
-                std::cout << "Order " <<  i + 1 << " - " << player->getOrdersList()->ordersVector[i];
+                std::cout << "Order " <<  i + 1 << " - " << *player->getOrdersList()->ordersVector[i] << "\n";
             }
 
             // Ask if the player wants to manage their orders list
             std::cout << "Would you like to manage your orders list before Orders Execution Phase? (Y/N): ";
-            std::cin >> inputO;
+            std::getline(std::cin, inputO);
             std::cout << "\n\n";
 
             // If the player wants to manage their orders list, prompt for action
@@ -677,7 +684,7 @@ void GameEngine::issueOrdersPhase(Player* player)
             {
                 std::cout << "\nMove Order (m)\nRemove Order (r)\n\n";
                 std::cout << "Please choose an option: ";
-                std::cin >> inputOrderAction;
+                std::getline(std::cin, inputOrderAction);
 
                 // Handle moving an order in the list
                 if(toLowerCase(inputOrderAction) == "m")

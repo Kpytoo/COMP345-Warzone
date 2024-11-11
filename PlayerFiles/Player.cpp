@@ -256,7 +256,7 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         // Prompt the player to enter the name of the target territory to deploy army units.
         std::cout << "\nPlease enter the territory's name where you want to deploy your army units :";
         // Get the name of the target territory.
-        std::cin >> targetTName;
+        std::getline(std::cin, targetTName);
 
         // Display how many army units the player has left in their reinforcement pool.
         std::cout << "Number of army units left in the reinforcement pool: " << getNumArmies() << std::endl;
@@ -289,17 +289,18 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         // Prompt the player to choose a source territory (where they have army units stationed).
         std::cout << "\n\nChoose a source territory (army units should be on standby there): ";
         // Get the name of the source territory.
-        std::cin >> sourceTName;
+        std::getline(std::cin, sourceTName);
 
         // Prompt the player to choose a target territory to advance to.
         std::cout << "\nChoose a target territory to advance to: ";
         // Get the name of the target territory.
-        std::cin >> targetTName;
+        std::getline(std::cin, targetTName);
 
         // Prompt the player to enter the number of army units they want to advance.
         std::cout << "\nEnter the number of army units to execute an advance order: ";
         // Get the number of army units to advance.
         std::cin >> armies;
+        std::cin.ignore(256, '\n'); // Ignore newline in user input stream (can cause issues after reading number)
 
         // Create a new AdvanceOrder object and add it to the orders list.
         Player* enemyPlayer = FindTerritoryOwner(targetTName, *players); // Look for owner of target territory, if any
@@ -340,4 +341,4 @@ void Player::issueOrder(std::string orderType, Deck *deck)
 
 Player::Player(const std::string &playerName, const std::vector<Territory *> &ownedTerritories,
                std::vector<Player *> *players) : playerName(playerName), OwnedTerritories(ownedTerritories),
-                                                 players(players) {}
+                                                 players(players), playerHand(new Hand()) {}
