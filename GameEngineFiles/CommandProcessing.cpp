@@ -12,6 +12,7 @@
 void Command::saveEffect(std::string effect)
 {
     this->effect = effect;
+    notify(this);
 }
 
 Command::Command(const Command& copy) : name(copy.name), arg(copy.arg), nextState(copy.nextState), description(copy.description) {}
@@ -24,6 +25,17 @@ Command::Command() : name("Nothing"), description("Nothing") {
 
 std::string Command::ToString() {
     return name + " " + arg;
+}
+
+std::string Command::stringToLog() const {
+    std::stringstream SS;
+    SS << "Command's effect: " << effect;
+    return SS.str();
+}
+
+std::ostream &operator<<(std::ostream &os, const Command &command) {
+    os << " name: "<< command.name << " arg: " << command.arg;
+    return os;
 }
 
 
@@ -187,18 +199,6 @@ std::string CommandProcessor::readCommand()
     return stringCommand; ///> return the input line
 }
 
-std::vector<std::string> split(const std::string &input, char delimiter) {
-    std::istringstream stream(input);
-    std::vector<std::string> result;
-    std::string segment;
-
-    while (std::getline(stream, segment, delimiter)) {
-        result.push_back(segment);
-    }
-
-    return result;
-}
-
 /**
  * This function takes in a constant string, and parses it
  * to determine the specific command. If the command entered
@@ -212,12 +212,14 @@ std::vector<std::string> split(const std::string &input, char delimiter) {
  */
 Command &CommandProcessor::saveCommand(const std::string stringCommand)
 {
-    std::vector<std::string> split_command = split(stringCommand, ' ');
-    std::string cmd = split_command[0];
+    std::istringstream iss(stringCommand);
+    std::string token;
+    std::getline(iss, token, ' '); // Split command into name and arg by white space
+    std::string cmd = token;
 
     std::string arg = "";
-    if (split_command.size() >= 2) {
-        arg = split_command[1];
+    if (std::getline(iss, token)) {
+        arg = token;
     }
 
     if ((cmd == "addplayer" || cmd == "loadmap") && arg.length() == 0) {
@@ -231,11 +233,18 @@ Command &CommandProcessor::saveCommand(const std::string stringCommand)
         command->arg = arg;
         commandCollection.push_back(command); ///> add the command to the collection
         std::cout << "*** " << cmd << " command added to command collection (argument: " << arg << ") ***" << std::endl;
+        notify(this);
         return *command;
     } else {
         Command* c = new Command();
         return *c;
     }
+}
+
+std::string CommandProcessor::stringToLog() const {
+    std::stringstream SS;
+    SS << "Command: " << *commandCollection.back();
+    return SS.str();
 }
 
 // <<<< FileCommandProcessorAdapter Class Definitions >>>>

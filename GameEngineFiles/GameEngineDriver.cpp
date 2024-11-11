@@ -70,7 +70,7 @@ void testStartupPhase()
     Map gameMap;
     Deck gameDeck;
 
-    std::string commandFilePath = "commands.txt";
+    std::string commandFilePath = "../GameEngineFiles/Commands.txt";
     FileCommandProcessorAdapter commandProcessor(commandFilePath);
 
     // Call the startupPhase method

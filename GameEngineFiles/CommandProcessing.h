@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include "LogFiles/LoggingObserver.h"
 
 /**
  * Enum representing various game states/phases.
@@ -44,7 +45,7 @@ enum class GameState
 /**
  * Command class that holds a game state along with its description and methods.
  */
-class Command
+class Command : public Subject, public ILoggable
 {
 public:
     // The game state triggered from the command input by the player
@@ -77,6 +78,10 @@ public:
      * @param effect The effect of the command as a string.
      */
     void saveEffect(std::string effect);
+
+    std::string stringToLog() const override;
+
+    friend std::ostream &operator<<(std::ostream &os, const Command &command);
 };
 
 /**
@@ -117,7 +122,7 @@ const std::map<GameState, std::vector<std::string>> MapValidCommands = {
  * It also provides a public getCommand() method to other objects
  * such as the GameEngine or the Player.
  */
-class CommandProcessor
+class CommandProcessor : public Subject, public ILoggable
 {
 public:
     /**
@@ -182,6 +187,8 @@ public:
      * A vector that contains a collection of Command pointers.
      */
     std::list<Command *> commandCollection;
+
+    std::string stringToLog() const override;
 
 private:
     /**

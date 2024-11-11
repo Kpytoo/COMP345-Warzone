@@ -39,7 +39,6 @@ GameEngine::~GameEngine()
     // Delete the pointer and free memory allocated for the current game state
     delete currentGameState;
 
-    delete currentMap;
     for(auto player : players)
     {
         delete player;
@@ -163,6 +162,7 @@ void GameEngine::manageCommand(Command& command)
             *currentGameState = c->second.nextState;
             // Notify the user about the transition to the new game state
             std::cout << "\nTransitioned to game state: " << getCurrentState() << "\n\n";
+            notify(this);
 
             // If we reach the game state End
             if (*currentGameState == GameState::End)
@@ -250,6 +250,7 @@ void GameEngine::setCurrentState(GameState newState)
 {
     *currentGameState = newState;
     std::cout << "Game state updated to: " << getCurrentState() << std::endl;
+    notify(this);
 }
 
 std::vector<Player *> &GameEngine::getPlayers()
@@ -344,7 +345,7 @@ void GameEngine::startupPhase(CommandProcessor &commandProcessor, Map &gameMap, 
             {
                 manageCommand(command);
                 std::string playerName = command.arg;
-                players.push_back(new Player(playerName, {}));
+                players.push_back(new Player(playerName, {}, &players));
                 playerCount++;
                 std::cout << "Player " << playerName << " added. Total players: " << playerCount << "\n";
             }
@@ -447,6 +448,7 @@ void GameEngine::mainGameLoop()
     {
         // Switch to the game state Assign_Reinforcement
         *currentGameState = GameState::Assign_Reinforcement;
+        notify(this);
 
          // Iterate through each player to perform the reinforcement phase
         for(int i = 0; i < players.size(); i++)
@@ -470,6 +472,7 @@ void GameEngine::mainGameLoop()
 
         //Switch to game state Issue_Orders
         *currentGameState = GameState::Issue_Orders;
+        notify(this);
         // Iterate through each player to perform the issue orders phase
         for(int i = 0; i < players.size(); i++)
         {
@@ -479,6 +482,7 @@ void GameEngine::mainGameLoop()
 
         //Switch to game state Execute_Orders
         *currentGameState = GameState::Execute_Orders;
+        notify(this);
         // Execute the orders that have been issued by the players
         executeOrdersPhase();
     }
@@ -487,6 +491,7 @@ void GameEngine::mainGameLoop()
     std::cout << "\nGame Over! Player " << players[0]->getPlayerName() << "has won! \n\n";
     // Switch to the game state Win
     *currentGameState = GameState::Win;
+    notify(this);
 }
 
 /**
@@ -590,24 +595,24 @@ void GameEngine::issueOrdersPhase(Player* player)
     // Flag to determine if the player wants to finalize their orders list
     bool finalOrders = false;
 
-    // Input to issue an order or not
-    std::string inputO;
-    // Input for the type of order to issue
-    std::string inputOrderType;
-    // Input for managing the orders list (move or remove)
-    std::string inputOrderAction;
-
     // Loop to allow the player to issue orders until they decide to stop
     while(!noMoreOrders)
     {
         // Prompt the player to issue an order or not, ensuring valid input
         do
         {
+            // Input to issue an order or not
+            std::string inputO;
+            // Input for the type of order to issue
+            std::string inputOrderType;
+            // Input for managing the orders list (move or remove)
+            std::string inputOrderAction;
+
             // Reset invalid input flag
             invalidO = false;
             // Prompt user for whether they want to issue an order
             std::cout << "Issue an Order? (Y/N): ";
-            std::cin >> inputO;
+            std::getline(std::cin, inputO);
             std::cout << "\n\n";
 
             // If the player wants to issue an order, ask for the order type
@@ -622,7 +627,7 @@ void GameEngine::issueOrdersPhase(Player* player)
 
                 // Prompt player for selection
                 std::cout << "Please issue an order type: ";
-                std::cin >> inputOrderType;
+                std::getline(std::cin, inputOrderType);
 
                 // Issue the order based on user input (order type)
                 player->issueOrder(toLowerCase(inputOrderType), mainDeck);
@@ -652,6 +657,13 @@ void GameEngine::issueOrdersPhase(Player* player)
         // Prompt the player to modify the orders list or not, ensuring valid input
         do
         {
+            // Input to issue an order or not
+            std::string inputO;
+            // Input for the type of order to issue
+            std::string inputOrderType;
+            // Input for managing the orders list (move or remove)
+            std::string inputOrderAction;
+
             // Reset invalid input flag
             invalidO = false;
 
@@ -659,12 +671,12 @@ void GameEngine::issueOrdersPhase(Player* player)
             std::cout << "- Orders List -\n";
             for(size_t i = 0; i < player->getOrdersList()->ordersVector.size(); ++i)
             {
-                std::cout << "Order " <<  i + 1 << " - " << player->getOrdersList()->ordersVector[i];
+                std::cout << "Order " <<  i + 1 << " - " << *player->getOrdersList()->ordersVector[i] << "\n";
             }
 
             // Ask if the player wants to manage their orders list
             std::cout << "Would you like to manage your orders list before Orders Execution Phase? (Y/N): ";
-            std::cin >> inputO;
+            std::getline(std::cin, inputO);
             std::cout << "\n\n";
 
             // If the player wants to manage their orders list, prompt for action
@@ -672,7 +684,7 @@ void GameEngine::issueOrdersPhase(Player* player)
             {
                 std::cout << "\nMove Order (m)\nRemove Order (r)\n\n";
                 std::cout << "Please choose an option: ";
-                std::cin >> inputOrderAction;
+                std::getline(std::cin, inputOrderAction);
 
                 // Handle moving an order in the list
                 if(toLowerCase(inputOrderAction) == "m")

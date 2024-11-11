@@ -1,4 +1,4 @@
-loadmap Map.txt
+loadmap ../SomeMapsFromOnline/Montreal/Grand Montreal.map
 validatemap
 addplayer player1
 addplayer player2

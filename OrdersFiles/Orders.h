@@ -5,7 +5,7 @@
 #include <string>
 #include <iostream>
 #include "LogFiles/LoggingObserver.h"
-
+#include <unordered_map>
 class Player;
 
 /**
@@ -65,7 +65,7 @@ public:
      * @param ORDER The Order object to display.
      * @return std::ostream& The modified output stream.
      */
-    friend std::ostream& operator<<(std::ostream &COUT, const Order &ORDER);
+    friend std::ostream &operator<<(std::ostream &COUT, const Order &ORDER);
 
     std::string stringToLog() const override;
 };
@@ -80,7 +80,7 @@ public:
     /**
      * @brief Vector containing pointers to the list of orders.
      */
-    std::vector<Order*> ordersVector;
+    std::vector<Order *> ordersVector;
 
     /**
      * @brief Adds an Order to the list of orders.
@@ -88,7 +88,7 @@ public:
      *
      * @param order A pointer to the Order object to add.
      */
-    void add(Order* order);
+    void add(Order *order);
 
     /**
      * @brief Moves an Order from one position to another within the list.
@@ -136,7 +136,7 @@ public:
      * @param ORDERSLIST The OrdersList object to display.
      * @return std::ostream& The modified output stream.
      */
-    friend std::ostream& operator<<(std::ostream &COUT, const OrdersList &ORDERSLIST);
+    friend std::ostream &operator<<(std::ostream &COUT, const OrdersList &ORDERSLIST);
 
     /**
      * @brief Destructor for the OrdersList class.
@@ -151,14 +151,15 @@ public:
  * @brief A class representing a DeployOrder in the game.
  * Handles troop deployment actions.
  */
-class DeployOrder : public Order {
+class DeployOrder : public Order
+{
 public:
     // The name of the territory where army units are to be deployed.
     std::string territoryDeployName;
     // The number of army units to be deployed to the specified territory.
     int army;
     // A pointer to the player who issued the deploy order.
-    Player* player;
+    Player *player;
 
     /**
      * @brief Constructor for DeployOrder.
@@ -168,12 +169,12 @@ public:
 
     /**
      * Parameterized constructor for the DeployOrder class.
-     * 
+     *
      * @param p The player who issued the order.
      * @param tName The name of the territory where the army units are being deployed.
      * @param armyDeployed The number of army units being deployed to the territory.
      */
-    DeployOrder(Player* p, const std::string tName, int armyUnits);
+    DeployOrder(Player *p, const std::string tName, int armyUnits);
 
     /**
      * @brief Validates the DeployOrder.
@@ -192,7 +193,8 @@ public:
  * @brief A class representing an AdvanceOrder in the game.
  * Handles troop advancement actions.
  */
-class AdvanceOrder : public Order {
+class AdvanceOrder : public Order
+{
 public:
     // The name of the territory from which the army will advance.
     std::string territoryAdvanceSName;
@@ -201,7 +203,8 @@ public:
     // The number of army units to advance.
     int army;
     // A pointer to the player who issued the advance order.
-    Player* player;
+    Player *player;
+    Player *enemyPlayer;
 
     /**
      * @brief Constructor for AdvanceOrder.
@@ -211,13 +214,13 @@ public:
 
     /**
      * Parameterized constructor for the AdvanceOrder class.
-     * 
+     *
      * @param p A pointer to the player who is making the advance order.
      * @param sName The name of the source territory from which the army units will advance.
      * @param tName The name of the target territory to which the army units will advance.
      * @param armyUnits The number of army units that are being advanced.
      */
-    AdvanceOrder(Player* p, const std::string sName, const std::string tName, int armyUnits);
+    AdvanceOrder(Player *p, Player *enemyP, const std::string sName, const std::string tName, int armyUnits);
 
     /**
      * @brief Validates the AdvanceOrder.
@@ -236,9 +239,11 @@ public:
  * @brief A class representing a BombOrder in the game.
  * Handles bomb actions.
  */
-class BombOrder : public Order {
+class BombOrder : public Order
+{
 public:
     std::string territoryBombName;
+    Player *player;
 
     /**
      * @brief Constructor for BombOrder.
@@ -248,7 +253,7 @@ public:
 
     /**
      * Parameterized constructor for the BombOrder class.
-     * 
+     *
      * @param tBombName The name of the territory to bomb.
      */
     BombOrder(std::string tBombName);
@@ -270,10 +275,13 @@ public:
  * @brief A class representing a BlockadeOrder in the game.
  * Handles blockade actions.
  */
-class BlockadeOrder : public Order {
+class BlockadeOrder : public Order
+{
 public:
     // The name of the territory to block.
-    std::string terriitoryBlockadeName;
+    std::string territoryBlockadeName;
+    Player *player;
+    Player *neutralPlayer;
 
     /**
      * @brief Constructor for BlockadeOrder.
@@ -283,7 +291,7 @@ public:
 
     /**
      * Parameterized constructor for the BlockadeOrder class.
-     * 
+     *
      * @param tBlockadeName The name of the territory to blockade.
      */
     BlockadeOrder(std::string tBlockadeName);
@@ -305,7 +313,8 @@ public:
  * @brief A class representing an AirliftOrder in the game.
  * Handles airlift actions.
  */
-class AirliftOrder : public Order {
+class AirliftOrder : public Order
+{
 public:
     // The name of the territory from which the army will be airlifted.
     std::string territoryAirliftSName;
@@ -313,6 +322,7 @@ public:
     std::string territoryAirliftTName;
     // The number of army units to airlift.
     int army;
+    Player *player;
 
     /**
      * @brief Constructor for AirliftOrder.
@@ -322,7 +332,7 @@ public:
 
     /**
      * @brief Parameterized constructor for the AirliftOrder class.
-     * 
+     *
      * @param airSName The name of the source territory from which the army units will be airlifted.
      * @param airTName The name of the target territory to which the army units will be airlifted.
      * @param units The number of army units to airlift.
@@ -346,10 +356,13 @@ public:
  * @brief A class representing a NegotiateOrder in the game.
  * Handles negotiation actions.
  */
-class NegotiateOrder : public Order {
+class NegotiateOrder : public Order
+{
 public:
     // The name of the player to negotiate with.
     std::string playerTargetName;
+    Player *player;
+    static std::unordered_map<std::string, std::string> negotiatedPlayers;
 
     /**
      * @brief Constructor for NegotiateOrder.
@@ -359,10 +372,12 @@ public:
 
     /**
      * Parameterized constructor for the NegotiateOrder class.
-     * 
+     *
      * @param pTargetName The name of the player to negotiate with.
      */
     NegotiateOrder(std::string pTargetNAme);
+
+    NegotiateOrder(Player *p, std::string pTargetName);
 
     /**
      * @brief Validates the NegotiateOrder.
