@@ -121,6 +121,8 @@ void testMainGameLoop()
 
     gameEngine->getPlayers().push_back(player1);
     gameEngine->getPlayers().push_back(player2);
+    player1->players = &gameEngine->getPlayers();
+    player2->players = &gameEngine->getPlayers();
 
     // Test toDefend() and toAttack() for Player 1
     std::cout << "\nTesting Player 1's toDefend() and toAttack() methods:\n";

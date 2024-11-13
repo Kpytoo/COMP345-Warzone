@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Orders.h"
 #include "PlayerFiles/Player.h"
+#include "GameEngineFiles/GameEngine.h"
 
 std::unordered_map<std::string, std::string> NegotiateOrder::negotiatedPlayers;
 
@@ -104,6 +105,8 @@ DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed) :
     orderType = "deploy";
     // Initialize the validOrder flag to false, meaning the order is not validated at creation
     validOrder = false;
+
+    player->reinforcement_units -= armyDeployed;
 }
 
 std::ostream &operator<<(std::ostream &COUT, const DeployOrder &ORDER)
@@ -128,7 +131,7 @@ void DeployOrder::validate()
     for (Territory *t : player->toDefend())
     {
         // If the player's owned territory matches the target territory name
-        if (t->name == territoryDeployName)
+        if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryDeployName))
         {
             // The target territory was found.
             tFound = true;
@@ -185,7 +188,7 @@ void DeployOrder::execute()
         for (Territory *t : player->toDefend())
         {
             // If the target territory is found in the player's owned territories
-            if (t->name == territoryDeployName)
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryDeployName))
             {
                 // Deploy the army units to the territory by adding the army units to the target territory.
                 t->numberOfArmies += army;
@@ -252,7 +255,7 @@ void AdvanceOrder::validate()
     // Check if player owns the source territory
     for (Territory *t : player->getOwnedTerritories())
     {
-        if (t->name == territoryAdvanceSName)
+        if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceSName))
         {
             sFound = true;
             sourceT = t;
@@ -271,7 +274,7 @@ void AdvanceOrder::validate()
     // Check if the target territory is adjacent to the source
     for (const auto &pair : sourceT->adjacentTerritories)
     {
-        if (pair.second->name == territoryAdvanceTName)
+        if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
         {
             adjacent = true;
             targetT = pair.second;
@@ -324,7 +327,7 @@ void AdvanceOrder::execute()
         Territory *sourceT = nullptr;
         for (Territory *t : player->getOwnedTerritories())
         {
-            if (t->name == territoryAdvanceSName)
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceSName))
             {
                 sourceT = t;
                 t->numberOfArmies -= army;
@@ -335,7 +338,7 @@ void AdvanceOrder::execute()
         bool targetOwned = false;
         for (Territory *t : player->getOwnedTerritories())
         {
-            if (t->name == territoryAdvanceTName)
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceTName))
             {
                 targetOwned = true;
                 t->numberOfArmies += army;
@@ -351,7 +354,7 @@ void AdvanceOrder::execute()
             Territory *targetT = nullptr;
             for (const auto &pair : sourceT->adjacentTerritories)
             {
-                if (pair.second->name == territoryAdvanceTName)
+                if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
                 {
                     targetT = pair.second;
                     break;
@@ -452,7 +455,7 @@ void BombOrder::validate()
     // Check if the target territory is not owned by the player
     for (Territory* t : player->getOwnedTerritories())
     {
-        if (t->name == territoryBombName)
+        if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBombName))
         {
             std::cout << "Order Invalid: Cannot bomb own territory " << territoryBombName << ".\n";
             validOrder = false;
@@ -462,7 +465,7 @@ void BombOrder::validate()
         // Check if any of the player's territories are adjacent to the target
         for (const auto& adjPair : t->adjacentTerritories)
         {
-            if (adjPair.second->name == territoryBombName)
+            if (GameEngine::toLowerCase(adjPair.second->name) == GameEngine::toLowerCase(territoryBombName))
             {
                 hasAdjacentTerritory = true;
                 break;
@@ -509,7 +512,7 @@ void BombOrder::execute()
         // Assuming the bomb simply halves the army in the target territory
         for (Territory *t : player->toAttack())
         {
-            if (t->name == territoryBombName)
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBombName))
             {
                 t->numberOfArmies /= 2; // Halve the armies
                 std::cout << "Bombing " << territoryBombName << ": Armies reduced to " << t->numberOfArmies << ".\n";
@@ -575,7 +578,7 @@ void BlockadeOrder::validate()
     // Check if the target territory is owned by the player
     for (Territory *t : player->getOwnedTerritories())
     {
-        if (t->name == territoryBlockadeName)
+        if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBlockadeName))
         {
             targetIsOwned = true;
             break;
@@ -612,7 +615,7 @@ void BlockadeOrder::execute()
         // Find the target territory in the player's owned territories
         auto it = std::find_if(ownedTerritories.begin(), ownedTerritories.end(),
                                [this](Territory *t)
-                               { return t->name == territoryBlockadeName; });
+                               { return GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBlockadeName); });
 
         if (it != ownedTerritories.end())
         {
@@ -693,11 +696,11 @@ void AirliftOrder::validate()
     // Find source and target territories in the player's owned territories
     for (Territory *t : player->getOwnedTerritories())
     {
-        if (t->name == territoryAirliftSName)
+        if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAirliftSName))
         {
             sourceT = t;
         }
-        else if (t->name == territoryAirliftTName)
+        else if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAirliftTName))
         {
             targetT = t;
         }
@@ -745,11 +748,11 @@ void AirliftOrder::execute()
         // Transfer the specified army units
         for (Territory *t : player->getOwnedTerritories())
         {
-            if (t->name == territoryAirliftSName)
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAirliftSName))
             {
                 t->numberOfArmies -= army; // Deduct armies from source
             }
-            else if (t->name == territoryAirliftTName)
+            else if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAirliftTName))
             {
                 t->numberOfArmies += army; // Add armies to target
                 std::cout << "Airlifting " << army << " units from " << territoryAirliftSName

@@ -28,7 +28,7 @@ Player::Player(std::string name) : playerName(name), OwnedTerritories(), playerH
 Player::~Player()
 {
     delete playerHand;
-    delete ordersList;
+//    delete ordersList;
 }
 
 // Copy constructor: creates a deep copy of another Player object
@@ -225,11 +225,10 @@ Player* Player::FindTerritoryOwner(const std::string& territoryName, const std::
 void Player::issueOrder(std::string orderType, Deck *deck)
 {
     // Check if the player has no army units left in the reinforcement pool and tries to issue another order than deploy.
-    if (orderType != "deploy" && getNumArmies() != 0)
-    {
+    if (orderType != "deploy" && reinforcement_units != 0) {
         // Print a message informing the player they still have army units in the reinforcement pool and should deploy them.
         std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
-        // Exit the function without issuing the order if the player needs to deploy.
+        // Exit the function without issuing the order if the player needs to issue deploy orders.
         return;
     }
 
@@ -263,7 +262,9 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         // Prompt the player to enter the number of army units they wish to deploy to the selected territory.
         std::cout << "Please enter the number of army units you want to deploy in " << targetTName << ": ";
         // Get the number of army units to deploy.
-        std::cin >> armies;
+        std::string input0;
+        std::getline(std::cin, input0);
+        armies = std::stoi(input0);
         // Create a new DeployOrder object and add it to the orders list.
         ordersList->ordersVector.push_back(new DeployOrder(this, targetTName, armies));
     }
@@ -280,7 +281,7 @@ void Player::issueOrder(std::string orderType, Deck *deck)
 
         // Display a list of territories the player needs to defend.
         std::cout << "\nCurrent list of territories to defend:\n";
-        for (Territory *t : getToDefendTerritories())
+        for (Territory *t : toDefend())
         {
             // Print each territory that needs defending.
             std::cout << t->name << std::endl;
@@ -299,8 +300,9 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         // Prompt the player to enter the number of army units they want to advance.
         std::cout << "\nEnter the number of army units to execute an advance order: ";
         // Get the number of army units to advance.
-        std::cin >> armies;
-        std::cin.ignore(256, '\n'); // Ignore newline in user input stream (can cause issues after reading number)
+        std::string input0;
+        std::getline(std::cin, input0);
+        armies = std::stoi(input0);
 
         // Create a new AdvanceOrder object and add it to the orders list.
         Player* enemyPlayer = FindTerritoryOwner(targetTName, *players); // Look for owner of target territory, if any

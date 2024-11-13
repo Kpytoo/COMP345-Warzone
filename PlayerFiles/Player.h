@@ -20,8 +20,6 @@ private:
     OrdersList *ordersList;               // Pointer to the player's orders list
     int numArmies;                        // Number of armies player controls
 
-    std::vector<Player *>* players;        // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
-
 public:
     // Constructors, assignment operator, and destructor
     Player();
@@ -61,6 +59,10 @@ public:
     void issueOrder(std::string orderType, Deck* deck); // Issues an order for the player
 
     Deck* deck = nullptr; // Pointer to the deck for player to draw from
+
+    std::vector<Player *>* players;        // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
+
+    int reinforcement_units = 0;
 };
 
 #endif

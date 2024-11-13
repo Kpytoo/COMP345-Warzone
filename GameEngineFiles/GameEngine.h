@@ -30,14 +30,6 @@ private:
     // The deck used for the game
     Deck* mainDeck;
 
-    /**
-     * Helper function to convert a string to lowercase.
-     *
-     * @param str The input string to convert to lower case.
-     * @return The lowercase version of the input string.
-     */
-    std::string toLowerCase(const std::string &str) const;
-
 public:
     // Default Constructor
     GameEngine();
@@ -137,6 +129,14 @@ public:
     void startupPhase(CommandProcessor &commandProcessor, Map &gameMap, Deck &gameDeck);
 
     std::string stringToLog() const override;
+
+    /**
+     * Helper function to convert a string to lowercase.
+     *
+     * @param str The input string to convert to lower case.
+     * @return The lowercase version of the input string.
+     */
+    static std::string toLowerCase(const std::string &str);
 };
 
 #endif

@@ -58,7 +58,7 @@ GameEngine::~GameEngine()
  * @param str The input string to convert to lower case.
  * @return The lowercase version of the input string.
  */
-std::string GameEngine::toLowerCase(const std::string &str) const
+std::string GameEngine::toLowerCase(const std::string &str)
 {
     // Create a copy of the input string
     std::string s = str;
@@ -162,6 +162,7 @@ void GameEngine::manageCommand(Command& command)
             *currentGameState = c->second.nextState;
             // Notify the user about the transition to the new game state
             std::cout << "\nTransitioned to game state: " << getCurrentState() << "\n\n";
+            command.saveEffect("Transitioned to game state: " + getCurrentState());
             notify(this);
 
             // If we reach the game state End
@@ -517,6 +518,7 @@ void GameEngine::reinforcementPhase(Player* player)
     int numberOfTerritories = player->getOwnedTerritories().size();
     // Calculate the number of army units based on territories owned (minimum of 3)
     player->setNumArmies(std::max(static_cast<int>(3), static_cast<int>(std::floor(numberOfTerritories / 3))));
+    player->reinforcement_units = player->getNumArmies();
 
     // Iterate over each continent in the map to check for continent ownership
     for(const auto& continentPair : currentMap->continents)
@@ -696,9 +698,11 @@ void GameEngine::issueOrdersPhase(Player* player)
 
                     // Prompt for the current position and the new position to move the order
                     std::cout << "Enter the current position of the order you want to move: ";
-                    std::cin >> oldPos;
+                    std::getline(std::cin, inputO);
+                    oldPos = std::stoi(inputO);
                     std::cout << "Enter the new position for the order: ";
-                    std::cin >> newPos;
+                    std::getline(std::cin, inputO);
+                    newPos = std::stoi(inputO);
 
                     // Call method to move the order in the list
                     player->getOrdersList()->move(oldPos, newPos);
@@ -718,7 +722,8 @@ void GameEngine::issueOrdersPhase(Player* player)
 
                     // Ask for the position of the order to remove
                     std::cout << "Enter the position of the order you want to remove: ";
-                    std::cin >> orderPos;
+                    std::getline(std::cin, inputO);
+                    orderPos = std::stoi(inputO);
 
                     // Call method to remove the order
                     player->getOrdersList()->remove(orderPos);
@@ -782,9 +787,6 @@ void GameEngine::executeOrdersPhase()
             // Iterate through each player in the players list
             for(int i = 0; i < players.size(); i++)
             {
-                // Display whose turn it is for the deploy orders execution phase
-                std::cout << "Deploy Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
-
                 // If the current player has no orders left in their orders list
                 if(players[i]->getOrdersList()->ordersVector.empty())
                 {
@@ -794,6 +796,9 @@ void GameEngine::executeOrdersPhase()
                     // Skip the current player and move on to the next player
                     continue;
                 }
+
+                // Display whose turn it is for the deploy orders execution phase
+                std::cout << "Deploy Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
 
                 // Iterate through the orders list of the current player
                 for(int j = 0; j < players[i]->getOrdersList()->ordersVector.size(); j++)
@@ -811,7 +816,7 @@ void GameEngine::executeOrdersPhase()
                     // Stop checking further orders if the current order is not "deploy"
                     else
                     {
-                        break;
+                        continue;
                     }
                 }
             }
@@ -823,9 +828,6 @@ void GameEngine::executeOrdersPhase()
         // Iterate through each player in the game
         for(int i = 0; i < players.size(); i++)
         {
-            // Display whose turn it is for the orders execution phase
-            std::cout << "Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
-
             // If the current player has no orders left in their orders list
             if(players[i]->getOrdersList()->ordersVector.empty())
             {
@@ -835,6 +837,9 @@ void GameEngine::executeOrdersPhase()
                 // Skip the current player and move on to the next player
                 continue;
             }
+
+            // Display whose turn it is for the orders execution phase
+            std::cout << "Orders Execution Phase for " << players[i]->getPlayerName() << std::endl;
 
             // If the player still has orders to execute, set ordersLeft to true to continue executing orders
             ordersLeft = true;

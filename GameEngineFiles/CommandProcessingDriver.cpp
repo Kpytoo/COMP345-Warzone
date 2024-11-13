@@ -89,6 +89,8 @@ void testCommandProcessor(int argc, char *argv[])
         std::cout << std::endl;
     }
 
+    std::cout << "\nCommands Processed: \n" << *comProc;
+
     // Free the memory held by comProc
     delete comProc;
 

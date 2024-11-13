@@ -280,9 +280,5 @@ std::ostream& operator<<(std::ostream& COUT, Hand& HAND)
 // Hand destructor
 Hand::~Hand()
 {
-    for (auto *card : handVector)
-    {
-        delete card;
-    }
-    handVector.clear();
+    handVector.clear(); // Assumed that cards are deleted in deconstructor of deck
 }
