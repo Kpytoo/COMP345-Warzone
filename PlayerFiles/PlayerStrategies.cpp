@@ -9,14 +9,12 @@
 std::vector<Territory *> HumanPlayerStrategy::toDefend(Player *player)
 {
     std::cout << "Human Player: Please select territories to defend (by entering their IDs): ";
-    // Assuming input handling for territory IDs exists
     return player->getOwnedTerritories();
 }
 
 std::vector<Territory *> HumanPlayerStrategy::toAttack(Player *player)
 {
     std::cout << "Human Player: Please select territories to attack (by entering their IDs): ";
-    // Assuming input handling for territory IDs exists
     return player->getToAttackTerritories();
 }
 
@@ -142,7 +140,7 @@ void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &orderT
             {
                 // Find the current owner of the territory
                 Player *currentOwner = nullptr;
-                for (Player *p : *players) // Use the pointer to the players vector
+                for (Player *p : *players)
                 {
                     auto &ownedTerritories = p->getOwnedTerritories();
                     if (std::find(ownedTerritories.begin(), ownedTerritories.end(), adjacentTerritory) != ownedTerritories.end())

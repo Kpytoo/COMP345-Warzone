@@ -1,3 +1,0 @@
-C:/Users/gorba/Desktop/345(2)/COMP345-Warzone/build/CMakeFiles/COMP345_Warzone.dir
-C:/Users/gorba/Desktop/345(2)/COMP345-Warzone/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/gorba/Desktop/345(2)/COMP345-Warzone/build/CMakeFiles/ZERO_CHECK.dir

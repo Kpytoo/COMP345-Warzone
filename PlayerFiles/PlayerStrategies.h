@@ -51,7 +51,7 @@ public:
 class CheaterPlayerStrategy : public PlayerStrategy
 {
 private:
-    std::vector<Player *> *players; // Pointer to the players vector
+    std::vector<Player *> *players;
 
 public:
     CheaterPlayerStrategy::CheaterPlayerStrategy(std::vector<Player *> *players) : players(players) {}
