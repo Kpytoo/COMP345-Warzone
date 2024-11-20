@@ -7,18 +7,19 @@
 #include "MapFiles/Map.h"
 #include "CardsFiles/Cards.h"
 #include "OrdersFiles/Orders.h"
-
+#include "PlayerFiles/PlayerStrategies.h"
 
 class Player
 {
 private:
-    std::string playerName;               // Player's name
-    std::vector<Territory *> OwnedTerritories; // List of territories owned by the player
+    std::string playerName;                       // Player's name
+    std::vector<Territory *> OwnedTerritories;    // List of territories owned by the player
     std::vector<Territory *> toDefendTerritories; // Pointer list to OwnedTerritories elements to defend
     std::vector<Territory *> toAttackTerritories; // List of territories the player wants to attack
-    Hand *playerHand;                     // Pointer to the player's hand of cards
-    OrdersList *ordersList;               // Pointer to the player's orders list
-    int numArmies;                        // Number of armies player controls
+    Hand *playerHand;                             // Pointer to the player's hand of cards
+    OrdersList *ordersList;                       // Pointer to the player's orders list
+    int numArmies;                                // Number of armies player controls
+    PlayerStrategy *strategy;
 
 public:
     // Constructors, assignment operator, and destructor
@@ -36,12 +37,13 @@ public:
 
     // Getters for accessing private member variables
     std::string getPlayerName() const;
-    std::vector<Territory *>& getOwnedTerritories();
-    std::vector<Territory *>& getToDefendTerritories();
-    std::vector<Territory *>& getToAttackTerritories();
+    std::vector<Territory *> &getOwnedTerritories();
+    std::vector<Territory *> &getToDefendTerritories();
+    std::vector<Territory *> &getToAttackTerritories();
     Hand *getPlayerHand();
     OrdersList *getOrdersList() const;
     int getNumArmies() const;
+    PlayerStrategy *getStrategy() const;
 
     // Setters for modifying private member variables
     void setPlayerName(const std::string &name);
@@ -51,16 +53,17 @@ public:
     void setPlayerHand(Hand *hand);
     void setOrdersList(OrdersList *ordersList);
     void setNumArmies(int numArmies);
+    void setStrategy(PlayerStrategy *newStrategy);
 
     // Core gameplay methods
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
-    Player* FindTerritoryOwner(const std::string& territoryName, const std::vector<Player*>& players);
-    void issueOrder(std::string orderType, Deck* deck); // Issues an order for the player
+    Player *FindTerritoryOwner(const std::string &territoryName, const std::vector<Player *> &players);
+    void issueOrder(std::string orderType, Deck *deck); // Issues an order for the player
 
-    Deck* deck = nullptr; // Pointer to the deck for player to draw from
+    Deck *deck = nullptr; // Pointer to the deck for player to draw from
 
-    std::vector<Player *>* players;        // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
+    std::vector<Player *> *players; // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
 
     int reinforcement_units = 0;
 };

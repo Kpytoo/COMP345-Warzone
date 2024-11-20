@@ -1,0 +1,10 @@
+^C:\USERS\GORBA\DESKTOP\345(2)\COMP345-WARZONE\BUILD\CMAKEFILES\2A978D8C9ACA64473D09078C6DE1B2AC\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/gorba/Desktop/345(2)/COMP345-Warzone -BC:/Users/gorba/Desktop/345(2)/COMP345-Warzone/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/gorba/Desktop/345(2)/COMP345-Warzone/build/COMP345_Warzone.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

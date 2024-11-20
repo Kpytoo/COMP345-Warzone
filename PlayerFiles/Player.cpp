@@ -28,7 +28,7 @@ Player::Player(std::string name) : playerName(name), OwnedTerritories(), playerH
 Player::~Player()
 {
     delete playerHand;
-//    delete ordersList;
+    //    delete ordersList;
 }
 
 // Copy constructor: creates a deep copy of another Player object
@@ -127,7 +127,16 @@ void Player::setToAttackTerritories(const std::vector<Territory *> &territories)
 void Player::setPlayerHand(Hand *hand) { playerHand = hand; }
 void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersList; }
 void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
+void Player::setStrategy(PlayerStrategy *newStrategy)
+{
+    strategy = newStrategy;
+}
 
+// Get the current strategy of the player
+PlayerStrategy *Player::getStrategy() const
+{
+    return strategy;
+}
 /**
  * Returns a list of territories that the player should defend.
  *
@@ -199,12 +208,16 @@ std::vector<Territory *> Player::toAttack()
     return toAttackTerritories;
 }
 
-Player* Player::FindTerritoryOwner(const std::string& territoryName, const std::vector<Player*>& players) {
+Player *Player::FindTerritoryOwner(const std::string &territoryName, const std::vector<Player *> &players)
+{
     // Search through all players
-    for (Player* player : players) {
+    for (Player *player : players)
+    {
         // Check each territory owned by the current player
-        for (Territory* territory : player->getOwnedTerritories()) {
-            if (territory->name == territoryName) {
+        for (Territory *territory : player->getOwnedTerritories())
+        {
+            if (territory->name == territoryName)
+            {
                 return player;
             }
         }
@@ -222,10 +235,12 @@ Player* Player::FindTerritoryOwner(const std::string& territoryName, const std::
  *
  * @param orderType The type of the order to be issued. Possible values include "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
  */
+
 void Player::issueOrder(std::string orderType, Deck *deck)
 {
     // Check if the player has no army units left in the reinforcement pool and tries to issue another order than deploy.
-    if (orderType != "deploy" && reinforcement_units != 0) {
+    if (orderType != "deploy" && reinforcement_units != 0)
+    {
         // Print a message informing the player they still have army units in the reinforcement pool and should deploy them.
         std::cout << "You have army units left in the reinforcement pool!\nDeploy your army units!\n\n";
         // Exit the function without issuing the order if the player needs to issue deploy orders.
@@ -305,7 +320,7 @@ void Player::issueOrder(std::string orderType, Deck *deck)
         armies = std::stoi(input0);
 
         // Create a new AdvanceOrder object and add it to the orders list.
-        Player* enemyPlayer = FindTerritoryOwner(targetTName, *players); // Look for owner of target territory, if any
+        Player *enemyPlayer = FindTerritoryOwner(targetTName, *players); // Look for owner of target territory, if any
         ordersList->ordersVector.push_back(new AdvanceOrder(this, enemyPlayer, sourceTName, targetTName, armies));
     }
     else if (std::find(cardTypes.begin(), cardTypes.end(), orderType) != cardTypes.end())
