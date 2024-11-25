@@ -15,12 +15,14 @@ public:
     virtual ~PlayerStrategy() = default;
 };
 
-// Concrete Strategies
 class HumanPlayerStrategy : public PlayerStrategy
 {
 public:
     std::vector<Territory *> toDefend(Player *player) override;
     std::vector<Territory *> toAttack(Player *player) override;
+
+    void issueOrder(Player *player, Deck *deck);
+
     void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
 };
 

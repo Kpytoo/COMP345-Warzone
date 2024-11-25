@@ -381,13 +381,15 @@ void AdvanceOrder::execute()
                 std::cout << "Attack successful: " << territoryAdvanceTName
                           << " conquered with " << attackingUnits << " remaining units.\n";
                 player->getOwnedTerritories().push_back(targetT);
-                if (enemyPlayer != nullptr) { // Remove conquered territory from enemy territory
+                if (enemyPlayer != nullptr)
+                { // Remove conquered territory from enemy territory
                     enemyPlayer->getOwnedTerritories().erase(std::remove(enemyPlayer->getOwnedTerritories().begin(),
                                                                          enemyPlayer->getOwnedTerritories().end(), targetT),
                                                              enemyPlayer->getOwnedTerritories().end());
                 }
 
-                if (player->deck != nullptr) {
+                if (player->deck != nullptr)
+                {
                     player->deck->draw(*player->getPlayerHand());
                 }
             }
@@ -449,11 +451,11 @@ void BombOrder::validate()
         return;
     }
 
-    bool targetIsEnemy = true;  // Assume target is enemy until proven otherwise
+    bool targetIsEnemy = true; // Assume target is enemy until proven otherwise
     bool hasAdjacentTerritory = false;
 
     // Check if the target territory is not owned by the player
-    for (Territory* t : player->getOwnedTerritories())
+    for (Territory *t : player->getOwnedTerritories())
     {
         if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBombName))
         {
@@ -463,7 +465,7 @@ void BombOrder::validate()
         }
 
         // Check if any of the player's territories are adjacent to the target
-        for (const auto& adjPair : t->adjacentTerritories)
+        for (const auto &adjPair : t->adjacentTerritories)
         {
             if (GameEngine::toLowerCase(adjPair.second->name) == GameEngine::toLowerCase(territoryBombName))
             {
@@ -474,7 +476,7 @@ void BombOrder::validate()
 
         if (hasAdjacentTerritory)
         {
-            break;  // Exit the loop if we found an adjacent territory
+            break; // Exit the loop if we found an adjacent territory
         }
     }
 
@@ -838,8 +840,8 @@ void NegotiateOrder::execute()
     }
 }
 
-NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme) {
-
+NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme)
+{
 }
 
 // ---------------------- OrdersList Class Implementation ----------------------
