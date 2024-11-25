@@ -270,3 +270,6 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &ord
         player->issueOrder("deploy", deck);
     }
 }
+
+
+// ----- AggressivePlayerStrategy Implementation -----
