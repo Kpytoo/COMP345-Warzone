@@ -273,3 +273,81 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &ord
 
 
 // ----- AggressivePlayerStrategy Implementation -----
+
+std::vector<Territory *> AggressivePlayerStrategy::toDefend(Player* player)
+{
+    return {}; // Aggressive players do not defend
+}
+
+std::vector<Territory *> AggressivePlayerStrategy::toAttack(Player* player)
+{
+    // Retrieve owned territories of the aggressive player
+    std::vector<Territory *> ownedTerritories = player->getOwnedTerritories();
+    // Initialize a vector that will contain all attackable enemy territories
+    std::vector<Territory *> enemyTerritories;
+
+    // For each owned territory
+    for(Territory *ownedTerritory : ownedTerritories)
+    {   
+        // For each adjacent territory
+        for(const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
+        {   
+            // Create an instance of the enemy/adjacent territory
+            Territory *enemyTerritory = adjacentTerritory.second;
+            // Check if enemy/adjacent territory is not one of ours
+            if (std::find(ownedTerritories.begin(), ownedTerritories.end(), enemyTerritory) == ownedTerritories.end())
+            {   
+                // Append the enemy territory to be attacked
+                enemyTerritories.push_back(enemyTerritory);
+            }
+        }
+    } 
+
+    // Update the set of territories that an aggressive player can attack
+    player->setToAttackTerritories(enemyTerritories);
+    // Return the set of territories that an aggressive player can attack
+    return player->getToAttackTerritories();
+
+}
+
+
+void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+{
+    std::cout << "Aggressive Player: Deploying armies to attack enemy adjacent territories.\n";
+    // Try and attack each adjacent enemy territory
+    for (Territory *enemyTerritory : player->toAttack())
+    {   
+        int maxArmy = 0;
+        std::string attackingTerritory; 
+        // Find the owned territory with the largest army
+        for(Territory *ownedTerritory : player->getOwnedTerritories())
+        {
+            if(ownedTerritory->numberOfArmies > maxArmy)
+            {
+                maxArmy = ownedTerritory->numberOfArmies;
+                attackingTerritory = ownedTerritory->name;
+            }
+        }
+        Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+        player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+    }
+}
+
+
+// ----- NeutralPlayerStrategy Implementation -----
+
+
+std::vector<Territory *> NeutralPlayerStrategy::toDefend(Player* player)
+{
+    return {}; // Neutral players do not defend 
+}
+
+std::vector<Territory *> NeutralPlayerStrategy::toAttack(Player* player)
+{
+    return {}; // Neutral player do not attack 
+}
+
+void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+{
+    // Neutral players do not issue any orders
+}
