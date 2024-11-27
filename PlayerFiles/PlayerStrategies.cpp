@@ -344,10 +344,97 @@ std::vector<Territory *> NeutralPlayerStrategy::toDefend(Player* player)
 
 std::vector<Territory *> NeutralPlayerStrategy::toAttack(Player* player)
 {
-    return {}; // Neutral player do not attack 
+    return {}; // Neutral players do not attack 
 }
 
 void issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
     // Neutral players do not issue any orders
+}
+
+
+
+// ----- CheaterPlayerStrategy Implementation -----
+
+
+std::vector<Territory *> CheaterPlayerStrategy::toDefend(Player* player)
+{
+    return {}; // Cheater players do not defend
+}
+
+
+std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player* player)
+{
+    // Retrieve owned territories of the cheater player
+    std::vector<Territory *> ownedTerritories = player->getOwnedTerritories();
+    // Initialize a vector that will contain all attackable enemy territories
+    std::vector<Territory *> enemyTerritories;
+
+    // For each owned territory
+    for(Territory *ownedTerritory : ownedTerritories)
+    {   
+        // For each adjacent territory
+        for(const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
+        {   
+            // Create an instance of the enemy/adjacent territory
+            Territory *enemyTerritory = adjacentTerritory.second;
+            // Check if enemy/adjacent territory is not one of ours
+            if (std::find(ownedTerritories.begin(), ownedTerritories.end(), enemyTerritory) == ownedTerritories.end())
+            {   
+                // Append the enemy territory to be attacked
+                enemyTerritories.push_back(enemyTerritory);
+            }
+        }
+    } 
+
+    // Update the set of territories that a cheater player can attack
+    player->setToAttackTerritories(enemyTerritories);
+    // Return the set of territories that a cheater player can attack
+    return player->getToAttackTerritories();
+
+}
+
+
+
+void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+{
+    // Cheater player attacks each adjacent enemy territory automatically
+    std::cout << "Cheater Player: Conquers all adjacent enemy territory.\n";
+    // Retrieve owned territories of the cheater player
+    std::vector<Territory *> ownedTerritories = player->getOwnedTerritories();
+    // Initialize a vector that will contain all attackable enemy territories
+    std::vector<Territory *> enemyTerritories;
+
+    // For each owned territory
+    for(Territory *ownedTerritory : ownedTerritories)
+    {   
+        // For each adjacent territory
+        for(const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
+        {   
+            // Create an instance of the enemy/adjacent territory
+            Territory *enemyTerritory = adjacentTerritory.second;
+            // Check if enemy/adjacent territory is not one of ours
+            if (std::find(ownedTerritories.begin(), ownedTerritories.end(), enemyTerritory) == ownedTerritories.end())
+            {   
+
+                // Find the enemy territory owner
+                Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+                // Get the list of owned territories of the enemy
+                std::vector<Territory *> replaceTerritories = enemyPlayer->getOwnedTerritories();
+                // Remove the territory being conquered from the enemy
+                replaceTerritories.erase(std::remove(replaceTerritories.begin(), replaceTerritories.end(), enemyTerritory), replaceTerritories.end());
+                // Reassign the new ownedTerritories vector to the enemy
+                enemyPlayer->setOwnedTerritories(replaceTerritories);
+
+                // Get the list of owned territories of the cheater player
+                std::vector<Territory *> cheaterTerritories = player->getOwnedTerritories();
+                // Add the new conquered territory from the enemy to the cheater player
+                cheaterTerritories.push_back(enemyTerritory);
+                // Reassign the new cheaterTerritories vector to the cheater player
+                player->setOwnedTerritories(cheaterTerritories);
+
+            }
+        }
+    } 
+     
 }
