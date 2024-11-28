@@ -9,25 +9,15 @@
 #include <ctime>
 #include <sstream>
 
-// Function to create and setup territories and adjacency
 void testPlayerStrategies()
 {
-    std::cout << "Entered testPlayerStrategies function.\n";
-    srand(static_cast<unsigned>(time(0)));
-
-    // Initialize components
-    std::vector<Territory *> territories;
-    std::vector<Player *> players;
-    Deck deck;
-
-    // Setup territories and adjacency
+    // Setup players and territories
     auto *territory1 = new Territory();
     auto *territory2 = new Territory();
     auto *territory3 = new Territory();
     auto *territory4 = new Territory();
     auto *territory5 = new Territory();
 
-    // Set names and armies
     territory1->name = "Territory1";
     territory1->numberOfArmies = 10;
 
@@ -43,144 +33,98 @@ void testPlayerStrategies()
     territory5->name = "Territory5";
     territory5->numberOfArmies = 6;
 
-    // Set adjacency
     territory1->adjacentTerritories["Territory2"] = territory2;
-    territory1->adjacentTerritories["Territory3"] = territory3;
     territory2->adjacentTerritories["Territory1"] = territory1;
-    territory2->adjacentTerritories["Territory4"] = territory4;
-    territory3->adjacentTerritories["Territory1"] = territory1;
-    territory3->adjacentTerritories["Territory5"] = territory5;
+    territory2->adjacentTerritories["Territory3"] = territory3;
+    territory3->adjacentTerritories["Territory2"] = territory2;
+    territory3->adjacentTerritories["Territory4"] = territory4;
+    territory4->adjacentTerritories["Territory3"] = territory3;
+    territory4->adjacentTerritories["Territory5"] = territory5;
+    territory5->adjacentTerritories["Territory4"] = territory4;
 
-    territories = {territory1, territory2, territory3, territory4, territory5};
+    auto *humanPlayer = new Player("HumanPlayer", {territory1, territory2});
+    auto *benevolentPlayer = new Player("BenevolentPlayer", {territory3});
+    auto *cheaterPlayer = new Player("CheaterPlayer", {territory4});
 
-    // Setup players
-    auto *humanPlayer = new Player("HumanPlayer", {territories[0], territories[1]});
-    auto *benevolentPlayer = new Player("BenevolentPlayer", {territories[2]});
-    auto *cheaterPlayer = new Player("CheaterPlayer", {territories[3]});
-
-    std::cout << "Debug: Created HumanPlayer, BenevolentPlayer, and CheaterPlayer.\n";
-
-    // Set strategies
+    // Assign strategies
     humanPlayer->setStrategy(new HumanPlayerStrategy());
     benevolentPlayer->setStrategy(new BenevolentPlayerStrategy());
     cheaterPlayer->setStrategy(new CheaterPlayerStrategy());
 
-    std::cout << "Debug: Strategies assigned to players.\n";
+    // Assign sufficient reinforcement units
+    humanPlayer->setNumArmies(50);
+    benevolentPlayer->setNumArmies(50);
+    cheaterPlayer->setNumArmies(50);
 
-    // Assign hands
-    humanPlayer->setPlayerHand(new Hand());
-    benevolentPlayer->setPlayerHand(new Hand());
-    cheaterPlayer->setPlayerHand(new Hand());
+    // Display game setup
+    std::cout << "Game setup:\n";
+    std::cout << "- HumanPlayer owns Territory1 and Territory2.\n";
+    std::cout << "- BenevolentPlayer owns Territory3.\n";
+    std::cout << "- CheaterPlayer owns Territory4.\n";
 
-    std::cout << "Debug: Hands assigned to players.\n";
+    // Process strategies
+    std::vector<Player *> players = {humanPlayer, benevolentPlayer, cheaterPlayer};
+    Deck *deck = new Deck();
 
-    // Push players into the vector
-    players.push_back(humanPlayer);
-    players.push_back(benevolentPlayer);
-    players.push_back(cheaterPlayer);
-
-    std::cout << "Number of players: " << players.size() << "\n";
-
-    // Assign reinforcement units
-    humanPlayer->setNumArmies(10);
-    benevolentPlayer->setNumArmies(5);
-    cheaterPlayer->setNumArmies(8);
-
-    // Verify adjacency setup
-    std::cout << "Debug: Verifying adjacency setup.\n";
-    for (auto *territory : territories)
-    {
-        std::cout << territory->name << " adjacencies: ";
-        for (const auto &adjacent : territory->adjacentTerritories)
-        {
-            std::cout << adjacent.first << " ";
-        }
-        std::cout << "\n";
-    }
-
-    // Test strategies
     for (Player *player : players)
     {
         std::cout << "\n=== Player: " << player->getPlayerName() << " ===\n";
 
-        // Print owned territories
-        std::cout << "Owned Territories:\n";
-        for (Territory *t : player->getOwnedTerritories())
-        {
-            std::cout << "- " << t->name << " (" << t->numberOfArmies << " armies)\n";
-        }
-
-        // Print toDefend territories
-        std::cout << "\nTo Defend:\n";
-        for (Territory *t : player->toDefend())
-        {
-            std::cout << "- " << t->name << "\n";
-        }
-
-        // Print toAttack territories
-        std::cout << "\nTo Attack:\n";
-        for (Territory *t : player->toAttack())
-        {
-            std::cout << "- " << t->name << "\n";
-        }
-
-        // Test strategy-specific orders
         if (dynamic_cast<HumanPlayerStrategy *>(player->getStrategy()))
         {
-            std::istringstream simulatedInput("deploy\nTerritory1\n5\nend turn\n");
-            std::cin.rdbuf(simulatedInput.rdbuf());
-            player->issueOrder("deploy", &deck);
-            std::cout << "Debug: Finished issuing orders for HumanPlayer.\n";
-        }
-        else if (dynamic_cast<BenevolentPlayerStrategy *>(player->getStrategy()))
-        {
-            auto beforeDefend = player->toDefend();
-            std::cout << "Debug: Weakest territory before deploy: " << beforeDefend.front()->name
-                      << " with " << beforeDefend.front()->numberOfArmies << " armies.\n";
-
-            player->issueOrder("deploy", &deck);
-
-            auto afterDefend = player->toDefend();
-            std::cout << "Debug: Weakest territory after deploy: " << afterDefend.front()->name
-                      << " with " << afterDefend.front()->numberOfArmies << " armies.\n";
-
-            if (afterDefend.front()->numberOfArmies > beforeDefend.front()->numberOfArmies)
+            // Human player issues orders interactively
+            while (true)
             {
-                std::cout << "Benevolent Player successfully reinforced weakest territory.\n";
-            }
-            else
-            {
-                std::cout << "Benevolent Player failed to reinforce weakest territory. Check logic.\n";
+                std::cout << "\nHumanPlayer, choose an order type (deploy, advance, or end turn): ";
+                std::string orderType;
+                std::getline(std::cin, orderType);
+
+                if (orderType == "end turn")
+                {
+                    std::cout << "Ending HumanPlayer's turn.\n";
+                    break;
+                }
+
+                if (orderType == "deploy" || orderType == "advance")
+                {
+                    player->getStrategy()->issueOrder(player, orderType, deck);
+                }
+                else
+                {
+                    std::cout << "Invalid order type. Try again.\n";
+                }
             }
         }
-        else if (dynamic_cast<CheaterPlayerStrategy *>(player->getStrategy()))
+        else
         {
-            size_t beforeOwnedTerritories = player->getOwnedTerritories().size();
-            std::cout << "Debug: CheaterPlayer owned territories before: " << beforeOwnedTerritories << "\n";
+            // AI strategies issue orders automatically
+            player->getStrategy()->issueOrder(player, "deploy", deck);
+            player->getStrategy()->issueOrder(player, "advance", deck);
+        }
 
-            player->issueOrder("advance", &deck);
+        // Execute all issued orders
+        std::cout << "\nExecuting orders for Player: " << player->getPlayerName() << "\n";
+        for (Order *order : player->getOrdersList()->ordersVector)
+        {
+            order->execute();
+        }
 
-            size_t afterOwnedTerritories = player->getOwnedTerritories().size();
-            std::cout << "Debug: CheaterPlayer owned territories after: " << afterOwnedTerritories << "\n";
-
-            if (afterOwnedTerritories > beforeOwnedTerritories)
-            {
-                std::cout << "Cheater Player successfully conquered territories.\n";
-            }
-            else
-            {
-                std::cout << "Cheater Player failed to conquer territories. Check logic.\n";
-            }
+        // Print updated owned territories and their army counts
+        std::cout << "\nUpdated Territories Owned by " << player->getPlayerName() << ":\n";
+        for (Territory *territory : player->getOwnedTerritories())
+        {
+            std::cout << "- " << territory->name << " (Armies: " << territory->numberOfArmies << ")\n";
         }
     }
 
     // Cleanup
-    for (Territory *territory : territories)
-    {
-        delete territory;
-    }
-    for (Player *player : players)
-    {
-        delete player;
-    }
+    delete humanPlayer;
+    delete benevolentPlayer;
+    delete cheaterPlayer;
+    delete territory1;
+    delete territory2;
+    delete territory3;
+    delete territory4;
+    delete territory5;
+    delete deck;
 }
