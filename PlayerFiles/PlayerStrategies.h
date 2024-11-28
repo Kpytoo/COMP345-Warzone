@@ -52,11 +52,8 @@ public:
 
 class CheaterPlayerStrategy : public PlayerStrategy
 {
-private:
-    std::vector<Player *> *players;
 
 public:
-    CheaterPlayerStrategy::CheaterPlayerStrategy(std::vector<Player *> *players) : players(players) {}
     std::vector<Territory *> toDefend(Player *player) override;
     std::vector<Territory *> toAttack(Player *player) override;
     void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;

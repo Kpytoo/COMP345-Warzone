@@ -23,6 +23,7 @@ private:
 
 public:
     // Constructors, assignment operator, and destructor
+    std::vector<Player *> *players;
     Player();
     Player(std::string name);
     Player(std::string playerName, const std::vector<Territory *> &ownedTerritories);
@@ -63,7 +64,7 @@ public:
 
     Deck *deck = nullptr; // Pointer to the deck for player to draw from
 
-    std::vector<Player *> *players; // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
+    // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
 
     std::vector<Player *> *Player::getPlayers();
     int reinforcement_units = 0;

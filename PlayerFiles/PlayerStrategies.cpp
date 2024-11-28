@@ -18,13 +18,13 @@ std::vector<Territory *> HumanPlayerStrategy::toDefend(Player *player)
     return player->getToDefendTerritories();
 }
 
-std::vector<Territory *> Player::toAttack()
+std::vector<Territory *> HumanPlayerStrategy::toAttack(Player *player)
 {
     // Create a set to ensure unique enemy territories (avoid duplicates)
     std::set<Territory *> enemyTerritories;
 
     // Iterate over each owned territory (territories to defend)
-    for (Territory *defendTerritory : toDefend())
+    for (Territory *defendTerritory : player->getToDefendTerritories())
     {
         // Check adjacent territories of each owned territory
         for (const auto &adjacentPair : defendTerritory->adjacentTerritories)
@@ -32,7 +32,7 @@ std::vector<Territory *> Player::toAttack()
             Territory *adjacentTerritory = adjacentPair.second;
 
             // If the adjacent territory is not already in "toDefend", it's an enemy
-            if (std::find(toDefend().begin(), toDefend().end(), adjacentTerritory) == toDefend().end())
+            if (std::find(player->getToDefendTerritories().begin(), player->getToDefendTerritories().end(), adjacentTerritory) == player->getToDefendTerritories().end())
             {
                 enemyTerritories.insert(adjacentTerritory);
             }
@@ -43,10 +43,10 @@ std::vector<Territory *> Player::toAttack()
     std::vector<Territory *> enemyTerritoriesVector(enemyTerritories.begin(), enemyTerritories.end());
 
     // Update the player's list of attackable territories
-    setToAttackTerritories(enemyTerritoriesVector);
+    player->setToAttackTerritories(enemyTerritoriesVector);
 
     // Return the attackable territories
-    return getToAttackTerritories();
+    return player->getToAttackTerritories();
 }
 
 void HumanPlayerStrategy::issueOrder(Player *player, Deck *deck)
@@ -262,11 +262,155 @@ std::vector<Territory *> BenevolentPlayerStrategy::toAttack(Player *player)
     return {}; // Benevolent players do not attack
 }
 
-void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
+void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typeOfOrder, Deck *deck)
 {
-    std::cout << "Benevolent Player: Deploying armies to defend territories.\n";
-    for (Territory *t : toDefend(player))
+    static bool cardPlayed = false; // Track whether a card has been played this turn
+
+    if (typeOfOrder == "deploy")
     {
-        player->issueOrder("deploy", deck);
+        for (Territory *weakestTerritory : toDefend(player))
+        {
+            if (player->getNumArmies() > 0)
+            {
+                int armiesToDeploy = std::min(player->getNumArmies(), weakestTerritory->numberOfArmies + 1);
+                player->getOrdersList()->ordersVector.push_back(new DeployOrder(player, weakestTerritory->name, armiesToDeploy));
+                player->setNumArmies(player->getNumArmies() - armiesToDeploy);
+            }
+        }
+    }
+    else if (typeOfOrder == "advance")
+    {
+        std::vector<Territory *> defendableTerritories = toDefend(player);
+        if (defendableTerritories.size() >= 2)
+        {
+            Territory *source = defendableTerritories.back();
+            Territory *target = defendableTerritories.front();
+            if (source != target && source->numberOfArmies > 1)
+            {
+                int armiesToAdvance = source->numberOfArmies - 1;
+                player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, nullptr, source->name, target->name, armiesToAdvance));
+            }
+        }
+    }
+    else if (typeOfOrder == "airlift" || typeOfOrder == "blockade" || typeOfOrder == "bomb" || typeOfOrder == "negotiate")
+    {
+        if (cardPlayed)
+        {
+            std::cout << "Error: A card has already been played this turn!\n";
+            return;
+        }
+
+        bool hasCard = false;
+        Card *cardToPlay = nullptr;
+        for (Card *card : player->getPlayerHand()->handVector)
+        {
+            if (card->cardType == typeOfOrder)
+            {
+                hasCard = true;
+                cardToPlay = card;
+                break;
+            }
+        }
+
+        if (!hasCard)
+        {
+            std::cout << "Error: Benevolent Player does not have a " << typeOfOrder << " card!\n";
+            return;
+        }
+
+        if (typeOfOrder == "airlift")
+        {
+            Territory *source = player->getOwnedTerritories().front();
+            Territory *target = toDefend(player).front();
+            if (source != target && source->numberOfArmies > 1)
+            {
+                int armiesToAirlift = source->numberOfArmies - 1;
+                player->getOrdersList()->ordersVector.push_back(new AirliftOrder(source->name, target->name, armiesToAirlift));
+            }
+        }
+        else if (typeOfOrder == "blockade")
+        {
+            Territory *target = toDefend(player).front();
+            player->getOrdersList()->ordersVector.push_back(new BlockadeOrder(target->name));
+        }
+
+        cardToPlay->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
+        cardPlayed = true; // Set the flag after playing the card
+    }
+    else
+    {
+        std::cout << "Error: Invalid order type \"" << typeOfOrder << "\".\n";
+    }
+}
+
+std::vector<Territory *> CheaterPlayerStrategy::toDefend(Player *player)
+{
+    // Return all owned territories
+    return player->getOwnedTerritories();
+}
+
+std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player *player)
+{
+    // Identify all enemy territories adjacent to owned territories
+    std::set<Territory *> adjacentEnemyTerritories;
+
+    for (Territory *ownedTerritory : player->getOwnedTerritories())
+    {
+        for (const auto &adjacentPair : ownedTerritory->adjacentTerritories)
+        {
+            Territory *adjacentTerritory = adjacentPair.second;
+
+            // Check if the adjacent territory is not owned by the player
+            if (std::find(player->getOwnedTerritories().begin(), player->getOwnedTerritories().end(), adjacentTerritory) == player->getOwnedTerritories().end())
+            {
+                adjacentEnemyTerritories.insert(adjacentTerritory);
+            }
+        }
+    }
+
+    // Convert the set to a vector for easier handling
+    return std::vector<Territory *>(adjacentEnemyTerritories.begin(), adjacentEnemyTerritories.end());
+}
+
+void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &typeOfOrder, Deck *deck)
+{
+    if (typeOfOrder == "deploy")
+    {
+        // No deployment for the Cheater player
+        std::cout << "Cheater Player: Skipping deploy phase.\n";
+    }
+    else if (typeOfOrder == "advance")
+    {
+        // Automatically conquer adjacent enemy territories
+        std::vector<Territory *> territoriesToConquer = toAttack(player);
+        std::cout << "Cheater Player: Automatically conquering adjacent territories.\n";
+
+        for (Territory *enemyTerritory : territoriesToConquer)
+        {
+            // Find the current owner of the enemy territory
+            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->players);
+
+            if (enemyPlayer)
+            {
+                // Remove the territory from the enemy player's ownership
+                std::vector<Territory *> &enemyOwnedTerritories = enemyPlayer->getOwnedTerritories();
+                enemyOwnedTerritories.erase(
+                    std::remove(enemyOwnedTerritories.begin(), enemyOwnedTerritories.end(), enemyTerritory),
+                    enemyOwnedTerritories.end());
+            }
+
+            // Add the territory to the Cheater player's ownership
+            std::vector<Territory *> &cheaterOwnedTerritories = player->getOwnedTerritories();
+            if (std::find(cheaterOwnedTerritories.begin(), cheaterOwnedTerritories.end(), enemyTerritory) == cheaterOwnedTerritories.end())
+            {
+                cheaterOwnedTerritories.push_back(enemyTerritory);
+            }
+
+            std::cout << "Cheater Player has conquered " << enemyTerritory->name << ".\n";
+        }
+    }
+    else
+    {
+        std::cout << "Error: Invalid order type for Cheater Player. Only 'deploy' or 'advance' is allowed.\n";
     }
 }

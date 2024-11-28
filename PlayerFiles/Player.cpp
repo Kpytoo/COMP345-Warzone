@@ -133,10 +133,7 @@ void Player::setOrdersList(OrdersList *ordersList) { this->ordersList = ordersLi
 void Player::setNumArmies(int numArmies) { this->numArmies = numArmies; }
 void Player::setStrategy(PlayerStrategy *newStrategy)
 {
-    if (strategy)
-    {
-        delete strategy;
-    }
+
     strategy = newStrategy;
 }
 

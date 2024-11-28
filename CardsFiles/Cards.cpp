@@ -6,9 +6,9 @@
 // <<<< Card Class Definitions >>>>
 
 /**
- * Method that plays the card, which creates an order and adds it 
+ * Method that plays the card, which creates an order and adds it
  * to the player's list of orders and then returns the card to the deck.
- * 
+ *
  * @param ordersList The orders list to which the created order will be added to.
  * @param playingDeck The deck to which the card will be returned to.
  * @param playingHand The hand from which the card is played.
@@ -16,7 +16,7 @@
  */
 void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
 {
-    if(playingHand.handVector.size() == 0) ///< If hand is empty.
+    if (playingHand.handVector.size() == 0) ///< If hand is empty.
     {
         std::cout << "Hand is empty, no card available to play" << std::endl;
     }
@@ -30,7 +30,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
         int armies = 0;
 
         // Check if the order to be issued is an "airlift" type.
-        if(cardType == "airlift")
+        if (cardType == "airlift")
         {
             // Prompt the player to choose a source territory for the airlift.
             std::cout << "\nChoose a source territory (army units should be on standby there): ";
@@ -51,7 +51,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
             ordersList.ordersVector.push_back(new AirliftOrder(sourceTName, targetTName, armies)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "bomb" type.
-        else if(cardType == "bomb")
+        else if (cardType == "bomb")
         {
             // Prompt the player to choose a target territory to execute a bomb order.
             std::cout << "\nChoose a target territory to execute a bomb order: ";
@@ -62,7 +62,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
             ordersList.ordersVector.push_back(new BombOrder(targetTName)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "blockade" type.
-        else if(cardType == "blockade")
+        else if (cardType == "blockade")
         {
             // Prompt the player to choose a target territory for the blockade.
             std::cout << "\nChoose a target territory to execute a blockade order: ";
@@ -73,7 +73,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
             ordersList.ordersVector.push_back(new BlockadeOrder(targetTName)); // Need to have some logic that registers the details from the player's input
         }
         // Check if the order to be issued is a "negotiate" type.
-        else if(cardType == "negotiate")
+        else if (cardType == "negotiate")
         {
             // Declare a variable to store the name of the target player for negotiation.
             std::string targetPName;
@@ -88,7 +88,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
         }
 
         playingDeck.deckVector.push_back(this); ///< Return the pointer of the played card at the end of the deck.
-        playingHand.handVector.pop_back(); ///< Remove the pointer of the card from the player's hand.
+        playingHand.handVector.pop_back();      ///< Remove the pointer of the card from the player's hand.
     }
 }
 
@@ -97,7 +97,7 @@ void Card::play(OrdersList &ordersList, Deck &playingDeck, Hand &playingHand)
  */
 Card::Card()
 {
-   //assign cartType at random
+    // assign cartType at random
     cardType = cardTypes[rand() % cardTypes.size()];
 }
 
@@ -118,11 +118,13 @@ std::ostream &operator<<(std::ostream &COUT, const Card &CARD)
     return COUT;
 }
 
-const std::string &Card::getCardType() const {
+const std::string &Card::getCardType() const
+{
     return cardType;
 }
 
-void Card::setCardType(const std::string &cardType) {
+void Card::setCardType(const std::string &cardType)
+{
     Card::cardType = cardType;
 }
 
@@ -162,10 +164,10 @@ void Deck::draw(Hand &hand)
 /**
  * Overloaded Copy constructor of the Deck class, creates a deck given
  * another instance of a deck. This is a deep copy.
- * 
+ *
  * @param copyPlayingDeck Deck instance that is being copied from.
  */
-Deck::Deck(const Deck& copyPlayingDeck)
+Deck::Deck(const Deck &copyPlayingDeck)
 {
     for (const auto *card : copyPlayingDeck.deckVector)
     {
@@ -237,7 +239,7 @@ Hand::Hand(const Hand &copyHand)
  *
  * @param hand Hand instance that is being assigned from.
  */
-void Hand::operator=(const Hand& hand)
+void Hand::operator=(const Hand &hand)
 {
     for (auto *card : handVector)
     {
@@ -254,11 +256,11 @@ void Hand::operator=(const Hand& hand)
 /**
  * Overloaded Stream insertion operator which outputs the whole
  * hand.
- * 
+ *
  * @param COUT The output stream object.
  * @param HAND The card instance that is being outputted.
  */
-std::ostream& operator<<(std::ostream& COUT, Hand& HAND)
+std::ostream &operator<<(std::ostream &COUT, Hand &HAND)
 {
     if (HAND.handVector.empty())
     {
