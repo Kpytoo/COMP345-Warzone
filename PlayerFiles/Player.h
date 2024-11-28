@@ -23,13 +23,9 @@ private:
 
 public:
     // Constructors, assignment operator, and destructor
-    std::vector<Player *> *players;
     Player();
     Player(std::string name);
     Player(std::string playerName, const std::vector<Territory *> &ownedTerritories);
-
-    Player(const std::string &playerName, const std::vector<Territory *> &ownedTerritories,
-           std::vector<Player *> *players);
 
     Player(const Player &other);
     Player &operator=(const Player &other);
@@ -59,12 +55,12 @@ public:
     // Core gameplay methods
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
-    Player *FindTerritoryOwner(const std::string &territoryName, const std::vector<Player *> &players);
+    Player *FindTerritoryOwner(const std::string &territoryName);
     void issueOrder(std::string orderType, Deck *deck); // Issues an order for the player
 
     Deck *deck = nullptr; // Pointer to the deck for player to draw from
 
-    // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
+    static std::vector<Player *> players; // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
 
     std::vector<Player *> *Player::getPlayers();
     int reinforcement_units = 0;

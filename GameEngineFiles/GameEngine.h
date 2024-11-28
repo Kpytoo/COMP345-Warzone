@@ -22,13 +22,10 @@ private:
     GameState *currentGameState;
 
     // The map used for the game
-    Map* currentMap;
-
-    // Add a players vector to GameEngine
-    std::vector<Player *> players;
+    Map *currentMap;
 
     // The deck used for the game
-    Deck* mainDeck;
+    Deck *mainDeck;
 
 public:
     // Default Constructor
@@ -66,7 +63,7 @@ public:
      *
      * @param command The user input command to manage.
      */
-    void manageCommand(Command& command);
+    void manageCommand(Command &command);
 
     /**
      * Function to get the current game state as a string.
@@ -80,7 +77,6 @@ public:
     GameState getCurrentGameState() const;
 
     // Returns a const reference to the vector of players in the game
-    std::vector<Player *> &getPlayers();
     // Sets the list of players in the game
     void setPlayers(const std::vector<Player *> &newPlayers);
 
@@ -90,8 +86,8 @@ public:
     void displayCommands() const;
 
     // can delete these methods if not needed, created for GameEngineDriver
-    void setCurrentMap(Map* map);
-    void setGameDeck(Deck* deck);
+    void setCurrentMap(Map *map);
+    void setGameDeck(Deck *deck);
 
     /**
      * Main game loop that runs the core gameplay sequence.
@@ -103,14 +99,14 @@ public:
      *
      * @param player The player who is undergoing the reinforcement phase.
      */
-    void reinforcementPhase(Player* player);
+    void reinforcementPhase(Player *player);
 
     /**
      * Executes the Issuing Orders Phase for a given player.
      *
      * @param player The player who is issuing orders.
      */
-    void issueOrdersPhase(Player* player);
+    void issueOrdersPhase(Player *player);
 
     /**
      * Executes all orders in each player's orders list during the Orders Execution Phase of the game.

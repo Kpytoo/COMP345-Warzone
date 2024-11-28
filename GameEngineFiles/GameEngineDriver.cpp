@@ -79,7 +79,7 @@ void testStartupPhase()
     // Display the final game state to verify setup success
     std::cout << "Final Game State: " << gameEngine.getCurrentState() << "\n";
     std::cout << "Players and Territories:\n";
-    for (Player *player : gameEngine.getPlayers())
+    for (Player *player : Player::players)
     {
         std::cout << "Player: " << player->getPlayerName() << "\nOwned Territories:\n";
         for (Territory *territory : player->getOwnedTerritories())
@@ -97,15 +97,15 @@ void testStartupPhase()
 
 void testMainGameLoop()
 {
-    GameEngine* gameEngine = new GameEngine();
-    Map* gameMap = new Map();
+    GameEngine *gameEngine = new GameEngine();
+    Map *gameMap = new Map();
     MapLoader::LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", gameMap);
 
     gameEngine->setCurrentMap(gameMap);
 
     // Create players
-    Player* player1 = new Player();
-    Player* player2 = new Player();
+    Player *player1 = new Player();
+    Player *player2 = new Player();
 
     player1->setPlayerName("Player1");
     player2->setPlayerName("Player2");
@@ -119,25 +119,23 @@ void testMainGameLoop()
     player2->getOwnedTerritories().push_back(gameMap->territories.at("Mont Royal"));
     player2->getOwnedTerritories().push_back(gameMap->territories.at("NDG CDN"));
 
-    gameEngine->getPlayers().push_back(player1);
-    gameEngine->getPlayers().push_back(player2);
-    player1->players = &gameEngine->getPlayers();
-    player2->players = &gameEngine->getPlayers();
+    Player::players.push_back(player1);
+    Player::players.push_back(player2);
 
     // Test toDefend() and toAttack() for Player 1
     std::cout << "\nTesting Player 1's toDefend() and toAttack() methods:\n";
-    std::vector<Territory*> toDefend1 = player1->toDefend();
-    std::vector<Territory*> toAttack1 = player1->toAttack();
+    std::vector<Territory *> toDefend1 = player1->toDefend();
+    std::vector<Territory *> toAttack1 = player1->toAttack();
 
     std::cout << "Player 1 should defend:\n";
-    for (Territory* t : toDefend1)
+    for (Territory *t : toDefend1)
     {
         std::cout << t->name << std::endl;
     }
     std::cout << std::endl;
 
     std::cout << "Player 1 should attack:\n";
-    for (Territory* t : toAttack1)
+    for (Territory *t : toAttack1)
     {
         std::cout << t->name << std::endl;
     }
@@ -145,18 +143,18 @@ void testMainGameLoop()
 
     // Test toDefend() and toAttack() for Player 2
     std::cout << "\nTesting Player 2's toDefend() and toAttack() methods:\n";
-    std::vector<Territory*> toDefend2 = player2->toDefend();
-    std::vector<Territory*> toAttack2 = player2->toAttack();
+    std::vector<Territory *> toDefend2 = player2->toDefend();
+    std::vector<Territory *> toAttack2 = player2->toAttack();
 
     std::cout << "Player 2 should defend:\n";
-    for (Territory* t : toDefend2)
+    for (Territory *t : toDefend2)
     {
         std::cout << t->name << std::endl;
     }
     std::cout << std::endl;
 
     std::cout << "Player 2 should attack:\n";
-    for (Territory* t : toAttack2)
+    for (Territory *t : toAttack2)
     {
         std::cout << t->name << std::endl;
     }

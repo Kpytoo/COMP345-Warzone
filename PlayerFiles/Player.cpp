@@ -9,6 +9,7 @@
 #include "OrdersFiles/Orders.h"
 #include "MapFiles/Map.h"
 
+std::vector<Player *> Player::players;
 // Default constructor: initializes player with empty name, zero armies, and new Hand and OrdersList instances
 Player::Player() : playerName(""), OwnedTerritories(), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
 {
@@ -23,9 +24,6 @@ Player::Player(std::string playerName, const std::vector<Territory *> &ownedTerr
 Player::Player(std::string name) : playerName(name), OwnedTerritories(), playerHand(new Hand()), ordersList(new OrdersList()), numArmies(0)
 {
 }
-Player::Player(const std::string &playerName, const std::vector<Territory *> &ownedTerritories,
-               std::vector<Player *> *players) : playerName(playerName), OwnedTerritories(ownedTerritories),
-                                                 players(players), playerHand(new Hand()) {}
 
 // Destructor: frees memory allocated for player's hand and orders list
 Player::~Player()
@@ -118,10 +116,6 @@ std::vector<Territory *> &Player::getToAttackTerritories() { return toAttackTerr
 Hand *Player::getPlayerHand() { return playerHand; }
 OrdersList *Player::getOrdersList() const { return ordersList; }
 int Player::getNumArmies() const { return numArmies; }
-std::vector<Player *> *Player::getPlayers()
-{
-    return players;
-}
 
 // Setter definitions: modify player details
 void Player::setPlayerName(const std::string &name) { playerName = name; }
@@ -172,22 +166,36 @@ std::vector<Territory *> Player::toAttack()
     return strategy->toAttack(this);
 }
 
-Player *Player::FindTerritoryOwner(const std::string &territoryName, const std::vector<Player *> &players)
+Player *Player::FindTerritoryOwner(const std::string &territoryName)
 {
-    // Search through all players
-    for (Player *player : players)
+    std::cout << "Finding owner for territory: " << territoryName << std::endl;
+
+    for (Player *player : Player::players)
     {
-        // Check each territory owned by the current player
+        std::cout << player->playerName;
+    }
+
+    for (Player *player : Player::players) // Access the static Player::players vector
+    {
+        if (!player)
+        {
+            std::cerr << "Warning: Found a null player in the list!" << std::endl;
+            continue;
+        }
+
+        // Check each territory owned by the player
         for (Territory *territory : player->getOwnedTerritories())
         {
-            if (territory->name == territoryName)
+            if (territory && territory->name == territoryName)
             {
+                std::cout << "Owner found: " << player->getPlayerName() << " for territory " << territoryName << std::endl;
                 return player;
             }
         }
     }
-    // Territory not found or not owned by any player
-    return nullptr;
+
+    std::cerr << "No owner found for territory: " << territoryName << std::endl;
+    return nullptr; // Territory not found or no owner
 }
 
 /**

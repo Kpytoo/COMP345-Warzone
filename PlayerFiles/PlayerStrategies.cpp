@@ -281,49 +281,84 @@ std::vector<Territory *> CheaterPlayerStrategy::toDefend(Player *player)
 
 std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player *player)
 {
-    // Identify all enemy territories adjacent to owned territories
-    std::set<Territory *> adjacentEnemyTerritories;
+    // Use a set to store unique enemy territories
+    std::set<Territory *> enemyTerritories;
 
+    // Iterate through each owned territory
     for (Territory *ownedTerritory : player->getOwnedTerritories())
     {
-        for (const auto &adjacentPair : ownedTerritory->adjacentTerritories)
+        // Check each adjacent territory
+        for (const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
         {
-            Territory *adjacentTerritory = adjacentPair.second;
+            Territory *enemyTerritory = adjacentTerritory.second;
 
-            // Check if the adjacent territory is not owned by the player
-            if (std::find(player->getOwnedTerritories().begin(), player->getOwnedTerritories().end(), adjacentTerritory) == player->getOwnedTerritories().end())
+            // If the adjacent territory is not owned by the cheater, add it to the set
+            if (std::find(player->getOwnedTerritories().begin(), player->getOwnedTerritories().end(), enemyTerritory) == player->getOwnedTerritories().end())
             {
-                adjacentEnemyTerritories.insert(adjacentTerritory);
+                enemyTerritories.insert(enemyTerritory);
             }
         }
     }
 
-    // Convert the set to a vector for easier handling
-    return std::vector<Territory *>(adjacentEnemyTerritories.begin(), adjacentEnemyTerritories.end());
+    // Convert set to vector for easier handling
+    std::vector<Territory *> attackableTerritories(enemyTerritories.begin(), enemyTerritories.end());
+
+    // Update the player's attackable territories
+    player->setToAttackTerritories(attackableTerritories);
+
+    return player->getToAttackTerritories();
 }
 
-void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &typeOfOrder, Deck *deck)
+void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
-    if (typeOfOrder == "advance")
+    if (orderType == "advance")
     {
-        // Automatically conquer all adjacent enemy territories
-        for (Territory *enemyTerritory : toAttack(player))
+        // Identify all attackable territories
+        std::vector<Territory *> attackableTerritories = toAttack(player);
+
+        for (Territory *enemyTerritory : attackableTerritories)
         {
-            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+
+            std::cout << enemyTerritory->name;
+        }
+
+        std::vector<std::pair<Player *, Territory *>> toConquer;
+
+        for (Territory *enemyTerritory : attackableTerritories)
+        {
+            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
+
+            if (!enemyPlayer)
+            {
+                std::cerr << "No owner found for territory: " << enemyTerritory->name << ". Skipping.\n";
+                continue;
+            }
 
             if (enemyPlayer)
             {
-                // Remove the territory from the enemy player's ownership
-                enemyPlayer->getOwnedTerritories().erase(
-                    std::remove(enemyPlayer->getOwnedTerritories().begin(), enemyPlayer->getOwnedTerritories().end(), enemyTerritory),
-                    enemyPlayer->getOwnedTerritories().end());
+                toConquer.emplace_back(enemyPlayer, enemyTerritory);
             }
+        }
 
-            // Add the territory to the CheaterPlayer's ownership
-            player->getOwnedTerritories().push_back(enemyTerritory);
+        // Perform ownership updates after the loop
+        for (const auto &conquerPair : toConquer)
+        {
+            Player *enemyPlayer = conquerPair.first;
+            Territory *enemyTerritory = conquerPair.second;
 
-            // Log the conquest
-            std::cout << "CheaterPlayer automatically conquered " << enemyTerritory->name << ".\n";
+            std::cout << "CheaterPlayer conquers " << enemyTerritory->name << " from " << enemyPlayer->getPlayerName() << ".\n";
+
+            // Remove from enemy player
+            std::vector<Territory *> updatedEnemyTerritories = enemyPlayer->getOwnedTerritories();
+            updatedEnemyTerritories.erase(
+                std::remove(updatedEnemyTerritories.begin(), updatedEnemyTerritories.end(), enemyTerritory),
+                updatedEnemyTerritories.end());
+            enemyPlayer->setOwnedTerritories(updatedEnemyTerritories);
+
+            // Add to cheater player
+            std::vector<Territory *> updatedCheaterTerritories = player->getOwnedTerritories();
+            updatedCheaterTerritories.push_back(enemyTerritory);
+            player->setOwnedTerritories(updatedCheaterTerritories);
         }
     }
     else
