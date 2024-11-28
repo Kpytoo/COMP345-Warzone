@@ -49,48 +49,6 @@ std::vector<Territory *> HumanPlayerStrategy::toAttack(Player *player)
     return player->getToAttackTerritories();
 }
 
-void HumanPlayerStrategy::issueOrder(Player *player, Deck *deck)
-{
-    // Clear the input buffer to avoid issues between std::cin and std::getline
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    while (true)
-    {
-        // Display available options
-        std::cout << "\nHumanPlayerStrategy: Please decide an order to issue for Player " << player->getPlayerName() << ".\n";
-        std::cout << "Available options: deploy, advance, airlift, blockade, negotiate, bomb, or end turn.\n";
-
-        // Show the player's hand
-        std::cout << "\nYour current hand of cards:\n";
-        if (player->getPlayerHand()->handVector.empty())
-        {
-            std::cout << "- No cards available.\n";
-        }
-        else
-        {
-            for (Card *card : player->getPlayerHand()->handVector)
-            {
-                std::cout << "- " << card->cardType << std::endl;
-            }
-        }
-
-        // Get the order type from the player
-        std::string orderType;
-        std::cout << "\nEnter the type of order: ";
-        std::getline(std::cin, orderType);
-
-        // Handle the "end turn" case
-        if (orderType == "end turn")
-        {
-            std::cout << "Ending turn.\n";
-            break;
-        }
-
-        // Handle the order type
-        issueOrder(player, orderType, deck);
-    }
-}
-
 void HumanPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
     std::string sourceTName, targetTName;
@@ -215,23 +173,32 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typ
         {
             if (player->getNumArmies() > 0)
             {
+                // Deploy as many armies as possible to the weakest territory
                 int armiesToDeploy = std::min(player->getNumArmies(), weakestTerritory->numberOfArmies + 1);
+
+                // Create a deploy order and add it to the player's orders list
                 player->getOrdersList()->add(new DeployOrder(player, weakestTerritory->name, armiesToDeploy));
-                player->setNumArmies(player->getNumArmies() - armiesToDeploy);
             }
         }
     }
     else if (typeOfOrder == "advance")
     {
-        // Benevolent players do not attack but can advance armies to defend weaker territories
+        // Benevolent players do not attack but can advance armies to reinforce weaker territories
         std::vector<Territory *> defendableTerritories = toDefend(player);
+
+        // Ensure we have at least two territories to work with
         if (defendableTerritories.size() >= 2)
         {
-            Territory *source = defendableTerritories.back();
-            Territory *target = defendableTerritories.front();
+            // Sort territories from weakest to strongest
+            Territory *target = defendableTerritories.front(); // Weakest
+            Territory *source = defendableTerritories.back();  // Strongest
+
+            // Only move armies if the source territory has enough to spare
             if (source != target && source->numberOfArmies > 1)
             {
                 int armiesToAdvance = source->numberOfArmies - 1;
+
+                // Create an advance order and add it to the player's orders list
                 player->getOrdersList()->add(new AdvanceOrder(player, nullptr, source->name, target->name, armiesToAdvance));
             }
         }

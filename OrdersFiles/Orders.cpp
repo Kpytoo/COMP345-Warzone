@@ -99,14 +99,11 @@ DeployOrder::DeployOrder()
  * @param tName The name of the territory where the army units are being deployed.
  * @param armyDeployed The number of army units being deployed to the territory.
  */
-DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
+DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed)
+    : player(p), territoryDeployName(tName), army(armyDeployed)
 {
-    // Set the order type to "deploy", indicating this is a deployment order
     orderType = "deploy";
-    // Initialize the validOrder flag to false, meaning the order is not validated at creation
     validOrder = false;
-
-    player->reinforcement_units -= armyDeployed;
 }
 
 std::ostream &operator<<(std::ostream &COUT, const DeployOrder &ORDER)
@@ -175,39 +172,30 @@ void DeployOrder::validate()
  * Validates and then performs the deployment if valid.
  */
 void DeployOrder::execute()
+
 {
-    // Validate the deploy order before execution.
     DeployOrder::validate();
 
-    // If the order is valid, proceed with the execution.
     if (validOrder)
     {
-        // Call the base class execute method (Displaying the order type executing).
         Order::execute();
 
         for (Territory *t : player->toDefend())
         {
-            // If the target territory is found in the player's owned territories
             if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryDeployName))
             {
-                // Deploy the army units to the territory by adding the army units to the target territory.
-                t->numberOfArmies += army;
-                // Update the player's reinforcement pool to reflect the deployment.
-                player->setNumArmies(player->getNumArmies() - army);
-                // Notify that the deployment was successful.
+                t->numberOfArmies += army;                           // Add the armies to the target territory
+                player->setNumArmies(player->getNumArmies() - army); // Deduct armies from reinforcement pool
                 std::cout << "Successfully deployed " << army << " units to " << t->name << ".\n";
-                // Exit the loop once the deployment is completed.
                 break;
             }
         }
     }
-    // If the order is invalid, notify the player that the order will not be executed.
     else
     {
         std::cout << "Deploy order is invalid and will not be executed.\n";
     }
 }
-
 // ---------------------- Advance Order ----------------------
 
 /**
@@ -311,39 +299,110 @@ void AdvanceOrder::execute()
 
     if (validOrder)
     {
-        std::cout << "Executing advance order: " << territoryAdvanceSName << " -> " << territoryAdvanceTName
-                  << " with " << army << " armies.\n";
+        // Check if negotiation prevents the attack
+        if (NegotiateOrder::negotiatedPlayers.count(player->getPlayerName()) > 0 &&
+            NegotiateOrder::negotiatedPlayers.at(player->getPlayerName()) == enemyPlayer->getPlayerName())
+        {
+            std::cout << "Advance order prevented due to active negotiation between "
+                      << player->getPlayerName() << " and " << enemyPlayer->getPlayerName() << ".\n";
+            return; // Exit without executing the attack
+        }
 
-        // Attack logic
+        Order::execute();
+
+        // Proceed with the usual advance order logic
         Territory *sourceT = nullptr;
         for (Territory *t : player->getOwnedTerritories())
         {
             if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceSName))
             {
                 sourceT = t;
-                t->numberOfArmies -= army;
+                sourceT->numberOfArmies -= army; // Deduct armies
                 break;
             }
         }
 
+        if (!sourceT)
+        {
+            std::cerr << "Error: Source territory not found.\n";
+            return;
+        }
+
+        bool targetOwned = false;
         Territory *targetT = nullptr;
-        for (const auto &pair : sourceT->adjacentTerritories)
+        for (Territory *t : player->getOwnedTerritories())
         {
-            if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
+            if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceTName))
             {
-                targetT = pair.second;
+                targetOwned = true;
+                t->numberOfArmies += army; // Add armies
+                std::cout << "Advanced " << army << " units from " << territoryAdvanceSName
+                          << " to defend " << territoryAdvanceTName << ".\n";
                 break;
             }
         }
 
-        if (targetT != nullptr && targetT->numberOfArmies == 0)
+        // If target is not owned, proceed with attack logic
+        if (!targetOwned)
         {
-            std::cout << "Conquered " << targetT->name << " successfully!\n";
-            player->getOwnedTerritories().push_back(targetT);
-        }
-        else
-        {
-            std::cout << "Attack failed. Defending armies remain in " << targetT->name << ".\n";
+            // Find the target territory among adjacent ones
+            for (const auto &pair : sourceT->adjacentTerritories)
+            {
+                if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
+                {
+                    targetT = pair.second;
+                    break;
+                }
+            }
+
+            if (!targetT)
+            {
+                std::cerr << "Error: Target territory is not adjacent to source territory.\n";
+                return;
+            }
+
+            int attackingUnits = army;
+            int defendingUnits = targetT->numberOfArmies;
+
+            std::mt19937 rng(static_cast<unsigned>(std::time(0)));
+            std::uniform_int_distribution<int> dist(1, 100);
+
+            // Battle loop
+            while (attackingUnits > 0 && defendingUnits > 0)
+            {
+                if (dist(rng) < 60)
+                    defendingUnits--;
+                if (dist(rng) < 70)
+                    attackingUnits--;
+                if (attackingUnits == 0 || defendingUnits == 0)
+                    break; // Exit loop when one side loses
+            }
+
+            if (defendingUnits == 0)
+            {
+                targetT->numberOfArmies = attackingUnits;
+                std::cout << "Attack successful: " << territoryAdvanceTName
+                          << " conquered with " << attackingUnits << " remaining units.\n";
+                player->getOwnedTerritories().push_back(targetT);
+
+                if (enemyPlayer != nullptr)
+                {
+                    enemyPlayer->getOwnedTerritories().erase(std::remove(enemyPlayer->getOwnedTerritories().begin(),
+                                                                         enemyPlayer->getOwnedTerritories().end(), targetT),
+                                                             enemyPlayer->getOwnedTerritories().end());
+                }
+
+                if (player->deck != nullptr)
+                {
+                    player->deck->draw(*player->getPlayerHand());
+                }
+            }
+            else
+            {
+                targetT->numberOfArmies = defendingUnits;
+                std::cout << "Attack failed: " << territoryAdvanceTName
+                          << " defended with " << defendingUnits << " units remaining.\n";
+            }
         }
     }
     else

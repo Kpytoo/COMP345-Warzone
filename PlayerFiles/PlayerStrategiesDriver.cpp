@@ -1,4 +1,3 @@
-#include "PlayerFiles/PlayerStrategies.h"
 #include "PlayerFiles/Player.h"
 #include "CardsFiles/Cards.h"
 #include "OrdersFiles/Orders.h"
@@ -8,6 +7,19 @@
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
+
+void printOwnedTerritories(const std::vector<Player *> &players)
+{
+    for (Player *player : players)
+    {
+        std::cout << "\n[ " << player->getPlayerName() << " ]\n";
+        for (Territory *territory : player->getOwnedTerritories())
+        {
+            std::cout << "  - " << territory->name << " (Armies: " << territory->numberOfArmies << ")\n";
+        }
+    }
+    std::cout << "----------------------------------------\n";
+}
 
 void testPlayerStrategies()
 {
@@ -43,8 +55,8 @@ void testPlayerStrategies()
     territory5->adjacentTerritories["Territory4"] = territory4;
 
     auto *humanPlayer = new Player("HumanPlayer", {territory1, territory2});
-    auto *benevolentPlayer = new Player("BenevolentPlayer", {territory3});
-    auto *cheaterPlayer = new Player("CheaterPlayer", {territory4});
+    auto *benevolentPlayer = new Player("BenevolentPlayer", {territory3, territory4});
+    auto *cheaterPlayer = new Player("CheaterPlayer", {territory5});
 
     // Assign strategies
     humanPlayer->setStrategy(new HumanPlayerStrategy());
@@ -52,70 +64,70 @@ void testPlayerStrategies()
     cheaterPlayer->setStrategy(new CheaterPlayerStrategy());
 
     // Assign sufficient reinforcement units
-    humanPlayer->setNumArmies(50);
-    benevolentPlayer->setNumArmies(50);
-    cheaterPlayer->setNumArmies(50);
+    humanPlayer->setNumArmies(10);
+    benevolentPlayer->setNumArmies(10);
+    cheaterPlayer->setNumArmies(0);
 
     // Display game setup
-    std::cout << "Game setup:\n";
-    std::cout << "- HumanPlayer owns Territory1 and Territory2.\n";
-    std::cout << "- BenevolentPlayer owns Territory3.\n";
-    std::cout << "- CheaterPlayer owns Territory4.\n";
+    std::cout << "\n========== GAME SETUP ==========\n";
+    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
 
-    // Process strategies
-    std::vector<Player *> players = {humanPlayer, benevolentPlayer, cheaterPlayer};
-    Deck *deck = new Deck();
+    // DEPLOY PHASE
+    std::cout << "\n========== DEPLOY PHASE ==========\n";
+    std::cout << "HumanPlayer deploys 5 armies to Territory1 and 5 to Territory2.\n";
+    humanPlayer->getOrdersList()->add(new DeployOrder(humanPlayer, "Territory1", 5));
+    humanPlayer->getOrdersList()->add(new DeployOrder(humanPlayer, "Territory2", 5));
 
-    for (Player *player : players)
+    std::cout << "BenevolentPlayer deploys 6 armies to Territory3 and 4 to Territory4.\n";
+    benevolentPlayer->getOrdersList()->add(new DeployOrder(benevolentPlayer, "Territory3", 6));
+    benevolentPlayer->getOrdersList()->add(new DeployOrder(benevolentPlayer, "Territory4", 4));
+
+    std::cout << "CheaterPlayer skips deploy phase.\n";
+
+    // Execute deploy orders
+    std::cout << "\n--- Executing Deploy Orders ---\n";
+    for (Player *player : {humanPlayer, benevolentPlayer, cheaterPlayer})
     {
-        std::cout << "\n=== Player: " << player->getPlayerName() << " ===\n";
-
-        if (dynamic_cast<HumanPlayerStrategy *>(player->getStrategy()))
-        {
-            // Human player issues orders interactively
-            while (true)
-            {
-                std::cout << "\nHumanPlayer, choose an order type (deploy, advance, or end turn): ";
-                std::string orderType;
-                std::getline(std::cin, orderType);
-
-                if (orderType == "end turn")
-                {
-                    std::cout << "Ending HumanPlayer's turn.\n";
-                    break;
-                }
-
-                if (orderType == "deploy" || orderType == "advance")
-                {
-                    player->getStrategy()->issueOrder(player, orderType, deck);
-                }
-                else
-                {
-                    std::cout << "Invalid order type. Try again.\n";
-                }
-            }
-        }
-        else
-        {
-            // AI strategies issue orders automatically
-            player->getStrategy()->issueOrder(player, "deploy", deck);
-            player->getStrategy()->issueOrder(player, "advance", deck);
-        }
-
-        // Execute all issued orders
-        std::cout << "\nExecuting orders for Player: " << player->getPlayerName() << "\n";
         for (Order *order : player->getOrdersList()->ordersVector)
         {
-            order->execute();
-        }
-
-        // Print updated owned territories and their army counts
-        std::cout << "\nUpdated Territories Owned by " << player->getPlayerName() << ":\n";
-        for (Territory *territory : player->getOwnedTerritories())
-        {
-            std::cout << "- " << territory->name << " (Armies: " << territory->numberOfArmies << ")\n";
+            if (order->orderType == "deploy")
+            {
+                order->execute();
+            }
         }
     }
+
+    // Print owned territories after deploy phase
+    std::cout << "\n--- Owned Territories After Deploy Phase ---\n";
+    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
+
+    // ADVANCE PHASE
+    std::cout << "\n========== ADVANCE PHASE ==========\n";
+    std::cout << "HumanPlayer advances 4 armies from Territory1 to Territory2.\n";
+    humanPlayer->getOrdersList()->add(new AdvanceOrder(humanPlayer, nullptr, "Territory1", "Territory2", 4));
+
+    std::cout << "BenevolentPlayer advances 7 armies from Territory4 to Territory3.\n";
+    benevolentPlayer->getOrdersList()->add(new AdvanceOrder(benevolentPlayer, nullptr, "Territory4", "Territory3", 7));
+
+    std::cout << "CheaterPlayer skips advance phase.\n";
+
+    // Execute advance orders
+    std::cout << "\n--- Executing Advance Orders ---\n";
+    for (Player *player : {humanPlayer, benevolentPlayer})
+    {
+        for (Order *order : player->getOrdersList()->ordersVector)
+        {
+            if (order->orderType == "advance")
+            {
+                order->execute();
+            }
+        }
+        player->getOrdersList()->ordersVector.clear(); // Clear executed orders
+    }
+
+    // Print owned territories after advance phase
+    std::cout << "\n--- Owned Territories After Advance Phase ---\n";
+    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
 
     // Cleanup
     delete humanPlayer;
@@ -126,5 +138,4 @@ void testPlayerStrategies()
     delete territory3;
     delete territory4;
     delete territory5;
-    delete deck;
 }
