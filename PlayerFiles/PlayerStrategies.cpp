@@ -7,7 +7,15 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+#include <string>
 #include <limits>
+
+std::string toLower(const std::string &str)
+{
+    std::string lowerStr = str;
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
+}
 
 // ----- HumanPlayerStrategy Implementation -----
 std::vector<Territory *> HumanPlayerStrategy::toDefend(Player *player)
@@ -135,7 +143,7 @@ void HumanPlayerStrategy::issueOrder(Player *player, const std::string &orderTyp
                 }
 
                 // Play the card
-                c->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
+                // c->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
                 return;
             }
         }
@@ -209,23 +217,28 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typ
         bool hasAirliftCard = false;
         for (Card *card : player->getPlayerHand()->handVector)
         {
-            if (card->cardType == "airlift")
+            if (toLower(card->cardType) == "airlift")
             {
                 hasAirliftCard = true;
 
                 // Identify source and target territories for airlift
                 std::vector<Territory *> defendableTerritories = toDefend(player);
+                player->setOwnedTerritories(defendableTerritories);
                 if (defendableTerritories.size() >= 2)
                 {
                     Territory *source = defendableTerritories.back();
                     Territory *target = defendableTerritories.front();
                     if (source != target && source->numberOfArmies > 1)
                     {
+
                         int armiesToAirlift = source->numberOfArmies - 1;
-                        player->getOrdersList()->add(new AirliftOrder(source->name, target->name, armiesToAirlift));
+                        auto airliftOrder = new AirliftOrder(source->name, target->name, armiesToAirlift);
+                        airliftOrder->setPlayer(player);
+
+                        player->getOrdersList()->add(airliftOrder);
 
                         // Play the card
-                        card->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
+                        // card->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
                         std::cout << "Benevolent Player airlifted " << armiesToAirlift << " units from "
                                   << source->name << " to " << target->name << ".\n";
                     }
@@ -244,7 +257,7 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typ
         bool hasBlockadeCard = false;
         for (Card *card : player->getPlayerHand()->handVector)
         {
-            if (card->cardType == "blockade")
+            if (toLower(card->cardType) == "blockade")
             {
                 hasBlockadeCard = true;
 
@@ -253,10 +266,13 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typ
                 if (!defendableTerritories.empty())
                 {
                     Territory *target = defendableTerritories.front();
-                    player->getOrdersList()->add(new BlockadeOrder(target->name));
+                    auto blockadeOrder = new BlockadeOrder(target->name);
+                    blockadeOrder->setPlayer(player);
+
+                    player->getOrdersList()->add(blockadeOrder);
 
                     // Play the card
-                    card->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
+                    // card->play(*player->getOrdersList(), *deck, *player->getPlayerHand());
                     std::cout << "Benevolent Player used blockade on " << target->name << ".\n";
                 }
                 break;

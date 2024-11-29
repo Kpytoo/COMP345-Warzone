@@ -81,6 +81,22 @@ void testPlayerStrategies()
     // Assign sufficient reinforcement units
     humanPlayer->setNumArmies(100);
     benevolentPlayer->setNumArmies(100);
+    Deck *deck = new Deck();
+
+    for (int i = 0; i < 10; ++i)
+    {
+        if (!deck->deckVector.empty()) // Ensure the deck has cards remaining
+        {
+            humanPlayer->getPlayerHand()->handVector.push_back(deck->deckVector.back());
+            deck->deckVector.pop_back();
+        }
+
+        if (!deck->deckVector.empty()) // Ensure the deck has cards remaining
+        {
+            benevolentPlayer->getPlayerHand()->handVector.push_back(deck->deckVector.back());
+            deck->deckVector.pop_back();
+        }
+    }
 
     // Display game setup
     std::cout << "\n========== GAME SETUP ==========\n";
@@ -108,13 +124,23 @@ void testPlayerStrategies()
     executeOrders(humanPlayer);
     executeOrders(benevolentPlayer);
 
-    std::cout << "\n========== CHEATER PLAYER ADVANCE (Not Executed) ==========\n";
-    cheaterPlayer->issueOrder("advance", nullptr); // Cheater player issues an advance order
-    std::cout << "CheaterPlayer has issued an advance order but it will not be executed.\n";
+    // std::cout << "\n========== CHEATER PLAYER ADVANCE (Not Executed) ==========\n";
+    // cheaterPlayer->issueOrder("advance", nullptr); // Cheater player issues an advance order
+    // std::cout << "CheaterPlayer has issued an advance order but it will not be executed.\n";
+
+    std::cout << "\n========== FINAL STATE ==========\n";
+    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
 
     // Print owned territories after advance phase
     std::cout << "\n--- Owned Territories After Advance Phase ---\n";
     printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
+
+    for (Card *card : benevolentPlayer->getPlayerHand()->handVector)
+    {
+        std::cout << "Card type: " << card->getCardType() << "\n";
+    }
+    benevolentPlayer->issueOrder("airlift", deck);
+    executeOrders(benevolentPlayer);
 
     // CHANGE STRATEGY DYNAMICALLY
     // std::cout << "\n========== DYNAMIC STRATEGY CHANGE ==========\n";

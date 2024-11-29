@@ -439,6 +439,10 @@ std::ostream &operator<<(std::ostream &COUT, const BombOrder &ORDER)
     COUT << ORDER.orderType << std::endl;
     return COUT;
 }
+void BombOrder::setPlayer(Player *p)
+{
+    player = p;
+}
 
 /**
  * @brief Validates the BombOrder.
@@ -538,6 +542,8 @@ void BombOrder::execute()
  * @brief Constructor for the BlockadeOrder class.
  * Initializes the orderType as "blockade".
  */
+void BlockadeOrder::setPlayer(Player *p) { player = p; }
+
 BlockadeOrder::BlockadeOrder()
 {
     orderType = "blockade";
@@ -652,6 +658,8 @@ void BlockadeOrder::execute()
  * @brief Constructor for the AirliftOrder class.
  * Initializes the orderType as "airlift".
  */
+void AirliftOrder::setPlayer(Player *p) { player = p; }
+
 AirliftOrder::AirliftOrder()
 {
     orderType = "airlift";
@@ -688,6 +696,11 @@ std::ostream &operator<<(std::ostream &COUT, const AirliftOrder &ORDER)
 void AirliftOrder::validate()
 {
     std::cout << "Validating airlift order...\n";
+    for (Territory *t : player->getOwnedTerritories())
+    {
+
+        std::cout << t->name;
+    }
 
     if (!player)
     {
@@ -781,6 +794,10 @@ void AirliftOrder::execute()
 NegotiateOrder::NegotiateOrder()
 {
     orderType = "negotiate";
+}
+void NegotiateOrder::setPlayer(Player *p)
+{
+    player = p;
 }
 
 /**
