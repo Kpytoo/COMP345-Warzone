@@ -137,6 +137,16 @@ public:
      * @return The lowercase version of the input string.
      */
     static std::string toLowerCase(const std::string &str);
+
+    /**
+     * Starts the tournament by simulating multiple games with different maps and strategies.
+     * 
+     * @param maps A vector of strings representing the names of maps to be used in the tournament.
+     * @param strategies A vector of strings representing the strategies to be used by players in the tournament.
+     * @param numGames The number of games to be played per map.
+     * @param maxTurns The maximum number of turns allowed for each game.
+     */
+    void startTournament(const std::vector<std::string>& maps, const std::vector<std::string>& strategies, int numGames, int maxTurns);
 };
 
 #endif

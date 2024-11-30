@@ -9,6 +9,8 @@
 #include <vector>
 #include "LogFiles/LoggingObserver.h"
 
+class GameEngine;
+
 /**
  * Enum representing various game states/phases.
  */
@@ -189,6 +191,16 @@ public:
     std::list<Command *> commandCollection;
 
     std::string stringToLog() const override;
+
+    /**
+     * Processes the tournament command and parses the arguments for tournament configuration.
+     * 
+     * @param args A vector of strings representing the command-line arguments passed to the program.
+     * @param gameEngine A reference to the GameEngine instance that will manage and start the tournament.
+     * 
+     * @return Returns true if the tournament parameters are valid and the tournament was successfully started, otherwise false.
+     */
+    static bool processTournamentCommand(const std::vector<std::string>& args, GameEngine &gameEngine);
 
 private:
     /**
