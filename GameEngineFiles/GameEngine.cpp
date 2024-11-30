@@ -878,17 +878,25 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
 
     // Log the maps that will be used in the tournament.
     logFile << "M: ";
-    for (const auto& map : maps)
+    for (size_t i = 0; i < maps.size(); ++i)
     {
-        logFile << map << " | ";
+        logFile << maps[i];
+        if (i != maps.size() - 1)
+        {
+            logFile << ", ";
+        }
     }
 
     // Log the strategies that will be used in the tournament.
     logFile << "\nP: ";
-    for (const auto& strategy : strategies)
+    for (size_t i = 0; i < strategies.size(); ++i)
     {
-        logFile << strategy << " | ";
-    } 
+        logFile << strategies[i];
+        if (i != strategies.size() - 1)
+        {
+            logFile << ", ";
+        }
+    }
 
     // Log the number of games and the maximum number of turns allowed.
     logFile << "\nG: " << numGames << "\nD: " << maxTurns << "\n";
@@ -902,10 +910,11 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
     {
         for (int j = 0; j < numGames; ++j)
         {
-            // For simplicity, we are assigning a draw result here.
-            // In a real implementation, this is where the game simulation would happen
-            // using the strategies and maxTurns for each game.
-            results[i][j] = strategies[j % strategies.size()];  // Example strategy assignment
+            /* ATTENTION HERE: NEED REAL PLAYER STRATEGIES AND NEED TO SIMULATE THE GAME*/
+            /* We need to simulate the game, maybe like a simulateGame method or anything appropriate
+             * which will turn out to be results[i][j] = simulateGame() or something instead
+             */
+            results[i][j] = strategies[j % strategies.size()]; // PLACE HOLDER FOR RESULTS
         }
     }
 
@@ -920,14 +929,21 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
         int numMap = 1;
         for (size_t i = 0; i < maps.size(); ++i)
         {
-            // Log the strategy that won the game for the given map and game number.
-            logFile << results[i][game] << " (Map " << numMap << ") | ";
-            // Increment the map number.
-            numMap++;
+            // Result for this map and game
+            logFile << results[i][game];
+            
+            if (i != maps.size() - 1)
+            {
+                logFile << ", ";
+            }
         }
         logFile << "\n";
     }
 
+    // Add a closing line to signify the end of the tournament log.
+    logFile << "--- End of Tournament ---\n\n";
+
     // Close the log file after writing all details.
     logFile.close();
 }
+
