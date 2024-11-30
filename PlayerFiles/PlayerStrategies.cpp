@@ -276,7 +276,10 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &ord
 
 std::vector<Territory *> AggressivePlayerStrategy::toDefend(Player* player)
 {
-    return {}; // Aggressive players do not defend
+    // Set the territories to defend
+    player->setToDefendTerritories(player->getOwnedTerritories());
+    // Return the territories to defend
+    return player->getToDefendTerritories(); 
 }
 
 std::vector<Territory *> AggressivePlayerStrategy::toAttack(Player* player)
@@ -311,26 +314,57 @@ std::vector<Territory *> AggressivePlayerStrategy::toAttack(Player* player)
 }
 
 
-void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+void AggressivePlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
-    std::cout << "Aggressive Player: Deploying armies to attack enemy adjacent territories.\n";
-    // Try and attack each adjacent enemy territory
-    for (Territory *enemyTerritory : player->toAttack())
-    {   
-        int maxArmy = 0;
-        std::string attackingTerritory; 
-        // Find the owned territory with the largest army
-        for(Territory *ownedTerritory : player->getOwnedTerritories())
+
+    if (orderType == "deploy")
+    {
+        int highestArmy = 0;
+        Territory *strongestTerritory;
+        // Deploy armies to the strongest territories
+        for (Territory *strongestTerritories : player->getOwnedTerritories())
         {
-            if(ownedTerritory->numberOfArmies > maxArmy)
-            {
-                maxArmy = ownedTerritory->numberOfArmies;
-                attackingTerritory = ownedTerritory->name;
+            if (player->getNumArmies() > 0)
+            {   
+                // Find the territory with the strongest (highest army)
+                if(strongestTerritories->numberOfArmies >= highestArmy)
+                {
+                    highestArmy = strongestTerritories->numberOfArmies;
+                    strongestTerritory =  strongestTerritories;
+                }
             }
         }
-        Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
-        player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+
+        // Create a deploy order to be added to the aggressive player's order list
+        player->getOrdersList()->add(new DeployOrder(player, strongestTerritory->name, highestArmy));
     }
+    else if (orderType == "advance")
+    {
+        // Try and attack each adjacent enemy territory
+        for (Territory *enemyTerritory : player->toAttack())
+        {   
+            int maxArmy = 0;
+            std::string attackingTerritory; 
+            // Find the owned territory with the largest army
+            for(Territory *ownedTerritory : player->getOwnedTerritories())
+            {
+                if(ownedTerritory->numberOfArmies > maxArmy)
+                {
+                    maxArmy = ownedTerritory->numberOfArmies;
+                    attackingTerritory = ownedTerritory->name;
+                }
+            }
+            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+            player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+        } 
+    }
+    else 
+    {
+        std::cout << "Error: Aggressive Player cannot issue order of type \"" << orderType << "\"." << std::endl;
+    }
+
+
+    
 }
 
 
@@ -339,7 +373,10 @@ void issueOrder(Player *player, const std::string &orderType, Deck *deck)
 
 std::vector<Territory *> NeutralPlayerStrategy::toDefend(Player* player)
 {
-    return {}; // Neutral players do not defend 
+    // Set the territories to defend
+    player->setToDefendTerritories(player->getOwnedTerritories());
+    // Return the territories to defend
+    return player->getToDefendTerritories(); 
 }
 
 std::vector<Territory *> NeutralPlayerStrategy::toAttack(Player* player)
@@ -350,6 +387,7 @@ std::vector<Territory *> NeutralPlayerStrategy::toAttack(Player* player)
 void issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
     // Neutral players do not issue any orders
+    std::cout << "Neutral Player do not issue any orders" << std::endl;
 }
 
 
