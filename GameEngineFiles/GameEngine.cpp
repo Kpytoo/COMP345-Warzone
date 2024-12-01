@@ -603,8 +603,6 @@ void GameEngine::issueOrdersPhase(Player *player)
         {
             // Input to issue an order or not
             std::string inputO;
-            // Input for the type of order to issue
-            std::string inputOrderType;
             // Input for managing the orders list (move or remove)
             std::string inputOrderAction;
 
@@ -618,19 +616,8 @@ void GameEngine::issueOrdersPhase(Player *player)
             // If the player wants to issue an order, ask for the order type
             if (toLowerCase(inputO) == "y")
             {
-                // Display available order types
-                std::cout << "- Order Types -\n\n";
-                std::cout << "\t- Deploy\n\t- Advance\n\t- Airlift (Use one Airlift card)\n\t- Bomb (Use one Bomb card)\n\t- Blockade (Use one Blockade card)\n\t- Negotiate (Use one Diplomacy card)\n\n";
-
-                // Print out the player's hand
-                std::cout << *(player->getPlayerHand()) << std::endl;
-
-                // Prompt player for selection
-                std::cout << "Please issue an order type: ";
-                std::getline(std::cin, inputOrderType);
-
                 // Issue the order based on user input (order type)
-                player->issueOrder(toLowerCase(inputOrderType), mainDeck);
+                player->issueOrder(mainDeck);
             }
             // If the player doesn't want to issue an order, exit the loop
             else if (toLowerCase(inputO) == "n")
@@ -906,11 +893,34 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
     {
         for (int j = 0; j < numGames; ++j)
         {
-            /* ATTENTION HERE: NEED REAL PLAYER STRATEGIES AND NEED TO SIMULATE THE GAME*/
-            /* We need to simulate the game, maybe like a simulateGame method or anything appropriate
-             * which will turn out to be results[i][j] = simulateGame() or something instead
-             */
-            results[i][j] = strategies[j % strategies.size()]; // PLACE HOLDER FOR RESULTS
+            std::cout<<"GAME : " << i+1 <<std::endl;
+
+            // Load and validate map
+            setCurrentMap(new Map());
+            MapLoader::LoadMap(maps[i], currentMap);
+            if (!currentMap->Validate()) {
+                results[i][j] = "Invalid Map";
+                continue;
+            }
+
+            // Clear any existing players
+            for (auto player : Player::players) {
+                delete player;
+            }
+            Player::players.clear();
+
+            // Setup game deck
+            setGameDeck(new Deck());
+
+            // Simulate the game
+            simulateGame(strategies, maxTurns);
+
+            // Record the winner
+            if (Player::players.size() == 1) {
+                results[i][j] = Player::players[0]->getPlayerName();
+            } else {
+                results[i][j] = "Draw";
+            }
         }
     }
 
@@ -941,5 +951,117 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
 
     // Close the log file after writing all details.
     logFile.close();
+}
+
+void GameEngine::simulateGame(const std::vector<std::string>& strategies, int maxTurns) {
+    // Initialize players with their strategies
+    for (const auto& strategy : strategies) {
+        // Count number of players of strategies already in game for incrementing naming counts
+        int numOfExistingOfStrategy = 0;
+        for (auto p : Player::players) {
+            if (strategy == "Aggressive") {
+                if (dynamic_cast<AggressivePlayerStrategy*>(p->getStrategy()) != nullptr) {
+                    numOfExistingOfStrategy++;
+                }
+            } else if (strategy == "Benevolent") {
+                if (dynamic_cast<BenevolentPlayerStrategy*>(p->getStrategy()) != nullptr) {
+                    numOfExistingOfStrategy++;
+                }
+            } else if (strategy == "Neutral") {
+                if (dynamic_cast<NeutralPlayerStrategy*>(p->getStrategy()) != nullptr) {
+                    numOfExistingOfStrategy++;
+                }
+            } else if (strategy == "Cheater") {
+                if (dynamic_cast<CheaterPlayerStrategy*>(p->getStrategy()) != nullptr) {
+                    numOfExistingOfStrategy++;
+                }
+            }
+        }
+
+        Player* player = new Player(strategy + std::to_string(numOfExistingOfStrategy), {});
+        // Set player's strategy based on input
+        if (strategy == "Aggressive") {
+            player->setStrategy(new AggressivePlayerStrategy(player));
+        } else if (strategy == "Benevolent") {
+            player->setStrategy(new BenevolentPlayerStrategy(player));
+        } else if (strategy == "Neutral") {
+            player->setStrategy(new NeutralPlayerStrategy(player));
+        } else if (strategy == "Cheater") {
+            player->setStrategy(new CheaterPlayerStrategy(player));
+        }
+        Player::players.push_back(player);
+    }
+
+    // Distribute territories randomly
+    std::vector<Territory*> allTerritories;
+    for (const auto& territory : currentMap->territories) {
+        allTerritories.push_back(territory.second);
+    }
+
+    std::random_shuffle(allTerritories.begin(), allTerritories.end());
+    int territoriesPerPlayer = allTerritories.size() / Player::players.size();
+    int remainingTerritories = allTerritories.size() % Player::players.size();
+    auto it = allTerritories.begin();
+
+    // Assign territories to players
+    for (Player* player : Player::players) {
+        std::vector<Territory*> ownedTerritories(it, it + territoriesPerPlayer);
+        player->setOwnedTerritories(ownedTerritories);
+        it += territoriesPerPlayer;
+    }
+
+    // Distribute remaining territories
+    for (int i = 0; i < remainingTerritories; ++i) {
+        Player::players[i]->getOwnedTerritories().push_back(*it++);
+    }
+
+    // Initialize players with armies and cards
+    for (Player* player : Player::players) {
+        player->setNumArmies(50);
+        for (int i = 0; i < 2; i++) {
+            mainDeck->draw(*(player->getPlayerHand()));
+        }
+    }
+
+    // Main game loop
+    int currentTurn = 0;
+    while (currentTurn < maxTurns && Player::players.size() > 1) {
+        std::cout<<"TURN : "<< currentTurn + 1 <<std::endl;
+
+        // Reinforcement Phase
+        setCurrentState(GameState::Assign_Reinforcement);
+        for (int i = 0; i < Player::players.size(); i++) {
+            if (Player::players[i]->getOwnedTerritories().empty()) {
+                delete Player::players[i];
+                Player::players.erase(Player::players.begin() + i);
+                i--;
+                continue;
+            }
+            reinforcementPhase(Player::players[i]);
+        }
+
+        // Issue Orders Phase
+        setCurrentState(GameState::Issue_Orders);
+        for (Player* player : Player::players) {
+            // Let the strategy determine and issue orders
+            do {
+                player->getStrategy()->issueOrder(mainDeck);
+            } while ((player->getStrategy()->isIssuingOrders()));
+        }
+
+        // Execute Orders Phase
+        setCurrentState(GameState::Execute_Orders);
+        executeOrdersPhase();
+
+        currentTurn++;
+    }
+
+    // Determine winner
+    if (Player::players.size() == 1) {
+        std::cout << "Player " << Player::players[0]->getPlayerName() << " wins!\n";
+        setCurrentState(GameState::Win);
+    } else {
+        std::cout << "Game ended in a draw after " << maxTurns << " turns.\n";
+    }
 }
 

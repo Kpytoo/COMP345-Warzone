@@ -9,54 +9,77 @@ class Player;
 class PlayerStrategy
 {
 public:
-    virtual std::vector<Territory *> toDefend(Player *player) = 0;
-    virtual std::vector<Territory *> toAttack(Player *player) = 0;
-    virtual void issueOrder(Player *player, const std::string &orderType, Deck *deck) = 0;
+    virtual std::vector<Territory *> toDefend() = 0;
+    virtual std::vector<Territory *> toAttack() = 0;
+    virtual void issueOrder(Deck *deck) = 0;
     virtual ~PlayerStrategy() = default;
+    explicit PlayerStrategy(Player* p) : player(p) {}
+
+    bool isIssuingOrders() const;
+    void setIssuingOrders(bool isIssuingOrders);
+
+protected:
+    Player* player;  // The player using this strategy
+    bool issuingOrders = false;
+
+    // Flags for strategy order issuing
+    bool deploying = true;
+    bool advancing = true;
+    bool airlifting = true;
+    bool blockading = true;
+    bool bombing = true;
 };
 
 class HumanPlayerStrategy : public PlayerStrategy
 {
 public:
-    std::vector<Territory *> toDefend(Player *player) override;
-    std::vector<Territory *> toAttack(Player *player) override;
+    explicit HumanPlayerStrategy(Player* p) : PlayerStrategy(p) {}
 
-    void issueOrder(Player *player, Deck *deck);
+    std::vector<Territory *> toDefend() override;
+    std::vector<Territory *> toAttack() override;
 
-    void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
+    void issueOrder(Deck *deck) override;
 };
 
 class AggressivePlayerStrategy : public PlayerStrategy
 {
 public:
-    std::vector<Territory *> toDefend(Player *player) override;
-    std::vector<Territory *> toAttack(Player *player) override;
-    void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
+    explicit AggressivePlayerStrategy(Player* p) : PlayerStrategy(p) {}
+
+    std::vector<Territory *> toDefend() override;
+    std::vector<Territory *> toAttack() override;
+    void issueOrder(Deck *deck) override;
 };
 
 class BenevolentPlayerStrategy : public PlayerStrategy
 {
 public:
-    std::vector<Territory *> toDefend(Player *player) override;
-    std::vector<Territory *> toAttack(Player *player) override;
-    void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
+    explicit BenevolentPlayerStrategy(Player* p) : PlayerStrategy(p) {}
+
+    std::vector<Territory *> toDefend() override;
+    std::vector<Territory *> toAttack() override;
+    void issueOrder(Deck *deck) override;
 };
 
 class NeutralPlayerStrategy : public PlayerStrategy
 {
 public:
-    std::vector<Territory *> toDefend(Player *player) override;
-    std::vector<Territory *> toAttack(Player *player) override;
-    void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
+    explicit NeutralPlayerStrategy(Player* p) : PlayerStrategy(p) {}
+
+    std::vector<Territory *> toDefend() override;
+    std::vector<Territory *> toAttack() override;
+    void issueOrder(Deck *deck) override;
 };
 
 class CheaterPlayerStrategy : public PlayerStrategy
 {
 
 public:
-    std::vector<Territory *> toDefend(Player *player) override;
-    std::vector<Territory *> toAttack(Player *player) override;
-    void issueOrder(Player *player, const std::string &orderType, Deck *deck) override;
+    explicit CheaterPlayerStrategy(Player* p) : PlayerStrategy(p) {}
+
+    std::vector<Territory *> toDefend() override;
+    std::vector<Territory *> toAttack() override;
+    void issueOrder(Deck *deck) override;
 };
 
 #endif

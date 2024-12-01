@@ -73,9 +73,9 @@ void testPlayerStrategies()
     auto *cheaterPlayer = new Player("CheaterPlayer", {territory5});
 
     // Assign strategies
-    humanPlayer->setStrategy(new HumanPlayerStrategy());
-    benevolentPlayer->setStrategy(new BenevolentPlayerStrategy());
-    cheaterPlayer->setStrategy(new CheaterPlayerStrategy());
+    humanPlayer->setStrategy(new HumanPlayerStrategy(humanPlayer));
+    benevolentPlayer->setStrategy(new BenevolentPlayerStrategy(benevolentPlayer));
+    cheaterPlayer->setStrategy(new CheaterPlayerStrategy(cheaterPlayer));
     Player::players.push_back(humanPlayer);
     Player::players.push_back(benevolentPlayer);
     Player::players.push_back(cheaterPlayer);
@@ -105,8 +105,8 @@ void testPlayerStrategies()
 
     // DEPLOY PHASE
     std::cout << "\n========== DEPLOY PHASE ==========\n";
-    humanPlayer->issueOrder("deploy", nullptr);      // Human player makes decisions interactively
-    benevolentPlayer->issueOrder("deploy", nullptr); // Benevolent player acts automatically
+//    humanPlayer->issueOrder("deploy", nullptr);      // Human player makes decisions interactively
+//    benevolentPlayer->issueOrder("deploy", nullptr); // Benevolent player acts automatically
 
     // Execute deploy orders
     executeOrders(humanPlayer);
@@ -118,8 +118,8 @@ void testPlayerStrategies()
 
     // ADVANCE PHASE
     std::cout << "\n========== ADVANCE PHASE ==========\n";
-    humanPlayer->issueOrder("advance", nullptr);      // Human player makes decisions interactively
-    benevolentPlayer->issueOrder("advance", nullptr); // Benevolent player acts automatically
+//    humanPlayer->issueOrder("advance", nullptr);      // Human player makes decisions interactively
+//    benevolentPlayer->issueOrder("advance", nullptr); // Benevolent player acts automatically
 
     // Execute advance orders
     executeOrders(humanPlayer);
@@ -140,7 +140,7 @@ void testPlayerStrategies()
     {
         std::cout << "Card type: " << card->getCardType() << "\n";
     }
-    benevolentPlayer->issueOrder("airlift", deck);
+//    benevolentPlayer->issueOrder("airlift", deck);
     executeOrders(benevolentPlayer);
 
     // CHANGE STRATEGY DYNAMICALLY

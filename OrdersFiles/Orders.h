@@ -260,6 +260,8 @@ public:
      */
     BombOrder(std::string tBombName);
 
+    BombOrder(Player *player, const std::string &territoryBombName);
+
     /**
      * @brief Validates the BombOrder.
      * Checks whether bombing is valid.
@@ -283,7 +285,7 @@ public:
     // The name of the territory to block.
     std::string territoryBlockadeName;
     Player *player;
-    Player *neutralPlayer;
+    Player *neutralPlayer = nullptr;
 
     /**
      * @brief Constructor for BlockadeOrder.

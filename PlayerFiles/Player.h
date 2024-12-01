@@ -56,13 +56,12 @@ public:
     std::vector<Territory *> toDefend(); // Returns territories the player should defend
     std::vector<Territory *> toAttack(); // Returns territories the player may attack
     Player *FindTerritoryOwner(const std::string &territoryName);
-    void issueOrder(std::string orderType, Deck *deck); // Issues an order for the player
+    void issueOrder(Deck *deck); // Issues an order for the player
 
     Deck *deck = nullptr; // Pointer to the deck for player to draw from
 
     static std::vector<Player *> players; // Pointer to player that would be stored in GameEngine, used for finding owners of enemy territories.
 
-    std::vector<Player *> *getPlayers();
     int reinforcement_units = 0;
 };
 

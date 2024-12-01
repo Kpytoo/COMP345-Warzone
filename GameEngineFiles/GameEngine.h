@@ -143,6 +143,8 @@ public:
      * @param maxTurns The maximum number of turns allowed for each game.
      */
     void startTournament(const std::vector<std::string>& maps, const std::vector<std::string>& strategies, int numGames, int maxTurns);
+
+    void simulateGame(const std::vector<std::string>& strategies, int maxTurns);
 };
 
 #endif

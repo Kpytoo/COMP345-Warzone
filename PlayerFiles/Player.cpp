@@ -148,7 +148,7 @@ PlayerStrategy *Player::getStrategy() const
  */
 std::vector<Territory *> Player::toDefend()
 {
-    return strategy->toDefend(this);
+    return strategy->toDefend();
 }
 
 /**
@@ -163,17 +163,12 @@ std::vector<Territory *> Player::toDefend()
 
 std::vector<Territory *> Player::toAttack()
 {
-    return strategy->toAttack(this);
+    return strategy->toAttack();
 }
 
 Player *Player::FindTerritoryOwner(const std::string &territoryName)
 {
     std::cout << "Finding owner for territory: " << territoryName << std::endl;
-
-    for (Player *player : Player::players)
-    {
-        std::cout << player->playerName;
-    }
 
     for (Player *player : Player::players) // Access the static Player::players vector
     {
@@ -208,7 +203,8 @@ Player *Player::FindTerritoryOwner(const std::string &territoryName)
  * @param orderType The type of the order to be issued. Possible values include "deploy", "advance", "airlift", "bomb", "blockade", and "negotiate".
  */
 
-void Player::issueOrder(std::string orderType, Deck *deck)
+void Player::issueOrder(Deck *deck)
 {
-    strategy->issueOrder(this, orderType, deck);
+    strategy->issueOrder(deck);
 }
+

@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
             {
                 std::cout << "Running test: testTournament...\n";
                 testTournament(argc - 1, argv + 1); // Provide args after first argument to driver
+                break;                                    // Exit parent loop
             }
             else
             {

@@ -378,6 +378,13 @@ void AdvanceOrder::execute()
                     break; // Exit loop when one side loses
             }
 
+            // Enemy player will become aggressive player if neutral
+            if (dynamic_cast<NeutralPlayerStrategy*>(enemyPlayer->getStrategy()) != nullptr) {
+                delete enemyPlayer->getStrategy();
+
+                enemyPlayer->setStrategy(new AggressivePlayerStrategy(enemyPlayer));
+            }
+
             if (defendingUnits == 0)
             {
                 targetT->numberOfArmies = attackingUnits;
@@ -534,6 +541,14 @@ void BombOrder::execute()
     {
         std::cout << "Bomb order is invalid and will not be executed.\n";
     }
+}
+
+BombOrder::BombOrder(Player *player, const std::string &territoryBombName) : player(player),
+                                                                             territoryBombName(territoryBombName) {
+    // Sets the order type to "bomb"
+    orderType = "bomb";
+    // Initially invalid until validated
+    validOrder = false;
 }
 
 // ---------------------- BlockadeOrder Class Implementation ----------------------
