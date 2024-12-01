@@ -205,15 +205,18 @@ void BenevolentPlayerStrategy::issueOrder(Deck *deck)
 
     // Deploy armies to the weakest territories
     if (deploying) {
+        int armies_available = player->getNumArmies();
+
         for (Territory *weakestTerritory : toDefend())
         {
-            if (player->getNumArmies() > 0)
+            if (armies_available > 0)
             {
                 // Deploy as many armies as possible to the weakest territory
                 int armiesToDeploy = std::min(player->getNumArmies(), weakestTerritory->numberOfArmies + 1);
 
                 // Create a deploy order and add it to the player's orders list
                 player->getOrdersList()->add(new DeployOrder(player, weakestTerritory->name, armiesToDeploy));
+                armies_available -= armies_available;
             }
         }
         deploying = false;
@@ -496,7 +499,7 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
         for (Territory *enemyTerritory : player->toAttack())
         {   
             int maxArmy = 0;
-            std::string attackingTerritory; 
+            std::string attackingTerritory;
             // Find the owned territory with the largest army
             for(Territory *ownedTerritory : player->getOwnedTerritories())
             {
@@ -506,8 +509,12 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
                     attackingTerritory = ownedTerritory->name;
                 }
             }
-            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
-            player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+
+            if (attackingTerritory.empty()) {
+                Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
+                player->getOrdersList()->ordersVector.push_back(
+                        new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+            }
         }
 
         advancing = false;
