@@ -4,6 +4,8 @@
 #include <ctime>
 #include <cstdlib>
 #include "CommandProcessing.h"
+#include <iostream>
+#include <fstream>
 
 /**
  * Default constructor for the GameEngine class.
@@ -851,3 +853,93 @@ GameState GameEngine::getCurrentGameState() const
 {
     return *currentGameState;
 }
+
+/**
+ * Starts the tournament by simulating multiple games with different maps and strategies.
+ * 
+ * This method logs the tournament details and the results of the simulated games, which include the maps
+ * and strategies used for the games, the number of games per map, and the maximum number of turns allowed.
+ * 
+ * @param maps A vector of strings representing the names of maps to be used in the tournament.
+ * @param strategies A vector of strings representing the strategies to be used by players in the tournament.
+ * @param numGames The number of games to be played per map.
+ * @param maxTurns The maximum number of turns allowed for each game.
+ */
+void GameEngine::startTournament(const std::vector<std::string>& maps, const std::vector<std::string>& strategies, int numGames, int maxTurns)
+{
+    // Open a log file to record the tournament details.
+    std::ofstream logFile("tournament_log.txt");
+    // Write the initial "Tournament mode" header to the log file.
+    logFile << "--- Tournament mode ---\n";
+
+    // Log the maps that will be used in the tournament.
+    logFile << "M: ";
+    for (size_t i = 0; i < maps.size(); ++i)
+    {
+        logFile << maps[i];
+        if (i != maps.size() - 1)
+        {
+            logFile << ", ";
+        }
+    }
+
+    // Log the strategies that will be used in the tournament.
+    logFile << "\nP: ";
+    for (size_t i = 0; i < strategies.size(); ++i)
+    {
+        logFile << strategies[i];
+        if (i != strategies.size() - 1)
+        {
+            logFile << ", ";
+        }
+    }
+
+    // Log the number of games and the maximum number of turns allowed.
+    logFile << "\nG: " << numGames << "\nD: " << maxTurns << "\n";
+
+    // Initialize a result matrix to track the outcome of each game for each map.
+    // Initially, set all results to "Draw".
+    std::vector<std::vector<std::string>> results(maps.size(), std::vector<std::string>(numGames, "Draw"));
+
+    // Simulate the games for each map.
+    for (size_t i = 0; i < maps.size(); ++i)
+    {
+        for (int j = 0; j < numGames; ++j)
+        {
+            /* ATTENTION HERE: NEED REAL PLAYER STRATEGIES AND NEED TO SIMULATE THE GAME*/
+            /* We need to simulate the game, maybe like a simulateGame method or anything appropriate
+             * which will turn out to be results[i][j] = simulateGame() or something instead
+             */
+            results[i][j] = strategies[j % strategies.size()]; // PLACE HOLDER FOR RESULTS
+        }
+    }
+
+    // Log the results of the simulated games.
+    logFile << "Results:\n";
+    for (int game = 0; game < numGames; ++game)
+    {
+        // Log the result for each game.
+        logFile << "Game " << (game + 1) << ": ";
+
+        // For each map, log the result of the game.
+        int numMap = 1;
+        for (size_t i = 0; i < maps.size(); ++i)
+        {
+            // Result for this map and game
+            logFile << results[i][game];
+            
+            if (i != maps.size() - 1)
+            {
+                logFile << ", ";
+            }
+        }
+        logFile << "\n";
+    }
+
+    // Add a closing line to signify the end of the tournament log.
+    logFile << "--- End of Tournament ---\n\n";
+
+    // Close the log file after writing all details.
+    logFile.close();
+}
+

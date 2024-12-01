@@ -1,7 +1,11 @@
 #include "CommandProcessing.h"
+#include "GameEngine.h"
 #include <algorithm>
 #include <cstring>
 #include <sstream>
+#include <iostream>
+#include <vector>
+#include <string>
 
 /**
  * Once a command gets executed, we can save its effect by using
@@ -245,6 +249,84 @@ std::string CommandProcessor::stringToLog() const {
     std::stringstream SS;
     SS << "Command: " << *commandCollection.back();
     return SS.str();
+}
+
+/**
+ * Processes the tournament command and parses the arguments for tournament configuration.
+ * 
+ * This function extracts relevant tournament parameters (maps, strategies, number of games, and maximum turns)
+ * from the command-line arguments and validates them. If the parameters are valid, it calls the GameEngine to start the tournament with the parsed settings.
+ * 
+ * @param args A vector of strings representing the command-line arguments passed to the program.
+ * @param gameEngine A reference to the GameEngine instance that will manage and start the tournament.
+ * 
+ * @return Returns true if the tournament parameters are valid and the tournament was successfully started, otherwise false.
+ */
+bool CommandProcessor::processTournamentCommand(const std::vector<std::string>& args, GameEngine &gameEngine)
+{
+    // Vectors to hold the parsed maps
+    std::vector<std::string> maps;
+    // Vectors to hold the parsed strategies
+    std::vector<std::string> strategies;
+    // Number of games
+    int numGames = 0;
+    // Max turns for each game
+    int maxTurns = 0;
+
+    // Loop through the arguments to extract values for maps, strategies, numGames, and maxTurns
+    for (size_t i = 1; i < args.size(); ++i)
+    {
+        // If we encounter the argument -M, it indicates maps are being specified
+        if (args[i] == "-M")
+        {
+            // Read the maps from the next argument and split them by commas
+            std::stringstream ss(args[++i]);
+            std::string map;
+            // Split the maps by commas and add them to the 'maps' vector
+            while (std::getline(ss, map, ','))
+            {
+                maps.push_back(map);
+            }
+        }
+        // If we encounter the argument -P, it indicates strategies are being specified
+        else if (args[i] == "-P")
+        {
+            // Read the strategies from the next argument and split them by commas
+            std::stringstream ss(args[++i]);
+            std::string strategy;
+            // Split the strategies by commas and add them to the 'strategies' vector
+            while (std::getline(ss, strategy, ','))
+            {
+                strategies.push_back(strategy);
+            }
+        }
+        // If we encounter the argument -G, it indicates the number of games is being specified
+        else if (args[i] == "-G")
+        {
+            // Convert the number of games from string to integer
+            numGames = std::stoi(args[++i]);
+        }
+        // If we encounter the argument -D, it indicates the maximum number of turns per game is being specified
+        else if (args[i] == "-D")
+        {
+            // Convert the max turns from string to integer
+            maxTurns = std::stoi(args[++i]);
+        }
+    }
+
+    // Validate the parsed parameters to make sure they fall within acceptable ranges
+    if (maps.size() < 1 || maps.size() > 5 || strategies.size() < 2 || strategies.size() > 4 || numGames < 1 || numGames > 5 || maxTurns < 10 || maxTurns > 50) 
+    {
+        // If the validation fails, print an error message and return false
+        std::cout << "Invalid tournament parameters!\n";
+        return false;
+    }
+
+    // Call the GameEngine to start the tournament with the parsed and validated parameters
+    gameEngine.startTournament(maps, strategies, numGames, maxTurns);
+
+    // Return true indicating the tournament was successfully started and the results are written in the log file
+    return true;
 }
 
 // <<<< FileCommandProcessorAdapter Class Definitions >>>>
