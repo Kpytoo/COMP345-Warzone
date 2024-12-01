@@ -289,99 +289,99 @@ void BenevolentPlayerStrategy::issueOrder(Player *player, const std::string &typ
     }
 }
 
-std::vector<Territory *> CheaterPlayerStrategy::toDefend(Player *player)
-{
-    // Return all owned territories
-    return player->getOwnedTerritories();
-}
-
-std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player *player)
-{
-    // Use a set to store unique enemy territories
-    std::set<Territory *> enemyTerritories;
-
-    // Iterate through each owned territory
-    for (Territory *ownedTerritory : player->getOwnedTerritories())
-    {
-        // Check each adjacent territory
-        for (const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
-        {
-            Territory *enemyTerritory = adjacentTerritory.second;
-
-            // If the adjacent territory is not owned by the cheater, add it to the set
-            if (std::find(player->getOwnedTerritories().begin(), player->getOwnedTerritories().end(), enemyTerritory) == player->getOwnedTerritories().end())
-            {
-                enemyTerritories.insert(enemyTerritory);
-            }
-        }
-    }
-
-    // Convert set to vector for easier handling
-    std::vector<Territory *> attackableTerritories(enemyTerritories.begin(), enemyTerritories.end());
-
-    // Update the player's attackable territories
-    player->setToAttackTerritories(attackableTerritories);
-
-    return player->getToAttackTerritories();
-}
-
-void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
-{
-    if (orderType == "advance")
-    {
-        // Identify all attackable territories
-        std::vector<Territory *> attackableTerritories = toAttack(player);
-
-        for (Territory *enemyTerritory : attackableTerritories)
-        {
-
-            std::cout << enemyTerritory->name;
-        }
-
-        std::vector<std::pair<Player *, Territory *>> toConquer;
-
-        for (Territory *enemyTerritory : attackableTerritories)
-        {
-            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
-
-            if (!enemyPlayer)
-            {
-                std::cerr << "No owner found for territory: " << enemyTerritory->name << ". Skipping.\n";
-                continue;
-            }
-
-            if (enemyPlayer)
-            {
-                toConquer.emplace_back(enemyPlayer, enemyTerritory);
-            }
-        }
-
-        // Perform ownership updates after the loop
-        for (const auto &conquerPair : toConquer)
-        {
-            Player *enemyPlayer = conquerPair.first;
-            Territory *enemyTerritory = conquerPair.second;
-
-            std::cout << "CheaterPlayer conquers " << enemyTerritory->name << " from " << enemyPlayer->getPlayerName() << ".\n";
-
-            // Remove from enemy player
-            std::vector<Territory *> updatedEnemyTerritories = enemyPlayer->getOwnedTerritories();
-            updatedEnemyTerritories.erase(
-                std::remove(updatedEnemyTerritories.begin(), updatedEnemyTerritories.end(), enemyTerritory),
-                updatedEnemyTerritories.end());
-            enemyPlayer->setOwnedTerritories(updatedEnemyTerritories);
-
-            // Add to cheater player
-            std::vector<Territory *> updatedCheaterTerritories = player->getOwnedTerritories();
-            updatedCheaterTerritories.push_back(enemyTerritory);
-            player->setOwnedTerritories(updatedCheaterTerritories);
-        }
-    }
-    else
-    {
-        std::cout << "Invalid order type for Cheater Player.\n";
-    }
-}
+//std::vector<Territory *> CheaterPlayerStrategy::toDefend(Player *player)
+//{
+//    // Return all owned territories
+//    return player->getOwnedTerritories();
+//}
+//
+//std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player *player)
+//{
+//    // Use a set to store unique enemy territories
+//    std::set<Territory *> enemyTerritories;
+//
+//    // Iterate through each owned territory
+//    for (Territory *ownedTerritory : player->getOwnedTerritories())
+//    {
+//        // Check each adjacent territory
+//        for (const auto &adjacentTerritory : ownedTerritory->adjacentTerritories)
+//        {
+//            Territory *enemyTerritory = adjacentTerritory.second;
+//
+//            // If the adjacent territory is not owned by the cheater, add it to the set
+//            if (std::find(player->getOwnedTerritories().begin(), player->getOwnedTerritories().end(), enemyTerritory) == player->getOwnedTerritories().end())
+//            {
+//                enemyTerritories.insert(enemyTerritory);
+//            }
+//        }
+//    }
+//
+//    // Convert set to vector for easier handling
+//    std::vector<Territory *> attackableTerritories(enemyTerritories.begin(), enemyTerritories.end());
+//
+//    // Update the player's attackable territories
+//    player->setToAttackTerritories(attackableTerritories);
+//
+//    return player->getToAttackTerritories();
+//}
+//
+//void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
+//{
+//    if (orderType == "advance")
+//    {
+//        // Identify all attackable territories
+//        std::vector<Territory *> attackableTerritories = toAttack(player);
+//
+//        for (Territory *enemyTerritory : attackableTerritories)
+//        {
+//
+//            std::cout << enemyTerritory->name;
+//        }
+//
+//        std::vector<std::pair<Player *, Territory *>> toConquer;
+//
+//        for (Territory *enemyTerritory : attackableTerritories)
+//        {
+//            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
+//
+//            if (!enemyPlayer)
+//            {
+//                std::cerr << "No owner found for territory: " << enemyTerritory->name << ". Skipping.\n";
+//                continue;
+//            }
+//
+//            if (enemyPlayer)
+//            {
+//                toConquer.emplace_back(enemyPlayer, enemyTerritory);
+//            }
+//        }
+//
+//        // Perform ownership updates after the loop
+//        for (const auto &conquerPair : toConquer)
+//        {
+//            Player *enemyPlayer = conquerPair.first;
+//            Territory *enemyTerritory = conquerPair.second;
+//
+//            std::cout << "CheaterPlayer conquers " << enemyTerritory->name << " from " << enemyPlayer->getPlayerName() << ".\n";
+//
+//            // Remove from enemy player
+//            std::vector<Territory *> updatedEnemyTerritories = enemyPlayer->getOwnedTerritories();
+//            updatedEnemyTerritories.erase(
+//                std::remove(updatedEnemyTerritories.begin(), updatedEnemyTerritories.end(), enemyTerritory),
+//                updatedEnemyTerritories.end());
+//            enemyPlayer->setOwnedTerritories(updatedEnemyTerritories);
+//
+//            // Add to cheater player
+//            std::vector<Territory *> updatedCheaterTerritories = player->getOwnedTerritories();
+//            updatedCheaterTerritories.push_back(enemyTerritory);
+//            player->setOwnedTerritories(updatedCheaterTerritories);
+//        }
+//    }
+//    else
+//    {
+//        std::cout << "Invalid order type for Cheater Player.\n";
+//    }
+//}
 
 
 // ----- AggressivePlayerStrategy Implementation -----
@@ -466,7 +466,7 @@ void AggressivePlayerStrategy::issueOrder(Player *player, const std::string &ord
                     attackingTerritory = ownedTerritory->name;
                 }
             }
-            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+            Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
             player->getOrdersList()->ordersVector.push_back(new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
         } 
     }
@@ -496,7 +496,7 @@ std::vector<Territory *> NeutralPlayerStrategy::toAttack(Player* player)
     return {}; // Neutral players do not attack 
 }
 
-void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+void NeutralPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
     // Neutral players do not issue any orders
     std::cout << "Neutral Player do not issue any orders" << std::endl;
@@ -546,7 +546,7 @@ std::vector<Territory *> CheaterPlayerStrategy::toAttack(Player* player)
 
 
 
-void issueOrder(Player *player, const std::string &orderType, Deck *deck)
+void CheaterPlayerStrategy::issueOrder(Player *player, const std::string &orderType, Deck *deck)
 {
     // Cheater player attacks each adjacent enemy territory automatically
     std::cout << "Cheater Player: Conquers all adjacent enemy territory.\n";
@@ -568,7 +568,7 @@ void issueOrder(Player *player, const std::string &orderType, Deck *deck)
             {   
 
                 // Find the enemy territory owner
-                Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name, *player->getPlayers());
+                Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
                 // Get the list of owned territories of the enemy
                 std::vector<Territory *> replaceTerritories = enemyPlayer->getOwnedTerritories();
                 // Remove the territory being conquered from the enemy

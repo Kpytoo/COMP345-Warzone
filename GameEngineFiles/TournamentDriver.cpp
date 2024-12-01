@@ -1,3 +1,4 @@
+#include "TournamentDriver.h"
 #include "GameEngine.h"
 #include "CommandProcessing.h"
 #include <iostream>
@@ -50,22 +51,4 @@ void testTournament(int argc, char *argv[])
         // If the tournament setup failed, output an error message
         std::cerr << "Failed to start the tournament.\n";
     }
-}
-
-/**
- * The entry point of the program.
- * 
- * This function calls the `testTournament` function to process the command-line arguments 
- * and start the tournament. It returns 0 to indicate the program completed successfully.
- * 
- * @param argc The number of command-line arguments.
- * @param argv An array of command-line arguments.
- * 
- * @return Returns 0 indicating successful execution of the program.
- */
-int main(int argc, char *argv[])
-{
-    // Call the testTournament function to handle tournament processing
-    testTournament(argc, argv);
-    return 0;
 }

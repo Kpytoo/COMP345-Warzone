@@ -8,6 +8,7 @@
 #include "LogFiles/LoggingObserverDriver.h"
 #include "GameEngineFiles/CommandProcessingDriver.h"
 #include "PlayerFiles/PlayerStrategiesDriver.h"
+#include "GameEngineFiles/TournamentDriver.h"
 
 /**
  * @brief Main function that runs specified test cases based on command-line arguments.
@@ -85,10 +86,17 @@ int main(int argc, char *argv[])
                 std::cout << "Running test: testLoggingObserver...\n";
                 testLoggingObserver();
             }
+
+            // Assignment 3 drivers
             else if (arg == "testPlayerStrategies")
             {
                 std::cout << "Running test: testPlayerStrategies...\n";
                 testPlayerStrategies();
+            }
+            else if (arg == "testTournament")
+            {
+                std::cout << "Running test: testTournament...\n";
+                testTournament(argc - 1, argv + 1); // Provide args after first argument to driver
             }
             else
             {
