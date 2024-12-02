@@ -984,14 +984,17 @@ void GameEngine::simulateGame(const std::vector<std::string>& strategies, int ma
         // Set player's strategy based on input
         if (strategy == "Aggressive") {
             player->setStrategy(new AggressivePlayerStrategy(player));
+            Player::players.push_back(player);
         } else if (strategy == "Benevolent") {
             player->setStrategy(new BenevolentPlayerStrategy(player));
+            Player::players.push_back(player);
         } else if (strategy == "Neutral") {
             player->setStrategy(new NeutralPlayerStrategy(player));
+            Player::players.push_back(player);
         } else if (strategy == "Cheater") {
             player->setStrategy(new CheaterPlayerStrategy(player));
+            Player::players.insert(Player::players.begin(), player); // insert at start, so that it takes territories before the other players
         }
-        Player::players.push_back(player);
     }
 
     // Distribute continents randomly
@@ -1040,6 +1043,8 @@ void GameEngine::simulateGame(const std::vector<std::string>& strategies, int ma
 
         // Reinforcement Phase
         setCurrentState(GameState::Assign_Reinforcement);
+
+        // Check if player is eliminated
         for (int i = 0; i < Player::players.size(); i++) {
             if (Player::players[i]->getOwnedTerritories().empty()) {
                 delete Player::players[i];
@@ -1055,7 +1060,7 @@ void GameEngine::simulateGame(const std::vector<std::string>& strategies, int ma
         for (Player* player : Player::players) {
             // Let the strategy determine and issue orders
             do {
-                player->getStrategy()->issueOrder(mainDeck);
+                player->issueOrder(mainDeck);
             } while ((player->getStrategy()->isIssuingOrders()));
         }
 

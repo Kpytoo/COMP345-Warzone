@@ -201,6 +201,10 @@ Player *Player::FindTerritoryOwner(const std::string &territoryName)
 
 void Player::issueOrder(Deck *deck)
 {
+    if (OwnedTerritories.size() == 0) {
+        return; // Player should be out, return
+    }
+
     strategy->issueOrder(deck);
 }
 
