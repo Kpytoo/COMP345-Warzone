@@ -1,171 +1,175 @@
 #include "PlayerFiles/PlayerStrategiesDriver.h"
 #include "PlayerFiles/Player.h"
 #include "CardsFiles/Cards.h"
-#include "OrdersFiles/Orders.h"
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
-#include <sstream>
 
-void printOwnedTerritories(const std::vector<Player *> &players)
-{
-    for (Player *player : players)
-    {
-        std::cout << "\n[ " << player->getPlayerName() << " ]\n";
-        for (Territory *territory : player->getOwnedTerritories())
-        {
-            std::cout << "  - " << territory->name << " (Armies: " << territory->numberOfArmies << ")\n";
-        }
-    }
-    std::cout << "----------------------------------------\n";
-}
+void testPlayerStrategies() {
+    std::cout << "\n==================== Testing Player Strategies ====================\n";
 
-void executeOrders(Player *player)
-{
-    std::cout << "\n--- Executing Orders for " << player->getPlayerName() << " ---\n";
-    OrdersList *ordersList = player->getOrdersList();
-    for (Order *order : ordersList->ordersVector)
-    {
-        order->execute(); // Call the execute method of each order
-    }
-    ordersList->ordersVector.clear(); // Optionally clear executed orders if needed
-}
+    // Load a map for testing
+    Map* gameMap = new Map();
+    MapLoader::LoadMap("../SomeMapsFromOnline/Montreal/Grand Montreal.map", gameMap);
 
-void testPlayerStrategies()
-{
-    // Setup players and territories
-    auto *territory1 = new Territory();
-    auto *territory2 = new Territory();
-    auto *territory3 = new Territory();
-    auto *territory4 = new Territory();
-    auto *territory5 = new Territory();
+    // Initialize deck
+    Deck* deck = new Deck();
 
-    territory1->name = "Territory1";
-    territory1->numberOfArmies = 10;
+    // 1. Demonstrate different players with different strategies
+    std::cout << "\n1. Testing different player strategies:\n";
 
-    territory2->name = "Territory2";
-    territory2->numberOfArmies = 5;
-
-    territory3->name = "Territory3";
-    territory3->numberOfArmies = 3;
-
-    territory4->name = "Territory4";
-    territory4->numberOfArmies = 8;
-
-    territory5->name = "Territory5";
-    territory5->numberOfArmies = 12;
-
-    territory1->adjacentTerritories["Territory2"] = territory2;
-    territory1->adjacentTerritories["Territory5"] = territory5;
-    territory2->adjacentTerritories["Territory1"] = territory1;
-    territory2->adjacentTerritories["Territory3"] = territory3;
-    territory3->adjacentTerritories["Territory2"] = territory2;
-    territory3->adjacentTerritories["Territory5"] = territory5;
-    territory3->adjacentTerritories["Territory4"] = territory4;
-    territory4->adjacentTerritories["Territory3"] = territory3;
-    territory5->adjacentTerritories["Territory3"] = territory3;
-    territory5->adjacentTerritories["Territory1"] = territory1;
-
-    auto *humanPlayer = new Player("HumanPlayer", {territory1, territory2});
-    auto *benevolentPlayer = new Player("BenevolentPlayer", {territory3, territory4});
-    auto *cheaterPlayer = new Player("CheaterPlayer", {territory5});
-
-    // Assign strategies
+    // Create players with different strategies
+    Player* humanPlayer = new Player("Human Player");
     humanPlayer->setStrategy(new HumanPlayerStrategy(humanPlayer));
-    benevolentPlayer->setStrategy(new BenevolentPlayerStrategy(benevolentPlayer));
-    cheaterPlayer->setStrategy(new CheaterPlayerStrategy(cheaterPlayer));
+    humanPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Ahuntsic"));
+    humanPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Cote St-Luc"));
+    humanPlayer->getOwnedTerritories().push_back(gameMap->territories.at("NDG CDN"));
+    humanPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Outremont"));
     Player::players.push_back(humanPlayer);
+
+    Player* aggressivePlayer = new Player("Aggressive Player");
+    aggressivePlayer->setStrategy(new AggressivePlayerStrategy(aggressivePlayer));
+    aggressivePlayer->getOwnedTerritories().push_back(gameMap->territories.at("Lachine"));
+    aggressivePlayer->getOwnedTerritories().push_back(gameMap->territories.at("Mont Royal"));
+    aggressivePlayer->getOwnedTerritories().push_back(gameMap->territories.at("La Salle"));
+    Player::players.push_back(aggressivePlayer);
+
+    Player* benevolentPlayer = new Player("Benevolent Player");
+    benevolentPlayer->setStrategy(new BenevolentPlayerStrategy(benevolentPlayer));
+    benevolentPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Brossard"));
+    benevolentPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Verdun"));
+    benevolentPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Westmount"));
     Player::players.push_back(benevolentPlayer);
+
+    Player* neutralPlayer = new Player("Neutral Player");
+    neutralPlayer->setStrategy(new NeutralPlayerStrategy(neutralPlayer));
+    neutralPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Boucherville"));
+    neutralPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Longueuil"));
+    neutralPlayer->getOwnedTerritories().push_back(gameMap->territories.at("Greenfield Park"));
+    Player::players.push_back(neutralPlayer);
+
+    Player* cheaterPlayer = new Player("Cheater Player");
+    cheaterPlayer->setStrategy(new CheaterPlayerStrategy(cheaterPlayer));
+    cheaterPlayer->getOwnedTerritories().push_back(gameMap->territories.at("St-Hubert"));
+    cheaterPlayer->getOwnedTerritories().push_back(gameMap->territories.at("St-Philippe"));
+    cheaterPlayer->getOwnedTerritories().push_back(gameMap->territories.at("St-Mathieu"));
     Player::players.push_back(cheaterPlayer);
-    // Assign sufficient reinforcement units
-    humanPlayer->setNumArmies(100);
-    benevolentPlayer->setNumArmies(100);
-    Deck *deck = new Deck();
 
-    for (int i = 0; i < 10; ++i)
-    {
-        if (!deck->deckVector.empty()) // Ensure the deck has cards remaining
-        {
-            humanPlayer->getPlayerHand()->handVector.push_back(deck->deckVector.back());
-            deck->deckVector.pop_back();
-        }
+    // Set initial armies for testing
+    humanPlayer->setNumArmies(5);
+    humanPlayer->reinforcement_units = 5;
+    aggressivePlayer->setNumArmies(5);
+    aggressivePlayer->reinforcement_units = 5;
+    benevolentPlayer->setNumArmies(5);
+    benevolentPlayer->reinforcement_units = 5;
+    neutralPlayer->setNumArmies(5);
+    neutralPlayer->reinforcement_units = 5;
+    cheaterPlayer->setNumArmies(5);
+    cheaterPlayer->reinforcement_units = 5;
 
-        if (!deck->deckVector.empty()) // Ensure the deck has cards remaining
-        {
-            benevolentPlayer->getPlayerHand()->handVector.push_back(deck->deckVector.back());
-            deck->deckVector.pop_back();
-        }
+    // Test toDefend() and toAttack() for each player
+    std::cout << "\nTesting toDefend() and toAttack() for each player:\n";
+
+    // Human Player
+    std::cout << "\nHuman Player territories to defend: ";
+    for (Territory* t : humanPlayer->toDefend()) {
+        std::cout << t->name << " ";
+    }
+    std::cout << "\nHuman Player territories to attack: ";
+    for (Territory* t : humanPlayer->toAttack()) {
+        std::cout << t->name << " ";
     }
 
-    // Display game setup
-    std::cout << "\n========== GAME SETUP ==========\n";
-    printOwnedTerritories({humanPlayer, benevolentPlayer});
-
-    // DEPLOY PHASE
-    std::cout << "\n========== DEPLOY PHASE ==========\n";
-//    humanPlayer->issueOrder("deploy", nullptr);      // Human player makes decisions interactively
-//    benevolentPlayer->issueOrder("deploy", nullptr); // Benevolent player acts automatically
-
-    // Execute deploy orders
-    executeOrders(humanPlayer);
-    executeOrders(benevolentPlayer);
-
-    // Print owned territories after deploy phase
-    std::cout << "\n--- Owned Territories After Deploy Phase ---\n";
-    printOwnedTerritories({humanPlayer, benevolentPlayer});
-
-    // ADVANCE PHASE
-    std::cout << "\n========== ADVANCE PHASE ==========\n";
-//    humanPlayer->issueOrder("advance", nullptr);      // Human player makes decisions interactively
-//    benevolentPlayer->issueOrder("advance", nullptr); // Benevolent player acts automatically
-
-    // Execute advance orders
-    executeOrders(humanPlayer);
-    executeOrders(benevolentPlayer);
-
-    // std::cout << "\n========== CHEATER PLAYER ADVANCE (Not Executed) ==========\n";
-    // cheaterPlayer->issueOrder("advance", nullptr); // Cheater player issues an advance order
-    // std::cout << "CheaterPlayer has issued an advance order but it will not be executed.\n";
-
-    std::cout << "\n========== FINAL STATE ==========\n";
-    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
-
-    // Print owned territories after advance phase
-    std::cout << "\n--- Owned Territories After Advance Phase ---\n";
-    printOwnedTerritories({humanPlayer, benevolentPlayer, cheaterPlayer});
-
-    for (Card *card : benevolentPlayer->getPlayerHand()->handVector)
-    {
-        std::cout << "Card type: " << card->getCardType() << "\n";
+    // Aggressive Player
+    std::cout << "\n\nAggressive Player territories to defend: ";
+    for (Territory* t : aggressivePlayer->toDefend()) {
+        std::cout << t->name << " ";
     }
-//    benevolentPlayer->issueOrder("airlift", deck);
-    executeOrders(benevolentPlayer);
+    std::cout << "\nAggressive Player territories to attack: ";
+    for (Territory* t : aggressivePlayer->toAttack()) {
+        std::cout << t->name << " ";
+    }
 
-    // CHANGE STRATEGY DYNAMICALLY
-    // std::cout << "\n========== DYNAMIC STRATEGY CHANGE ==========\n";
-    // std::cout << "Changing HumanPlayer's strategy to BenevolentPlayerStrategy...\n";
-    // humanPlayer->setStrategy(new BenevolentPlayerStrategy());
+    // Benevolent Player
+    std::cout << "\n\nBenevolent Player territories to defend: ";
+    for (Territory* t : benevolentPlayer->toDefend()) {
+        std::cout << t->name << " ";
+    }
+    std::cout << "\nBenevolent Player territories to attack: ";
+    for (Territory* t : benevolentPlayer->toAttack()) {
+        std::cout << t->name << " ";
+    }
 
-    // New deploy phase with updated strategy
-    // std::cout << "\n========== NEW DEPLOY PHASE WITH UPDATED STRATEGY ==========\n";
-    // humanPlayer->issueOrder("deploy", nullptr); // Now acts as a Benevolent player
-    // benevolentPlayer->issueOrder("deploy", nullptr);
+    // Neutral Player
+    std::cout << "\n\nNeutral Player territories to defend: ";
+    for (Territory* t : neutralPlayer->toDefend()) {
+        std::cout << t->name << " ";
+    }
+    std::cout << "\nNeutral Player territories to attack: ";
+    for (Territory* t : neutralPlayer->toAttack()) {
+        std::cout << t->name << " ";
+    }
 
-    // Execute orders again
-    // executeOrders(humanPlayer);
-    // executeOrders(benevolentPlayer);
+    // 2. Demonstrate dynamic strategy change
+    std::cout << "\n\n2. Testing dynamic strategy change:\n";
+    std::cout << "Converting Neutral Player to Aggressive Player (simulating being attacked)\n";
 
-    // Print owned territories after new deploy phase
-    // std::cout << "\n--- Owned Territories After New Deploy Phase ---\n";
-    // printOwnedTerritories({humanPlayer, benevolentPlayer});
+    // Change Neutral to Aggressive
+    delete neutralPlayer->getStrategy();
+    neutralPlayer->setStrategy(new AggressivePlayerStrategy(neutralPlayer));
+
+    std::cout << "After conversion - territories to attack: ";
+    for (Territory* t : neutralPlayer->toAttack()) {
+        std::cout << t->name << " ";
+    }
+
+    // 3. Demonstrate order issuing
+    std::cout << "\n\n3. Testing order issuing:\n";
+
+    // Test automatic order issuing for computer players
+    std::cout << "\nTesting Aggressive Player order issuing:\n";
+    aggressivePlayer->issueOrder(deck);
+    aggressivePlayer->getOrdersList()->ordersVector.at(0)->execute();
+    aggressivePlayer->issueOrder(deck);
+
+    std::cout << "\nTesting Benevolent Player order issuing:\n";
+    benevolentPlayer->issueOrder(deck);
+    benevolentPlayer->getOrdersList()->ordersVector.at(0)->execute();
+    benevolentPlayer->issueOrder(deck);
+
+    std::cout << "\nTesting Neutral Player order issuing:\n";
+    neutralPlayer->issueOrder(deck);
+    neutralPlayer->getOrdersList()->ordersVector.at(0)->execute();
+    neutralPlayer->issueOrder(deck);
+
+    std::cout << "\nTesting Cheater Player order issuing:\n";
+    cheaterPlayer->issueOrder(deck);
+    cheaterPlayer->issueOrder(deck);
+
+    std::cout << "\nTesting Human Player order issuing (requires user input):\n";
+    humanPlayer->issueOrder(deck);
+    humanPlayer->getOrdersList()->ordersVector.at(0)->execute();
+    humanPlayer->issueOrder(deck);
+
+    // 4. Display all player info with hand info
+    std::cout << "\n\4. Display all player info including card hand list:\n";
+    std::cout << "\nAggressive Player:\n"<<*aggressivePlayer<<std::endl;
+
+    std::cout << "\nBenevolent Player:\n"<<*benevolentPlayer<<std::endl;
+
+    std::cout << "\nNeutral Player:\n"<<*neutralPlayer<<std::endl;
+
+    std::cout << "\nCheater Player:\n"<<*cheaterPlayer<<std::endl;
+
+    std::cout << "\nHuman Player:\n"<<*humanPlayer<<std::endl;
 
     // Cleanup
+    delete gameMap;
+    delete deck;
     delete humanPlayer;
+    delete aggressivePlayer;
     delete benevolentPlayer;
-    delete territory1;
-    delete territory2;
-    delete territory3;
-    delete territory4;
+    delete neutralPlayer;
+    delete cheaterPlayer;
+
+    std::cout << "\n================== Player Strategies Testing Complete ==================\n";
 }

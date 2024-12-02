@@ -103,7 +103,7 @@ std::ostream &operator<<(std::ostream &os, const Player &obj)
 
     // Outputs player's hand and orders list (assuming operator<< is defined for Hand and OrdersList)
     os << "Player Hand: " << *(obj.playerHand) << std::endl;
-    os << "Orders List: " << *(obj.ordersList) << std::endl;
+    os << *(obj.ordersList) << std::endl;
 
     return os;
 }
@@ -168,8 +168,6 @@ std::vector<Territory *> Player::toAttack()
 
 Player *Player::FindTerritoryOwner(const std::string &territoryName)
 {
-    std::cout << "Finding owner for territory: " << territoryName << std::endl;
-
     for (Player *player : Player::players) // Access the static Player::players vector
     {
         if (!player)
@@ -183,13 +181,11 @@ Player *Player::FindTerritoryOwner(const std::string &territoryName)
         {
             if (territory && territory->name == territoryName)
             {
-                std::cout << "Owner found: " << player->getPlayerName() << " for territory " << territoryName << std::endl;
                 return player;
             }
         }
     }
 
-    std::cerr << "No owner found for territory: " << territoryName << std::endl;
     return nullptr; // Territory not found or no owner
 }
 

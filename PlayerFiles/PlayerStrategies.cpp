@@ -83,6 +83,7 @@ void HumanPlayerStrategy::issueOrder(Deck *deck)
     // Prompt player for selection
     std::cout << "Please issue an order type: ";
     std::getline(std::cin, orderType);
+    orderType = toLower(orderType);
 
     if (orderType == "deploy")
     {
@@ -387,23 +388,11 @@ void CheaterPlayerStrategy::issueOrder(Deck *deck)
     // Identify all attackable territories
     std::vector<Territory *> attackableTerritories = toAttack();
 
-    for (Territory *enemyTerritory : attackableTerritories)
-    {
-
-        std::cout << enemyTerritory->name;
-    }
-
     std::vector<std::pair<Player *, Territory *>> toConquer;
 
     for (Territory *enemyTerritory : attackableTerritories)
     {
         Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
-
-        if (!enemyPlayer)
-        {
-            std::cerr << "No owner found for territory: " << enemyTerritory->name << ". Skipping.\n";
-            continue;
-        }
 
         if (enemyPlayer)
         {
