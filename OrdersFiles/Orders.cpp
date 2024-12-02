@@ -379,7 +379,7 @@ void AdvanceOrder::execute()
             }
 
             // Enemy player will become aggressive player if neutral
-            if (dynamic_cast<NeutralPlayerStrategy*>(enemyPlayer->getStrategy()) != nullptr) {
+            if (enemyPlayer != nullptr && dynamic_cast<NeutralPlayerStrategy*>(enemyPlayer->getStrategy()) != nullptr) {
                 delete enemyPlayer->getStrategy();
 
                 enemyPlayer->setStrategy(new AggressivePlayerStrategy(enemyPlayer));

@@ -524,9 +524,11 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
             }
 
             if (!attackingTerritory.empty() && maxArmy > 0) {
+                int armiesToAdvance = maxArmy - 1;
+
                 Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
                 player->getOrdersList()->ordersVector.push_back(
-                        new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+                        new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, armiesToAdvance));
                 advancing = false;
                 break;
             }
@@ -541,7 +543,7 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
                 int highestArmy = 0;
                 Territory *strongestTerritory;
                 // Deploy armies to the strongest territories
-                for (Territory *strongestTerritories: player->getOwnedTerritories()) {
+                for (Territory *strongestTerritories: toAttack()) {
                     if (player->getNumArmies() > 0) {
                         // Find the territory with the strongest (highest army)
                         if (strongestTerritories->numberOfArmies >= highestArmy) {

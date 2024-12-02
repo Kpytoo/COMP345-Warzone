@@ -6,6 +6,8 @@
 #include "CommandProcessing.h"
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <random>
 
 /**
  * Default constructor for the GameEngine class.
@@ -992,27 +994,29 @@ void GameEngine::simulateGame(const std::vector<std::string>& strategies, int ma
         Player::players.push_back(player);
     }
 
-    // Distribute territories randomly
-    std::vector<Territory*> allTerritories;
-    for (const auto& territory : currentMap->territories) {
-        allTerritories.push_back(territory.second);
+    // Distribute continents randomly
+    std::vector<Continent*> allContinents;
+    for (const auto& territory : currentMap->continents) {
+        allContinents.push_back(territory.second);
     }
 
-    std::random_shuffle(allTerritories.begin(), allTerritories.end());
-    int territoriesPerPlayer = allTerritories.size() / Player::players.size();
-    int remainingTerritories = allTerritories.size() % Player::players.size();
-    auto it = allTerritories.begin();
+    // obtain a time-based seed:
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(allContinents.begin(), allContinents.end(), std::default_random_engine(seed));
 
     // Assign territories to players
+    int continentIdx = 0;
     for (Player* player : Player::players) {
-        std::vector<Territory*> ownedTerritories(it, it + territoriesPerPlayer);
-        player->setOwnedTerritories(ownedTerritories);
-        it += territoriesPerPlayer;
-    }
+        std::vector<Territory*> ownedTerritories;
 
-    // Distribute remaining territories
-    for (int i = 0; i < remainingTerritories; ++i) {
-        Player::players[i]->getOwnedTerritories().push_back(*it++);
+        auto assignedContinent = allContinents.at(continentIdx);
+
+        for (auto t : assignedContinent->childTerritories) {
+            ownedTerritories.push_back(t.second);
+        }
+
+        player->setOwnedTerritories(ownedTerritories);
+        continentIdx++;
     }
 
     // Initialize players with armies and cards
@@ -1021,6 +1025,12 @@ void GameEngine::simulateGame(const std::vector<std::string>& strategies, int ma
         for (int i = 0; i < 2; i++) {
             mainDeck->draw(*(player->getPlayerHand()));
         }
+    }
+
+    // Display players and their terriorities
+    std::cout<<"PLAYERS:"<<std::endl;
+    for (auto p : Player::players) {
+        std::cout<<*p;
     }
 
     // Main game loop
