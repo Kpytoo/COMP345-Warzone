@@ -212,7 +212,7 @@ void BenevolentPlayerStrategy::issueOrder(Deck *deck)
             if (armies_available > 0)
             {
                 // Deploy as many armies as possible to the weakest territory
-                int armiesToDeploy = std::min(player->getNumArmies(), weakestTerritory->numberOfArmies + 1);
+                int armiesToDeploy = player->getNumArmies(); // TODO: maybe update to spread out the armies more at the start
 
                 // Create a deploy order and add it to the player's orders list
                 player->getOrdersList()->add(new DeployOrder(player, weakestTerritory->name, armiesToDeploy));
@@ -233,10 +233,21 @@ void BenevolentPlayerStrategy::issueOrder(Deck *deck)
         {
             // Sort territories from weakest to strongest
             Territory *target = defendableTerritories.front(); // Weakest
-            Territory *source = defendableTerritories.back();  // Strongest
+            Territory *source = nullptr;  // Strongest
+            int maxArmies = 0;
+
+            for (Territory* territory : defendableTerritories) {
+                // Check if this territory is adjacent to the weakest territory
+                if (territory->adjacentTerritories.count(target->name) > 0) {
+                    if (territory->numberOfArmies > maxArmies) {
+                        maxArmies = territory->numberOfArmies;
+                        source = territory; // Get the strongest territory adjacent to target
+                    }
+                }
+            }
 
             // Only move armies if the source territory has enough to spare
-            if (source != target && source->numberOfArmies > 1)
+            if (source != target && source != nullptr && source->numberOfArmies > 1)
             {
                 int armiesToAdvance = source->numberOfArmies - 1;
 
@@ -476,7 +487,7 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
         int highestArmy = 0;
         Territory *strongestTerritory;
         // Deploy armies to the strongest territories
-        for (Territory *strongestTerritories : player->getOwnedTerritories())
+        for (Territory *strongestTerritories : toDefend())
         {
             // Find the territory with the strongest (highest army)
             if(strongestTerritories->numberOfArmies >= highestArmy)
@@ -487,7 +498,7 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
         }
 
         // Create a deploy order to be added to the aggressive player's order list
-        player->getOrdersList()->add(new DeployOrder(player, strongestTerritory->name, highestArmy));
+        player->getOrdersList()->add(new DeployOrder(player, strongestTerritory->name, player->reinforcement_units));
 
         deploying = false;
         return;
@@ -503,22 +514,23 @@ void AggressivePlayerStrategy::issueOrder(Deck *deck)
             // Find the owned territory with the largest army
             for(Territory *ownedTerritory : player->getOwnedTerritories())
             {
-                if(ownedTerritory->numberOfArmies > maxArmy)
-                {
-                    maxArmy = ownedTerritory->numberOfArmies;
-                    attackingTerritory = ownedTerritory->name;
+                // Check if this territory is adjacent
+                if (ownedTerritory->adjacentTerritories.count(enemyTerritory->name) > 0) {
+                    if (ownedTerritory->numberOfArmies > maxArmy) {
+                        maxArmy = ownedTerritory->numberOfArmies;
+                        attackingTerritory = ownedTerritory->name;
+                    }
                 }
             }
 
-            if (attackingTerritory.empty()) {
+            if (!attackingTerritory.empty() && maxArmy > 0) {
                 Player *enemyPlayer = player->FindTerritoryOwner(enemyTerritory->name);
                 player->getOrdersList()->ordersVector.push_back(
                         new AdvanceOrder(player, enemyPlayer, attackingTerritory, enemyTerritory->name, maxArmy));
+                advancing = false;
+                break;
             }
         }
-
-        advancing = false;
-        return;
     }
 
     if (bombing) {

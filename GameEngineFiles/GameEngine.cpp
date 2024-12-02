@@ -891,9 +891,10 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
     // Simulate the games for each map.
     for (size_t i = 0; i < maps.size(); ++i)
     {
+        std::cout<<"MAP : "<<maps[i]<<std::endl;
         for (int j = 0; j < numGames; ++j)
         {
-            std::cout<<"GAME : " << i+1 <<std::endl;
+            std::cout<<"GAME : " << j+1 <<std::endl;
 
             // Load and validate map
             setCurrentMap(new Map());
@@ -926,19 +927,18 @@ void GameEngine::startTournament(const std::vector<std::string>& maps, const std
 
     // Log the results of the simulated games.
     logFile << "Results:\n";
-    for (int game = 0; game < numGames; ++game)
+    for (int map = 0; map < maps.size(); ++map)
     {
         // Log the result for each game.
-        logFile << "Game " << (game + 1) << ": ";
+        logFile << "Map " << (map + 1) << ": ";
 
         // For each map, log the result of the game.
-        int numMap = 1;
-        for (size_t i = 0; i < maps.size(); ++i)
+        for (size_t i = 0; i < numGames; ++i)
         {
             // Result for this map and game
-            logFile << results[i][game];
+            logFile << results[map][i];
             
-            if (i != maps.size() - 1)
+            if (i != numGames - 1)
             {
                 logFile << ", ";
             }
