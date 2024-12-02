@@ -99,14 +99,11 @@ DeployOrder::DeployOrder()
  * @param tName The name of the territory where the army units are being deployed.
  * @param armyDeployed The number of army units being deployed to the territory.
  */
-DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed) : player(p), territoryDeployName(tName), army(armyDeployed)
+DeployOrder::DeployOrder(Player *p, const std::string tName, int armyDeployed)
+    : player(p), territoryDeployName(tName), army(armyDeployed)
 {
-    // Set the order type to "deploy", indicating this is a deployment order
     orderType = "deploy";
-    // Initialize the validOrder flag to false, meaning the order is not validated at creation
     validOrder = false;
-
-    player->reinforcement_units -= armyDeployed;
 }
 
 std::ostream &operator<<(std::ostream &COUT, const DeployOrder &ORDER)
@@ -175,39 +172,30 @@ void DeployOrder::validate()
  * Validates and then performs the deployment if valid.
  */
 void DeployOrder::execute()
+
 {
-    // Validate the deploy order before execution.
     DeployOrder::validate();
 
-    // If the order is valid, proceed with the execution.
     if (validOrder)
     {
-        // Call the base class execute method (Displaying the order type executing).
         Order::execute();
 
         for (Territory *t : player->toDefend())
         {
-            // If the target territory is found in the player's owned territories
             if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryDeployName))
             {
-                // Deploy the army units to the territory by adding the army units to the target territory.
-                t->numberOfArmies += army;
-                // Update the player's reinforcement pool to reflect the deployment.
-                player->setNumArmies(player->getNumArmies() - army);
-                // Notify that the deployment was successful.
+                t->numberOfArmies += army;                           // Add the armies to the target territory
+                player->setNumArmies(player->getNumArmies() - army); // Deduct armies from reinforcement pool
                 std::cout << "Successfully deployed " << army << " units to " << t->name << ".\n";
-                // Exit the loop once the deployment is completed.
                 break;
             }
         }
     }
-    // If the order is invalid, notify the player that the order will not be executed.
     else
     {
         std::cout << "Deploy order is invalid and will not be executed.\n";
     }
 }
-
 // ---------------------- Advance Order ----------------------
 
 /**
@@ -245,14 +233,15 @@ std::ostream &operator<<(std::ostream &COUT, const AdvanceOrder &ORDER)
  */
 void AdvanceOrder::validate()
 {
-    std::cout << "Validating advance order..." << std::endl;
+    std::cout << "Validating advance order: " << territoryAdvanceSName << " -> " << territoryAdvanceTName
+              << " with " << army << " armies.\n";
 
-    bool sFound = false;          // Source territory owned by the player
-    bool adjacent = false;        // Target territory is adjacent to the source
-    Territory *sourceT = nullptr; // Pointer to source territory
-    Territory *targetT = nullptr; // Pointer to target territory
+    bool sFound = false;
+    bool adjacent = false;
+    Territory *sourceT = nullptr;
+    Territory *targetT = nullptr;
 
-    // Check if player owns the source territory
+    // Check source territory
     for (Territory *t : player->getOwnedTerritories())
     {
         if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceSName))
@@ -265,13 +254,12 @@ void AdvanceOrder::validate()
 
     if (!sFound)
     {
-        std::cout << "Order Invalid: Source territory " << territoryAdvanceSName
-                  << " not found in " << player->getPlayerName() << "'s owned territories.\n";
+        std::cout << "Order Invalid: Source territory " << territoryAdvanceSName << " not found.\n";
         validOrder = false;
         return;
     }
 
-    // Check if the target territory is adjacent to the source
+    // Check adjacency
     for (const auto &pair : sourceT->adjacentTerritories)
     {
         if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
@@ -284,20 +272,19 @@ void AdvanceOrder::validate()
 
     if (!adjacent)
     {
-        std::cout << "Order Invalid: Target territory " << territoryAdvanceTName
-                  << " is not adjacent to source territory " << territoryAdvanceSName << ".\n";
+        std::cout << "Order Invalid: Target territory " << territoryAdvanceTName << " is not adjacent to source.\n";
         validOrder = false;
         return;
     }
 
-    // Check if the player has enough army units in the source territory to execute the order
+    // Validate army count
     if (sourceT->numberOfArmies >= army)
     {
         validOrder = true;
     }
     else
     {
-        std::cout << "Order Invalid: Insufficient armies in source territory " << territoryAdvanceSName << ".\n";
+        std::cout << "Order Invalid: Not enough armies in source territory " << territoryAdvanceSName << ".\n";
         validOrder = false;
     }
 }
@@ -330,28 +317,35 @@ void AdvanceOrder::execute()
             if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceSName))
             {
                 sourceT = t;
-                t->numberOfArmies -= army;
+                sourceT->numberOfArmies -= army; // Deduct armies
                 break;
             }
         }
 
+        if (!sourceT)
+        {
+            std::cerr << "Error: Source territory not found.\n";
+            return;
+        }
+
         bool targetOwned = false;
+        Territory *targetT = nullptr;
         for (Territory *t : player->getOwnedTerritories())
         {
             if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryAdvanceTName))
             {
                 targetOwned = true;
-                t->numberOfArmies += army;
+                t->numberOfArmies += army; // Add armies
                 std::cout << "Advanced " << army << " units from " << territoryAdvanceSName
                           << " to defend " << territoryAdvanceTName << ".\n";
                 break;
             }
         }
 
-        // Attack logic if target is not owned
+        // If target is not owned, proceed with attack logic
         if (!targetOwned)
         {
-            Territory *targetT = nullptr;
+            // Find the target territory among adjacent ones
             for (const auto &pair : sourceT->adjacentTerritories)
             {
                 if (GameEngine::toLowerCase(pair.second->name) == GameEngine::toLowerCase(territoryAdvanceTName))
@@ -361,18 +355,34 @@ void AdvanceOrder::execute()
                 }
             }
 
+            if (!targetT)
+            {
+                std::cerr << "Error: Target territory is not adjacent to source territory.\n";
+                return;
+            }
+
             int attackingUnits = army;
             int defendingUnits = targetT->numberOfArmies;
 
             std::mt19937 rng(static_cast<unsigned>(std::time(0)));
             std::uniform_int_distribution<int> dist(1, 100);
 
+            // Battle loop
             while (attackingUnits > 0 && defendingUnits > 0)
             {
                 if (dist(rng) < 60)
                     defendingUnits--;
                 if (dist(rng) < 70)
                     attackingUnits--;
+                if (attackingUnits == 0 || defendingUnits == 0)
+                    break; // Exit loop when one side loses
+            }
+
+            // Enemy player will become aggressive player if neutral
+            if (enemyPlayer != nullptr && dynamic_cast<NeutralPlayerStrategy*>(enemyPlayer->getStrategy()) != nullptr) {
+                delete enemyPlayer->getStrategy();
+
+                enemyPlayer->setStrategy(new AggressivePlayerStrategy(enemyPlayer));
             }
 
             if (defendingUnits == 0)
@@ -381,13 +391,16 @@ void AdvanceOrder::execute()
                 std::cout << "Attack successful: " << territoryAdvanceTName
                           << " conquered with " << attackingUnits << " remaining units.\n";
                 player->getOwnedTerritories().push_back(targetT);
-                if (enemyPlayer != nullptr) { // Remove conquered territory from enemy territory
+
+                if (enemyPlayer != nullptr)
+                {
                     enemyPlayer->getOwnedTerritories().erase(std::remove(enemyPlayer->getOwnedTerritories().begin(),
                                                                          enemyPlayer->getOwnedTerritories().end(), targetT),
                                                              enemyPlayer->getOwnedTerritories().end());
                 }
 
-                if (player->deck != nullptr) {
+                if (player->deck != nullptr)
+                {
                     player->deck->draw(*player->getPlayerHand());
                 }
             }
@@ -433,6 +446,10 @@ std::ostream &operator<<(std::ostream &COUT, const BombOrder &ORDER)
     COUT << ORDER.orderType << std::endl;
     return COUT;
 }
+void BombOrder::setPlayer(Player *p)
+{
+    player = p;
+}
 
 /**
  * @brief Validates the BombOrder.
@@ -449,11 +466,11 @@ void BombOrder::validate()
         return;
     }
 
-    bool targetIsEnemy = true;  // Assume target is enemy until proven otherwise
+    bool targetIsEnemy = true; // Assume target is enemy until proven otherwise
     bool hasAdjacentTerritory = false;
 
     // Check if the target territory is not owned by the player
-    for (Territory* t : player->getOwnedTerritories())
+    for (Territory *t : player->getOwnedTerritories())
     {
         if (GameEngine::toLowerCase(t->name) == GameEngine::toLowerCase(territoryBombName))
         {
@@ -463,7 +480,7 @@ void BombOrder::validate()
         }
 
         // Check if any of the player's territories are adjacent to the target
-        for (const auto& adjPair : t->adjacentTerritories)
+        for (const auto &adjPair : t->adjacentTerritories)
         {
             if (GameEngine::toLowerCase(adjPair.second->name) == GameEngine::toLowerCase(territoryBombName))
             {
@@ -474,7 +491,7 @@ void BombOrder::validate()
 
         if (hasAdjacentTerritory)
         {
-            break;  // Exit the loop if we found an adjacent territory
+            break; // Exit the loop if we found an adjacent territory
         }
     }
 
@@ -526,12 +543,22 @@ void BombOrder::execute()
     }
 }
 
+BombOrder::BombOrder(Player *player, const std::string &territoryBombName) : player(player),
+                                                                             territoryBombName(territoryBombName) {
+    // Sets the order type to "bomb"
+    orderType = "bomb";
+    // Initially invalid until validated
+    validOrder = false;
+}
+
 // ---------------------- BlockadeOrder Class Implementation ----------------------
 
 /**
  * @brief Constructor for the BlockadeOrder class.
  * Initializes the orderType as "blockade".
  */
+void BlockadeOrder::setPlayer(Player *p) { player = p; }
+
 BlockadeOrder::BlockadeOrder()
 {
     orderType = "blockade";
@@ -646,6 +673,8 @@ void BlockadeOrder::execute()
  * @brief Constructor for the AirliftOrder class.
  * Initializes the orderType as "airlift".
  */
+void AirliftOrder::setPlayer(Player *p) { player = p; }
+
 AirliftOrder::AirliftOrder()
 {
     orderType = "airlift";
@@ -682,6 +711,11 @@ std::ostream &operator<<(std::ostream &COUT, const AirliftOrder &ORDER)
 void AirliftOrder::validate()
 {
     std::cout << "Validating airlift order...\n";
+    for (Territory *t : player->getOwnedTerritories())
+    {
+
+        std::cout << t->name;
+    }
 
     if (!player)
     {
@@ -776,6 +810,10 @@ NegotiateOrder::NegotiateOrder()
 {
     orderType = "negotiate";
 }
+void NegotiateOrder::setPlayer(Player *p)
+{
+    player = p;
+}
 
 /**
  * Parameterized constructor for the NegotiateOrder class.
@@ -838,8 +876,8 @@ void NegotiateOrder::execute()
     }
 }
 
-NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme) {
-
+NegotiateOrder::NegotiateOrder(std::string pTargetNAme) : playerTargetName(pTargetNAme)
+{
 }
 
 // ---------------------- OrdersList Class Implementation ----------------------

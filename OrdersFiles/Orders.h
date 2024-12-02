@@ -242,6 +242,8 @@ public:
 class BombOrder : public Order
 {
 public:
+    void setPlayer(Player *p);
+
     std::string territoryBombName;
     Player *player;
 
@@ -257,6 +259,8 @@ public:
      * @param tBombName The name of the territory to bomb.
      */
     BombOrder(std::string tBombName);
+
+    BombOrder(Player *player, const std::string &territoryBombName);
 
     /**
      * @brief Validates the BombOrder.
@@ -281,13 +285,15 @@ public:
     // The name of the territory to block.
     std::string territoryBlockadeName;
     Player *player;
-    Player *neutralPlayer;
+    Player *neutralPlayer = nullptr;
 
     /**
      * @brief Constructor for BlockadeOrder.
      * Initializes the orderType to "blockade".
      */
     BlockadeOrder();
+
+    void setPlayer(Player *p);
 
     /**
      * Parameterized constructor for the BlockadeOrder class.
@@ -316,6 +322,8 @@ public:
 class AirliftOrder : public Order
 {
 public:
+    void setPlayer(Player *p);
+
     // The name of the territory from which the army will be airlifted.
     std::string territoryAirliftSName;
     // The name of the territory to which the army will be airlifted.
@@ -363,6 +371,7 @@ public:
     std::string playerTargetName;
     Player *player;
     static std::unordered_map<std::string, std::string> negotiatedPlayers;
+    void setPlayer(Player *p);
 
     /**
      * @brief Constructor for NegotiateOrder.

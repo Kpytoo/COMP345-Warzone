@@ -4,8 +4,7 @@
 #include "PlayerFiles/Player.h"
 #include "MapFiles/Map.h"
 #include "OrdersFiles/Orders.h"
-#include "CardsFiles/Cards.h" 
-
+#include "CardsFiles/Cards.h"
 
 // Function to test the Player class functionality
 void testPlayers()
@@ -36,8 +35,6 @@ void testPlayers()
     std::cout << "Player Details after Initialization:" << std::endl;
     std::cout << player1 << std::endl;
 
-    
-
     std::cout << "\nTerritories to Defend: "; // TODO: prob just print player object, should display everything needed
     for (auto &t : player1.getToDefendTerritories())
     {
@@ -52,11 +49,9 @@ void testPlayers()
     }
     std::cout << std::endl;
 
-   
-
     // Issue an order and display the updated orders list
     std::cout << "\nIssuing Order..." << std::endl;
-    //player1.issueOrder();
+    // player1.issueOrder();
     std::cout << "Order issued. Orders List:" << std::endl;
     std::cout << *(player1.getOrdersList()) << std::endl;
 
@@ -78,5 +73,4 @@ void testPlayers()
     delete t2;
     delete t3;
     delete t4;
-    
 }
