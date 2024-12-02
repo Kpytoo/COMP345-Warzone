@@ -4,6 +4,32 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * @brief Test driver function to demonstrate the Player Strategy pattern implementation
+ *
+ * This function demonstrates three key aspects of the Strategy pattern:
+ * 1. Different players can be assigned different strategies that lead to different behaviors
+ *    - Tests HumanPlayerStrategy, AggressivePlayerStrategy, BenevolentPlayerStrategy,
+ *      NeutralPlayerStrategy, and CheaterPlayerStrategy
+ *    - Shows how each strategy implements unique toDefend() and toAttack() behaviors
+ *    - Demonstrates different order issuing patterns for each strategy type
+ *
+ * 2. Strategy can be changed dynamically during gameplay
+ *    - Shows conversion of a Neutral player to an Aggressive player
+ *    - Demonstrates behavior changes after strategy switch
+ *
+ * 3. Human vs Computer decision making
+ *    - Shows how human players make decisions through user interaction
+ *    - Demonstrates automatic decision making for computer-controlled players
+ *
+ * The test uses a Montreal map with various territories assigned to different players.
+ * Each player is given initial armies and territories to demonstrate territory management
+ * and order issuing behaviors. The test also includes execution of issued orders and
+ * display of player information including card hands.
+ *
+ * Memory management: The function handles cleanup of all dynamically allocated objects
+ * including the game map, deck, and player objects.
+ */
 void testPlayerStrategies() {
     std::cout << "\n==================== Testing Player Strategies ====================\n";
 
